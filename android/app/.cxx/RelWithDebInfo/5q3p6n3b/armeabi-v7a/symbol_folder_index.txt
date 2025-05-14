@@ -1,0 +1,1 @@
+C:\Users\a\AndroidStudioProjects\thrive-frontend-main\build\app\intermediates\cxx\RelWithDebInfo\5q3p6n3b\obj\armeabi-v7a
