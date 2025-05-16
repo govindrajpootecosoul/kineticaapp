@@ -6,5 +6,6 @@ class ApiConfig {
 
   static const String salesSku = "$baseUrl/sales-sku-get";
   static const String pnlData = "$baseUrl/pnl-data";
+  //https://api.thrivebrands.ai/api/pnl-data
   static const String ukInventory = "$baseUrl/ukinventory-data";
 }

@@ -24,31 +24,42 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
     fetchData();
   }
 
-  Future<void> fetchData() async {
-    final response = await http.get(Uri.parse(ApiConfig.pnlData));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      allData = data;
-
-      // Extract unique months
-      final months = allData.map((e) {
-        final date = excelDateToDateTime(e['Year-Month']);
-        return DateFormat.yMMMM().format(date); // "April 2025"
-      }).toSet().toList();
-
-      months.sort((a, b) => a.compareTo(b)); // sort by date
-      setState(() {
-        availableMonths = months;
-        selectedMonth = months.isNotEmpty ? months.first : null;
-        updateSelectedMonthData();
-      });
-    } else {
-      throw Exception('Failed to load data');
-    }
+  DateTime excelDateToDateTime(double serial) {
+    return DateTime.fromMillisecondsSinceEpoch(
+        ((serial - 25569) * 86400000).round(),
+        isUtc: true);
   }
+  Future<void> fetchData() async {
+    try {
+      final response = await http.get(Uri.parse(ApiConfig.pnlData));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        allData = data;
 
-  DateTime excelDateToDateTime(int serial) {
-    return DateTime.fromMillisecondsSinceEpoch(((serial - 25569) * 86400000), isUtc: true);
+        final monthsSet = allData.map((e) {
+          final serial = (e['Year-Month'] as num).toDouble();
+          final date = excelDateToDateTime(serial);
+          return DateFormat.yMMMM().format(date);
+        }).toSet();
+
+        final months = monthsSet.toList();
+        months.sort((a, b) {
+          final dateA = DateFormat.yMMMM().parse(a);
+          final dateB = DateFormat.yMMMM().parse(b);
+          return dateA.compareTo(dateB);
+        });
+
+        setState(() {
+          availableMonths = months;
+          selectedMonth = months.isNotEmpty ? months.first : null;
+          updateSelectedMonthData();
+        });
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
   }
 
   void updateSelectedMonthData() {
@@ -209,3 +220,5 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
     );
   }
 }
+
+
