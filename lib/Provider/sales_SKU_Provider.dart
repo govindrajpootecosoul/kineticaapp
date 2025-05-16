@@ -51,7 +51,7 @@ class InventoryProvider with ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final response = await http.get(Uri.parse('http://192.168.50.92:4000/api/inventory'));
+      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/inventory'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         inventoryList = data.cast<Map<String, dynamic>>();
@@ -71,7 +71,7 @@ class InventoryProvider with ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final response = await http.get(Uri.parse('http://192.168.50.92:4000/api/inventory?sku=$sku'));
+      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/inventory?sku=$sku'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         inventoryList = data.cast<Map<String, dynamic>>();
@@ -91,7 +91,7 @@ class InventoryProvider with ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final response = await http.get(Uri.parse('http://192.168.50.92:4000/api/sku?q='));
+      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/sku?q='));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         skuList = data.cast<String>();

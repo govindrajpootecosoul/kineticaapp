@@ -5,7 +5,9 @@ import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../comman_Screens/productcard.dart';
 import '../../../utils/colors.dart';
-import '../financescreens/Finance_Executive_Screen.dart'; // Import the package
+import '../financescreens/Finance_Executive_Screen.dart';
+import '../graph/commanbarchar_file.dart';
+import '../utils/ApiConfig.dart'; // Import the package
 
 class NewHomeScreen extends StatefulWidget {
   @override
@@ -31,7 +33,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
 
 
   List<String> filterTypes = [
-    "today",
+   // "today",
     "last30days",
     "monthtodate",
     '6months',
@@ -101,9 +103,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
 
   Future<void> fetchDropdownData() async {
     try {
-      final stateRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/state?q='));
-      final cityRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/city?q='));
-      final skuRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/sku'));
+      final stateRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/state?q='));
+      final cityRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/city?q='));
+      final skuRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/sku'));
 
       if (stateRes.statusCode == 200) states = List<String>.from(json.decode(stateRes.body));
       if (cityRes.statusCode == 200) cities = List<String>.from(json.decode(cityRes.body));
@@ -134,10 +136,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
       final from = formatDate(startDate!);
       final to = formatDate(endDate!);
 
-      url = 'http://192.168.50.92:4000/api/sales/resion?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      url = '${ApiConfig.baseUrl}/sales/resion?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     } else {
       url =
-      'http://192.168.50.92:4000/api/sales/resion?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/sales/resion?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
 
     }
     //var request = http.Request('GET', url);
@@ -190,10 +192,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
       final to = formatDate(endDate!);
 
       url =
-      'http://192.168.50.92:4000/api/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     } else {
       url =
-      'http://192.168.50.92:4000/api/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     }
 
     var request = http.Request('GET', Uri.parse(url));
@@ -331,234 +333,13 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
     }
   }
 
+  final List<double> values = [10, 1500, 3000, 1102, 4003, 5000, 2007, 2700];
+  final List<String> labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Next'];
+
   @override
   Widget build(BuildContext context) {
     return
       Scaffold(
-      // appBar: AppBar(title: const Text("Sales Data Viewer")),
-      // body: Padding(
-      //   padding: const EdgeInsets.all(10.0),
-      //   child: Column(
-      //     children: [
-      //
-      //       SingleChildScrollView(
-      //        // scrollDirection: Axis.horizontal,
-      //         child: Row(
-      //           mainAxisAlignment: MainAxisAlignment.end,
-      //           children: [
-      //
-      //             SizedBox(
-      //               width: 190,
-      //               child: DropdownButtonFormField<String>(
-      //                 decoration: InputDecoration(
-      //                   hintText: "Select Filter Type",
-      //                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-      //                   enabledBorder: OutlineInputBorder(
-      //                     borderSide: BorderSide(color: Colors.blue, width: 1),
-      //                   ),
-      //                 ),
-      //                 items: filterTypes.map((type) {
-      //                   return DropdownMenuItem(
-      //                     value: type,
-      //                     child: Text(formatFilterType(type),
-      //                       overflow: TextOverflow.ellipsis,),
-      //                   );
-      //                 }).toList(),
-      //                 value: selectedFilterType,
-      //                 onChanged: (val) => onDropdownChanged(val, 'filter'),
-      //               ),
-      //             ),
-      //
-      //             if (selectedFilterType == 'custom')
-      //               Padding(
-      //                 padding: const EdgeInsets.only(left: 8.0),
-      //                 child: ElevatedButton.icon(
-      //                   onPressed: () => selectDateRange(context),
-      //                   icon: Icon(Icons.date_range),
-      //                   label: Text(
-      //                     startDate != null && endDate != null
-      //                         ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
-      //                         : "Select Date Range",
-      //                     overflow: TextOverflow.ellipsis,
-      //                   ),
-      //                 ),
-      //               ),
-      //
-      //             // SizedBox(width: 8), // optional spacing
-      //             // SizedBox(
-      //             //   width: 150,
-      //             //   child: DropdownSearch<String>(
-      //             //     items: states,
-      //             //     selectedItem: selectedState,
-      //             //     popupProps: PopupProps.menu(
-      //             //       showSearchBox: true,
-      //             //       searchFieldProps: TextFieldProps(
-      //             //         decoration: InputDecoration(
-      //             //           hintText: "Search State",
-      //             //           border: OutlineInputBorder(),
-      //             //         ),
-      //             //       ),
-      //             //     ),
-      //             //     dropdownDecoratorProps: DropDownDecoratorProps(
-      //             //       dropdownSearchDecoration: InputDecoration(
-      //             //         labelText: "State",
-      //             //         border: OutlineInputBorder(),
-      //             //       ),
-      //             //     ),
-      //             //     onChanged: (val) => onDropdownChanged(val, 'state'),
-      //             //   ),
-      //             // ),
-      //             //
-      //             // SizedBox(width: 8),
-      //             // SizedBox(
-      //             //   width: 150,
-      //             //   child: DropdownSearch<String>(
-      //             //     items: cities,
-      //             //     selectedItem: selectedCity,
-      //             //     popupProps: PopupProps.menu(
-      //             //       showSearchBox: true,
-      //             //       searchFieldProps: TextFieldProps(
-      //             //         decoration: InputDecoration(
-      //             //           hintText: "Search City",
-      //             //           border: OutlineInputBorder(),
-      //             //         ),
-      //             //       ),
-      //             //     ),
-      //             //     dropdownDecoratorProps: DropDownDecoratorProps(
-      //             //       dropdownSearchDecoration: InputDecoration(
-      //             //         labelText: "City",
-      //             //         border: OutlineInputBorder(),
-      //             //       ),
-      //             //     ),
-      //             //     onChanged: (val) => onDropdownChanged(val, 'city'),
-      //             //   ),
-      //             // ),
-      //             //
-      //             // SizedBox(width: 8),
-      //             // SizedBox(
-      //             //   width: 150,
-      //             //   child: DropdownSearch<String>(
-      //             //     items: skus,
-      //             //     selectedItem: selectedSku,
-      //             //     popupProps: PopupProps.menu(
-      //             //       showSearchBox: true,
-      //             //       searchFieldProps: TextFieldProps(
-      //             //         decoration: InputDecoration(
-      //             //           hintText: "Search SKU",
-      //             //           border: OutlineInputBorder(),
-      //             //         ),
-      //             //       ),
-      //             //     ),
-      //             //     dropdownDecoratorProps: DropDownDecoratorProps(
-      //             //       dropdownSearchDecoration: InputDecoration(
-      //             //         labelText: "SKU",
-      //             //         border: OutlineInputBorder(),
-      //             //       ),
-      //             //     ),
-      //             //     onChanged: (val) => onDropdownChanged(val, 'sku'),
-      //             //   ),
-      //             // ),
-      //
-      //           ],
-      //         ),
-      //       ),
-      //
-      //
-      //
-      //       const SizedBox(height: 20),
-      //
-      //       Expanded(
-      //         child: isLoading
-      //             ? Center(child: CircularProgressIndicator())
-      //             : errorMessage.isNotEmpty
-      //             ? Center(child: Text(errorMessage))
-      //             : Padding(
-      //             padding: const EdgeInsets.all(1.0),
-      //             child: Column(
-      //               children: [
-      //                 Row(children: [
-      //
-      //                   //    "previousTotalQuantity": 8596,
-      //                   //         "previousTotalSales": 389986.6699999971,
-      //                   //         "quantityChangePercent": "223.27% Profit",
-      //                   //         "salesChangePercent": "219.93% Profit"
-      //                   Expanded(
-      //                       child: MetricCard(
-      //                         title: "Overall Sales", value: '\$${salesData!['totalSales'].toStringAsFixed(2)}', compared: "${salesData!['comparison']['salesChangePercent']}",)),
-      //                   const SizedBox(width: 8),
-      //                   Expanded(
-      //                     child: MetricCard(
-      //                       title: "Units Orders", value:"${salesData!['totalQuantity']}", compared: "${salesData!['comparison']['quantityChangePercent']}",),),
-      //
-      //                 ],),
-      //
-      //
-      //                 const SizedBox(height: 16),
-      //
-      //                 Row(
-      //                   mainAxisAlignment:
-      //                   MainAxisAlignment.spaceEvenly,
-      //                   children: [
-      //                     Expanded(
-      //                         child: MetricCardcm(
-      //                            // title: "CM ₁", value: selectedMonthData['CM1'].toStringAsFixed(0)??"00.0")),
-      //                             title: "CM ₁", value: "00.0")),
-      //                     const SizedBox(width: 8),
-      //                     Expanded(
-      //                         child: MetricCardcm(
-      //                             title: "CM ₂",value: "00.0")),
-      //                     const SizedBox(width: 8),
-      //                     Expanded(
-      //                         child: MetricCardcm(
-      //                             title: "CM ₃",value: "00.0")),
-      //                   ],
-      //                 ),
-      //                 isLoading
-      //                     ? SizedBox(height: 10)
-      //                     : TextButton(
-      //                   onPressed: () {
-      //
-      //                     Navigator.push(
-      //                       context,
-      //                       MaterialPageRoute(builder: (context) => FinanceExecutiveScreen()),
-      //                     );
-      //
-      //                   },
-      //                   child: Row(
-      //                     mainAxisAlignment: MainAxisAlignment
-      //                         .center, // Centers the text
-      //                     children: [
-      //                       Text(
-      //                         'View full P&L',
-      //                         style: TextStyle(
-      //                           fontWeight: FontWeight.bold,
-      //                           color: AppColors.gold,
-      //                         ),
-      //                       ),
-      //                       SizedBox(
-      //                           width:
-      //                           8), // Space between text and icon
-      //                       Icon(Icons.arrow_forward,
-      //                           color: AppColors.gold),
-      //                     ],
-      //                   ),
-      //                 ),
-      //
-      //                 Divider(color: AppColors.gold, thickness: 0.5),
-      //
-      //
-      //
-      //
-      //               ],
-      //             )
-      //
-      //         ),
-      //       ),
-      //
-      //     ],
-      //   ),
-      // ),
-
         body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -572,8 +353,12 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
 
                           SizedBox(
                             width: 190,
+                            height: 33, // Fixed height
                             child: DropdownButtonFormField<String>(
+                              isDense: true, // Makes dropdown compact
+                              style: TextStyle(fontSize: 12, color: Colors.black), // Smaller font
                               decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Tight padding
                                 hintText: "Select Filter Type",
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                                 enabledBorder: OutlineInputBorder(
@@ -583,14 +368,19 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                               items: filterTypes.map((type) {
                                 return DropdownMenuItem(
                                   value: type,
-                                  child: Text(formatFilterType(type),
-                                    overflow: TextOverflow.ellipsis,),
+                                  child: Text(
+                                    formatFilterType(type),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(fontSize: 12, color: Colors.black),
+                                  ),
                                 );
                               }).toList(),
                               value: selectedFilterType,
                               onChanged: (val) => onDropdownChanged(val, 'filter'),
                             ),
                           ),
+
 
                           if (selectedFilterType == 'custom')
                             Padding(
@@ -687,7 +477,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                     ),
               // 🔼 Your dropdown and filter widgets here...
 
-              const SizedBox(height: 20),
+           //   const SizedBox(height: 20),
+
+
+              BarChartSample(values: values, labels: labels),
 
               /// This is your scrollable main content
               Expanded(
@@ -705,18 +498,18 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                             child: MetricCard(
                               title: "Overall Sales",
                               value:
-                              '\$${salesData!['totalSales'].toStringAsFixed(2)}',
+                              '£ ${salesData?['totalSales'].toStringAsFixed(2)}',
                               compared:
-                              "${salesData!['comparison']['salesChangePercent']}",
+                              "${salesData?['comparison']['salesChangePercent']}",
                             ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: MetricCard(
                               title: "Units Orders",
-                              value: "${salesData!['totalQuantity']}",
+                              value: "${salesData?['totalQuantity']}",
                               compared:
-                              "${salesData!['comparison']['quantityChangePercent']}",
+                              "${salesData?['comparison']['quantityChangePercent']}",
                             ),
                           ),
                         ],
@@ -728,7 +521,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                             child: MetricCardcm(
                               title: "AOV",
                               //value: "",
-                              value: (((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(2),
+                              value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(2)}",
 
 
 
@@ -739,8 +532,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                           Expanded(
                             child: MetricCardcm(
                               title: "Organic Sale",
-                              value: ((salesData!['totalSales'] ?? 0.0) - (adssales!['totalAdSales'] ?? 0.0))
-                                  .toStringAsFixed(2),
+                              value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))
+                                  .toStringAsFixed(2)}",
                               //value: salesData!['totalSales'] - adssales!['totalAdSales'],
                             //  value: ((double.tryParse(salesData!['totalSales'].toString()))-adssales!['totalAdSales']).toStringAsFixed(2),
 
@@ -755,7 +548,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                                               Expanded(
                                                 child: MetricCardcm(
                                                   title: "Adspend",
-                                                  value: (adssales!['totalAdSpend']).toStringAsFixed(2),
+                                                  value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(2)}",
 
 
                                                 ),
@@ -764,7 +557,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                                               Expanded(
                                                 child: MetricCardcm(
                                                   title: "Adsales",
-                                                  value: (adssales!['totalAdSales']).toStringAsFixed(2),
+                                                  value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(2)}",
+
 
 
                                                 ),
@@ -777,16 +571,15 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                                               Expanded(
                                                 child: MetricCardcm(
                                                   title: "ACOS",
-                                                  value: (adssales!['totalAdSpend'] / adssales!['totalAdSales']*100).toStringAsFixed(2) ?? "00",
+                                                  value: '${(adssales?['totalAdSpend'] / adssales?['totalAdSales']*100).toStringAsFixed(2) ?? "00"} %',
 
                                                 ),
                                               ),
-                                              const SizedBox(width: 8),
+                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: MetricCardcm(
                                                   title: "TACOS",
-                                                  value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
-
+                                                  value: "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 1) * 100).toStringAsFixed(2)} %",
                                                 ),
                                               ),
                                             ],
@@ -797,8 +590,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                                             children: [
                                               Expanded(
                                                 child: MetricCardcm(
-                                                  title: "OS %",
-                                                  value: (((salesData!['totalSales'] ?? 0.0) - (adssales!['totalAdSales'] ?? 0.0))/(salesData!['totalSales'] ?? 0.0)*100).toStringAsFixed(2),
+                                                  title: "Organic Sale",
+                                                  value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)}%"
 
                                                   //  value: (adssales!['totalAdSpend'] / adssales!['totalAdSales']*100).toStringAsFixed(2) ?? "00",
 
@@ -816,6 +609,34 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                                             ],
                                           ),
 
+                                          const SizedBox(height: 10),
+                                          if (!isLoading)
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => FinanceExecutiveScreen(),
+                                                  ),
+                                                );
+                                              },
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    'View full P&L',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      color: AppColors.gold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Icon(Icons.arrow_forward, color: AppColors.gold),
+                                                ],
+                                              ),
+                                            ),
+                                          Divider(color: AppColors.gold, thickness: 0.5),
+
                       const SizedBox(height: 16),
                                         ],
                                       ),
@@ -823,54 +644,107 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
               ),
 
               /// 🔽 Fixed bottom section (not scrollable)
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: MetricCardcm(title: "CM ₁", value: "00.0"),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: MetricCardcm(title: "CM ₂", value: "00.0"),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: MetricCardcm(title: "CM ₃", value: "00.0"),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  if (!isLoading)
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FinanceExecutiveScreen(),
-                          ),
-                        );
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'View full P&L',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.gold,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Icon(Icons.arrow_forward, color: AppColors.gold),
-                        ],
-                      ),
-                    ),
-                  Divider(color: AppColors.gold, thickness: 0.5),
-                ],
-              ),
+              // Column(
+              //   mainAxisSize: MainAxisSize.min,
+              //   children: [
+              //     // Row(
+              //     //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //     //   children: [
+              //     //     Expanded(
+              //     //         child: InkWell(
+              //     //             onTap: () {
+              //     //               print("CM1 Clicked");
+              //     //               showDialog(
+              //     //                 context: context,
+              //     //                 builder: (_) => AlertDialog(
+              //     //                   title: Text('CM1 '),
+              //     //                   content: Text('This is a popup message'),
+              //     //                   actions: [
+              //     //                     TextButton(
+              //     //                       onPressed: () => Navigator.pop(context),
+              //     //                       child: Text('OK'),
+              //     //                     )
+              //     //                   ],
+              //     //                 ),
+              //     //               );
+              //     //             },
+              //     //         child: MetricCardcm(title: "CM ₁", value: "00.0")),
+              //     //     ),
+              //     //     const SizedBox(width: 8),
+              //     //     Expanded(
+              //     //
+              //     //       child: InkWell(
+              //     //           onTap: () {
+              //     //             print("CM2 Clicked");
+              //     //             showDialog(
+              //     //               context: context,
+              //     //               builder: (_) => AlertDialog(
+              //     //                 title: Text('CM2 '),
+              //     //                 content: Text('This is a popup message'),
+              //     //                 actions: [
+              //     //                   TextButton(
+              //     //                     onPressed: () => Navigator.pop(context),
+              //     //                     child: Text('OK'),
+              //     //                   )
+              //     //                 ],
+              //     //               ),
+              //     //             );
+              //     //           },
+              //     //           child: MetricCardcm(title: "CM ₂", value: "00.0")),
+              //     //     ),
+              //     //     const SizedBox(width: 8),
+              //     //     Expanded(
+              //     //
+              //     //       child: InkWell(
+              //     //           onTap: () {
+              //     //             print("CM3 Clicked");
+              //     //             showDialog(
+              //     //               context: context,
+              //     //               builder: (_) => AlertDialog(
+              //     //                 title: Text('CM3 '),
+              //     //                 content: Text('This is a popup message'),
+              //     //                 actions: [
+              //     //                   TextButton(
+              //     //                     onPressed: () => Navigator.pop(context),
+              //     //                     child: Text('OK'),
+              //     //                   )
+              //     //                 ],
+              //     //               ),
+              //     //             );
+              //     //           },
+              //     //           child: MetricCardcm(title: "CM ₃", value: "00.0")),
+              //     //     ),
+              //     //   ],
+              //     // ),
+              //     const SizedBox(height: 10),
+              //     if (!isLoading)
+              //       TextButton(
+              //         onPressed: () {
+              //           Navigator.push(
+              //             context,
+              //             MaterialPageRoute(
+              //               builder: (context) => FinanceExecutiveScreen(),
+              //             ),
+              //           );
+              //         },
+              //         child: Row(
+              //           mainAxisAlignment: MainAxisAlignment.center,
+              //           children: [
+              //             Text(
+              //               'View full P&L',
+              //               style: TextStyle(
+              //                 fontWeight: FontWeight.bold,
+              //                 color: AppColors.gold,
+              //               ),
+              //             ),
+              //             const SizedBox(width: 8),
+              //             Icon(Icons.arrow_forward, color: AppColors.gold),
+              //           ],
+              //         ),
+              //       ),
+              //     Divider(color: AppColors.gold, thickness: 0.5),
+              //   ],
+              // ),
             ],
           ),
         ),
@@ -878,7 +752,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
 
       );
   }
-}
+}//write complete steps for create bussines account in google play console for publish app in android play store briefly explainin  excel sheet and also use links because this sheet in shared with client and client is non tech so  explain proper understand and purchase accound what we need whats kinds or id name etc
 
 class MetricCard extends StatelessWidget {
   final String title;

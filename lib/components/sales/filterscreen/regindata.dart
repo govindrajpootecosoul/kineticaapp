@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../utils/ApiConfig.dart';
+
 
 class SalesApp extends StatelessWidget {
   @override
@@ -29,7 +31,7 @@ class _SalesScreenState extends State<SalesScreen> {
   }
 
   Future<void> fetchSalesData() async {
-    var url = Uri.parse('http://192.168.50.92:4000/api/sales/resion?filterType=year&state=Worcestershire');
+    var url = Uri.parse('${ApiConfig.baseUrl}/sales/resion?filterType=year&state=Worcestershire');
     var request = http.Request('GET', url);
     try {
       http.StreamedResponse response = await request.send();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../financescreens/finance_sku.dart';
+import '../../graph/barchart.dart';
 import '../../testingfiles/new_testing1.dart';
 import '../profit_loss.dart';
 import 'aging_screen.dart';
@@ -16,7 +17,7 @@ class InventoryTabScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
          // title: Text("Inventory Tabs"),
@@ -30,7 +31,7 @@ class InventoryTabScreen extends StatelessWidget {
               Tab(text: "Executive"),
               Tab(text: "SKU"),
               Tab(text: "Inventory Details"),
-              Tab(text: "Shipment Details"),
+            //  Tab(text: "Shipment Details"),
               Tab(text: "Ageing"),
               // Tab(text: "P&L"),
             ],
@@ -44,9 +45,9 @@ class InventoryTabScreen extends StatelessWidget {
             //NewFinanceSkuScreen(),
             //Center(child: Text("Executive Content")),
             ///InventoryDetails(),
-
+            //BarChartSample4(),
             New_inventrory_details(),
-            New_shipment_details(),
+            //New_shipment_details(),
             AgingScreen_details(),
 
            // Testingsku(),

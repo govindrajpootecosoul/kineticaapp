@@ -42,18 +42,18 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
     "Warehouse Inventory": "afn-warehouse-quantity",
     "Total Sellable": "afn-fulfillable-quantity",
 
-    "0-30 Days": "inv-age-0-to-30-days",
-    "31-60 Days": "inv-age-31-to-60-days",
-    "61-90 Days": "inv-age-61-to-90-days",
-    "91-180 Days": "inv-age-91-to-180-days",
-    "181-270 Days": "inv-age-181-to-270-days",
-    "271-365 Days": "inv-age-271-to-365-days",
+    "0-30 Days": "inv_age_0_to_30_days",
+    "31-60 Days": "inv_age_31_to_60_days",
+    "61-90 Days": "inv_age_61_to_90_days",
+    "91-180 Days": "inv_age_91_to_180_days",
+    "181-270 Days": "inv_age_181_to_270_days",
+    "271-365 Days": "inv_age_271_to_365_days",
     "365+ Days": "inv-age-365-plus-days",
 
-    "Unit Shipped Till 7 Days": "units-shipped-t7",
-    "Unit Shipped Last 30 Days": "units-shipped-t30",
-    "Unit Shipped Last 60 Days": "units-shipped-t60",
-    "Unit Shipped Last 90 Days": "units-shipped-t90",
+    "Unit Shipped Till 7 Days": "units_shipped_t7",
+    "Unit Shipped Last 30 Days": "units_shipped_t30",
+    "Unit Shipped Last 60 Days": "units_shipped_t60",
+    "Unit Shipped Last 90 Days": "units_shipped_t90",
 
 
 
@@ -62,12 +62,12 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
     //         "units-shipped-t60": 18,
     //         "units-shipped-t90": 19,
 
-    "DOS": "afn-inbound-receiving-quantity",
+    "DOS": "afn_inbound_receiving_quantity",
     "Customer Reserved": "Customer_reserved",
-    "FC Transfer": "afn-fc-transfer",
-    "FC Processing": "afn-fc-processing",
-    "Unfulfilled": "afn-unfulfillable-quantity",
-    "Inbound Recieving": "afn-inbound-receiving-quantity",
+    "FC Transfer": "afn_fc_transfer",
+    "FC Processing": "afn_fc_processing",
+    "Unfulfilled": "afn_unfulfillable_quantity",
+    "Inbound Recieving": "afn_inbound_receiving_quantity",
   };
 
   List<dynamic> inventoryList = [];
@@ -89,7 +89,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
   Future<void> fetchSkuList() async {
     try {
       var dio = Dio();
-      var response = await dio.get('http://192.168.50.92:4000/api/sku?q=');
+      var response = await dio.get('${ApiConfig.baseUrl}/sku?q=');
 
       if (response.statusCode == 200) {
         setState(() {
@@ -119,8 +119,8 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
     try {
       var dio = Dio();
       String url = selectedSku == "All"
-          ? 'http://192.168.50.92:4000/api/inventory'  // Fetch all data
-          : 'http://192.168.50.92:4000/api/inventory?sku=$selectedSku';  // Fetch based on selected SKU
+          ? '${ApiConfig.baseUrl}/inventory'  // Fetch all data
+          : '${ApiConfig.baseUrl}/inventory?sku=$selectedSku';  // Fetch based on selected SKU
 
       var response = await dio.get(url);
 

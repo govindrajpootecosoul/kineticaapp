@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:dropdown_search/dropdown_search.dart';
 
 import '../../../comman_Screens/productcard.dart';
+import '../../../graph/commanbarchar_file.dart';
+import '../../../utils/ApiConfig.dart';
 import '../../../utils/colors.dart'; // Import the package
 
 class Filter_SalesRereginwiseScreen extends StatefulWidget {
@@ -30,7 +32,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
 
 
   List<String> filterTypes = [
-    "today",
+    //"today",
     "last30days",
     "monthtodate",
     '6months',
@@ -96,9 +98,9 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
 
   Future<void> fetchDropdownData() async {
     try {
-      final stateRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/state?q='));
-      final cityRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/city?q='));
-      final skuRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/sku'));
+      final stateRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/state?q='));
+      final cityRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/city?q='));
+      final skuRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/sku'));
 
       if (stateRes.statusCode == 200) states = List<String>.from(json.decode(stateRes.body));
       if (cityRes.statusCode == 200) cities = List<String>.from(json.decode(cityRes.body));
@@ -128,10 +130,10 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
       final from = formatDate(startDate!);
       final to = formatDate(endDate!);
 
-      url = 'http://192.168.50.92:4000/api/sales/resion?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      url = '${ApiConfig.baseUrl}/sales/resion?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     } else {
       url =
-      'http://192.168.50.92:4000/api/sales/resion?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/sales/resion?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
 
     }
     //var request = http.Request('GET', url);
@@ -183,10 +185,10 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
       final to = formatDate(endDate!);
 
       url =
-      'http://192.168.50.92:4000/api/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     } else {
       url =
-      'http://192.168.50.92:4000/api/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     }
 
     var request = http.Request('GET', Uri.parse(url));
@@ -260,6 +262,12 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
     }
   }
 
+
+  final List<double> values = [100, 150, 300, 112, 403, 500, 207, 270];
+  final List<String> labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Next'];
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -276,8 +284,12 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
 
                   SizedBox(
                     width: 190,
+                    height: 33, // Fixed height
                     child: DropdownButtonFormField<String>(
+                      isDense: true, // Makes dropdown compact
+                      style: TextStyle(fontSize: 12, color: Colors.black), // Smaller font
                       decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Tight padding
                         hintText: "Select Filter Type",
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                         enabledBorder: OutlineInputBorder(
@@ -287,14 +299,19 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                       items: filterTypes.map((type) {
                         return DropdownMenuItem(
                           value: type,
-                          child: Text(formatFilterType(type),
-                            overflow: TextOverflow.ellipsis,),
+                          child: Text(
+                            formatFilterType(type),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 12, color: Colors.black),
+                          ),
                         );
                       }).toList(),
                       value: selectedFilterType,
                       onChanged: (val) => onDropdownChanged(val, 'filter'),
                     ),
                   ),
+
 
                   if (selectedFilterType == 'custom')
                     Padding(
@@ -314,6 +331,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                   SizedBox(width: 8), // optional spacing
                   SizedBox(
                     width: 150,
+                    height: 33,
                     child: DropdownSearch<String>(
                       items: states,
                       selectedItem: selectedState,
@@ -339,6 +357,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                   SizedBox(width: 8),
                   SizedBox(
                     width: 150,
+                    height: 33,
                     child: DropdownSearch<String>(
                       items: cities,
                       selectedItem: selectedCity,
@@ -364,6 +383,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                   SizedBox(width: 8),
                   SizedBox(
                     width: 150,
+                    height: 33,
                     child: DropdownSearch<String>(
                       items: skus,
                       selectedItem: selectedSku,
@@ -390,154 +410,156 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
               ),
             ),
 
-
-
             const SizedBox(height: 20),
+            BarChartSample(values: values, labels: labels),
+           // const SizedBox(height: 20),
 
             Expanded(
-              child: isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : errorMessage.isNotEmpty
-                  ? Center(child: Text(errorMessage))
-                  : Padding(
-                padding: const EdgeInsets.all(1.0),
-                child: Column(
-                  children: [
-                    Row(children: [
-
-                      //    "previousTotalQuantity": 8596,
-                      //         "previousTotalSales": 389986.6699999971,
-                      //         "quantityChangePercent": "223.27% Profit",
-                      //         "salesChangePercent": "219.93% Profit"
-                    Expanded(
-                    child: MetricCard(
-                    title: "Overall Sales", value: '\$${salesData!['totalSales'].toStringAsFixed(2)}', compared: "${salesData!['comparison']['salesChangePercent']}",)),
-                    const SizedBox(width: 8),
-                    Expanded(
+              child: SingleChildScrollView(
+                child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : errorMessage.isNotEmpty
+                    ? Center(child: Text(errorMessage))
+                    : Padding(
+                  padding: const EdgeInsets.all(1.0),
+                  child: Column(
+                    children: [
+                      Row(children: [
+              
+                        //    "previousTotalQuantity": 8596,
+                        //         "previousTotalSales": 389986.6699999971,
+                        //         "quantityChangePercent": "223.27% Profit",
+                        //         "salesChangePercent": "219.93% Profit"
+                      Expanded(
                       child: MetricCard(
-                          title: "Units Orders", value:"${salesData!['totalQuantity']}", compared: "${salesData!['comparison']['quantityChangePercent']}",),),
-
-                      ],),
-
-                    SizedBox(height: 10,),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: MetricCardcm(
-                            title: "AOV",
-                            //value: "",
-                            value: (((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(2),
-
-
-
-                            //  totalOrders
+                      title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: MetricCard(
+                            title: "Units Orders", value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",),),
+              
+                        ],),
+              
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "AOV",
+                              //value: "",
+                              value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+              
+              
+              
+                              //  totalOrders
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: MetricCardcm(
-                            title: "Organic Sale",
-                            value: ((salesData!['totalSales'] ?? 0.0) - (adssales!['totalAdSales'] ?? 0.0)).toStringAsFixed(2),
-                            //value: salesData!['totalSales'] - adssales!['totalAdSales'],
-                            //  value: ((double.tryParse(salesData!['totalSales'].toString()))-adssales!['totalAdSales']).toStringAsFixed(2),
-
-
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Organic Sale",
+                              value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+                              //value: salesData!['totalSales'] - adssales!['totalAdSales'],
+                              //  value: ((double.tryParse(salesData!['totalSales'].toString()))-adssales!['totalAdSales']).toStringAsFixed(2),
+              
+              
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: MetricCardcm(
-                            title: "Adspend",
-                            value: (adssales!['totalAdSpend']).toStringAsFixed(2),
-
-
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Ad Spend",
+                              value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
+              
+              
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: MetricCardcm(
-                            title: "Adsales",
-                            value: (adssales!['totalAdSales']).toStringAsFixed(2),
-
-
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Ad Sales",
+                              value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+              
+              
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: MetricCardcm(
-                            title: "ACOS",
-                            value: (adssales!['totalAdSpend'] / adssales!['totalAdSales']*100).toStringAsFixed(2) ?? "00",
-
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "ACOS",
+                              value: "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: MetricCardcm(
-                            title: "TACOS",
-                            value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
-
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "TACOS",
+                              value: "${((adssales?['totalAdSales'] ?? 0) /
+    (salesData?['totalSales'] ?? 1) * 100)
+        .toStringAsFixed(0)} %"
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+              
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Organic Sale",
+                              value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(0)} %",
 
-                    SizedBox(height: 10,),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: MetricCardcm(
-                            title: "OS %",
-                            value: (((salesData!['totalSales'] ?? 0.0) - (adssales!['totalAdSales'] ?? 0.0))/(salesData!['totalSales'] ?? 0.0)*100).toStringAsFixed(2),
-
-                          //  value: (adssales!['totalAdSpend'] / adssales!['totalAdSales']*100).toStringAsFixed(2) ?? "00",
-
+                            //  value: (adssales!['totalAdSpend'] / adssales!['totalAdSales']*100).toStringAsFixed(2) ?? "00",
+              
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: MetricCardcm(
-                            title: "",//DOS
-                            value: "",
-                           // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
-
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "",//DOS
+                              value: "",
+                             // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
+              
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-
-
-                  ],
-                )
-
-                // ListView(
-                //   children: [
-                //     Text("Total Quantity: ${salesData!['totalQuantity']}", style: TextStyle(fontSize: 18)),
-                //     Text("Total Sales: \$${salesData!['totalSales'].toStringAsFixed(2)}", style: TextStyle(fontSize: 18)),
-                //     SizedBox(height: 20),
-                //     Text("Monthly Breakdown:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                //     ...List.generate(salesData!['breakdown'].length, (index) {
-                //       final item = salesData!['breakdown'][index];
-                //       return ListTile(
-                //         title: Text("${item['date']}"),
-                //         subtitle: Text("Quantity: ${item['totalQuantity']} - Sales: \$${item['totalSales'].toStringAsFixed(2)}"),
-                //       );
-                //     }),
-                //     SizedBox(height: 20),
-                //     Text("Comparison:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                //     Text("Previous Quantity: ${salesData!['comparison']['previousTotalQuantity']}"),
-                //     Text("Previous Sales: \$${salesData!['comparison']['previousTotalSales'].toStringAsFixed(2)}"),
-                //     Text("Quantity Change: ${salesData!['comparison']['quantityChangePercent']}"),
-                //     Text("Sales Change: ${salesData!['comparison']['salesChangePercent']}"),
-                //   ],
-                // ),
+                        ],
+                      ),
+              
+              
+                    ],
+                  )
+              
+                  // ListView(
+                  //   children: [
+                  //     Text("Total Quantity: ${salesData!['totalQuantity']}", style: TextStyle(fontSize: 18)),
+                  //     Text("Total Sales: \$${salesData!['totalSales'].toStringAsFixed(2)}", style: TextStyle(fontSize: 18)),
+                  //     SizedBox(height: 20),
+                  //     Text("Monthly Breakdown:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  //     ...List.generate(salesData!['breakdown'].length, (index) {
+                  //       final item = salesData!['breakdown'][index];
+                  //       return ListTile(
+                  //         title: Text("${item['date']}"),
+                  //         subtitle: Text("Quantity: ${item['totalQuantity']} - Sales: \$${item['totalSales'].toStringAsFixed(2)}"),
+                  //       );
+                  //     }),
+                  //     SizedBox(height: 20),
+                  //     Text("Comparison:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  //     Text("Previous Quantity: ${salesData!['comparison']['previousTotalQuantity']}"),
+                  //     Text("Previous Sales: \$${salesData!['comparison']['previousTotalSales'].toStringAsFixed(2)}"),
+                  //     Text("Quantity Change: ${salesData!['comparison']['quantityChangePercent']}"),
+                  //     Text("Sales Change: ${salesData!['comparison']['salesChangePercent']}"),
+                  //   ],
+                  // ),
+                ),
               ),
             ),
 

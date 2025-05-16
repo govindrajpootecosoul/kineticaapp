@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/utils/ApiConfig.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -88,9 +89,9 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
 
   Future<void> fetchDropdownData() async {
     try {
-      final stateRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/state?q='));
-      final cityRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/city?q='));
-      final skuRes = await http.get(Uri.parse('http://192.168.50.92:4000/api/sku'));
+      final stateRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/state?q='));
+      final cityRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/city?q='));
+      final skuRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/sku'));
 
       if (stateRes.statusCode == 200) states = List<String>.from(json.decode(stateRes.body));
       if (cityRes.statusCode == 200) cities = List<String>.from(json.decode(cityRes.body));
@@ -101,6 +102,7 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
       print('Error fetching dropdown data: $e');
     }
   }
+
 
   String formatDate(DateTime date) =>
       "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
@@ -121,12 +123,11 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
       final to = formatDate(endDate!);
 
       url =
-      'http://192.168.50.92:4000/api/sales?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/sales?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     } else {
       url =
-      'http://192.168.50.92:4000/api/sales?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/sales?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     }
-
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -134,6 +135,7 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
         List<SalesSku> tempSalesData = [];
 
         for (var item in parsedJson) {
+          print("qwertyuiop::: ${parsedJson}");
           var sku = item['SKU'];
           var totalQuantity = item['totalQuantity'];
           var totalSales = item['totalSales'];
@@ -403,28 +405,52 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
                   ? const Center(child: CircularProgressIndicator())
                   : salesData.isEmpty
                   ? const Center(child: Text("No data found."))
-                  : ListView.builder(
-                itemCount: salesData.length,
-                itemBuilder: (context, index) {
-                  final skuData = salesData[index];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: skuData.records.map((record) {
-                      final Map<String, dynamic> product = {
-                        'name': record.productName,
-                        'SKU': skuData.sku,
-                        'Quantity': skuData.totalQuantity,
-                        //'organicSales': record.organicSalesPercentage,
-                        'asin': record.asin,
-                        'Total_Sales': skuData.totalSales,
-                        //'returnRevenue': record.returnRevenuePercentage,
-                      };
-                      return ProductCard(product: product);
-                    }).toList(),
-                  );
-                },
+                  : ListView(
+                children: salesData.expand((skuData) {
+                  return skuData.records.map((record) {
+                    final Map<String, dynamic> product = {
+                      'name': record.productName,
+                      'SKU': skuData.sku,
+                      'Quantity': skuData.totalQuantity,
+                      //'organicSales': record.organicSalesPercentage,
+                      'asin': record.asin,
+                      'Total_Sales': skuData.totalSales,
+                      //'returnRevenue': record.returnRevenuePercentage,
+                    };
+                    return ProductCard(product: product);
+                  }).toList();
+                }).toList(),
               ),
             ),
+
+
+            // Expanded(
+            //   child: isLoading
+            //       ? const Center(child: CircularProgressIndicator())
+            //       : salesData.isEmpty
+            //       ? const Center(child: Text("No data found."))
+            //       : ListView.builder(
+            //     itemCount: salesData.length,
+            //     itemBuilder: (context, index) {
+            //       final skuData = salesData[index];
+            //       return Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: skuData.records.map((record) {
+            //           final Map<String, dynamic> product = {
+            //             'name': record.productName,
+            //             'SKU': skuData.sku,
+            //             'Quantity': skuData.totalQuantity,
+            //             //'organicSales': record.organicSalesPercentage,
+            //             'asin': record.asin,
+            //             'Total_Sales': skuData.totalSales,
+            //             //'returnRevenue': record.returnRevenuePercentage,
+            //           };
+            //           return ProductCard(product: product);
+            //         }).toList(),
+            //       );
+            //     },
+            //   ),
+            // ),
 
           ],
         ),

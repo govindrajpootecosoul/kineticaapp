@@ -467,14 +467,14 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
 
   final Map<String, String> fieldMapping = {
     "Warehouse Inventory": "afn-warehouse-quantity",
-    "Total Sellable": "afn-fulfillable-quantity",
+    "Total Sellable": "afn_fulfillable_quantity",
     "Amazon Reserved": "Amazon Reserved",
-    "Inventory Age": "inv-age-181-to-270-days"+"FC_Transfer",
+    "Inventory Age": "inv_age_181_to_270_days"+"FC_Transfer",
     "Customer Reserved": "Customer_reserved",
     "FC Transfer": "FC_Transfer",
     "FC Processing": "FC_Processing",
-    "Unfulfilled": "afn-unsellable-quantity",
-    "Inbound Recieving": "afn-inbound-receiving-quantity",
+    "Unfulfilled": "afn_unsellable_quantity",
+    "Inbound Recieving": "afn_inbound_receiving_quantity",
   };
 
   List<dynamic> inventoryList = [];
@@ -495,7 +495,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   Future<void> fetchSkuList() async {
     try {
       var dio = Dio();
-      var response = await dio.get('http://192.168.50.92:4000/api/sku?q=');
+      var response = await dio.get('${ApiConfig.baseUrl}/sku?q=');
 
       if (response.statusCode == 200) {
         setState(() {
@@ -525,8 +525,8 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
     try {
       var dio = Dio();
       String url = selectedSku == "All"
-          ? 'http://192.168.50.92:4000/api/inventory'  // Fetch all data
-          : 'http://192.168.50.92:4000/api/inventory?sku=$selectedSku';  // Fetch based on selected SKU
+          ? '${ApiConfig.baseUrl}/inventory'  // Fetch all data
+          : '${ApiConfig.baseUrl}/inventory?sku=$selectedSku';  // Fetch based on selected SKU
 
       var response = await dio.get(url);
 
@@ -556,8 +556,28 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
         preferredSize: const Size.fromHeight(60),
         child: AppBar(
           title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
             children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton<String>(
+                  value: selectedSku,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedSku = newValue;
+                      isLoading = true; // Set loading state before fetching new data
+                      fetchInventoryData(); // Fetch data with the new SKU
+                    });
+                  },
+                  items: skuList.map<DropdownMenuItem<String>>((String sku) {
+                    return DropdownMenuItem<String>(
+                      value: sku,
+                      child: Text(sku),
+                    );
+                  }).toList(),
+                ),
+              ),
               GestureDetector(
                 onTap: () async {
                   final List<String>? selectedValues = await showDialog(
@@ -601,25 +621,6 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
       body: Column(
         children: [
           // Dropdown for SKU selection
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButton<String>(
-              value: selectedSku,
-              onChanged: (newValue) {
-                setState(() {
-                  selectedSku = newValue;
-                  isLoading = true; // Set loading state before fetching new data
-                  fetchInventoryData(); // Fetch data with the new SKU
-                });
-              },
-              items: skuList.map<DropdownMenuItem<String>>((String sku) {
-                return DropdownMenuItem<String>(
-                  value: sku,
-                  child: Text(sku),
-                );
-              }).toList(),
-            ),
-          ),
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -693,10 +694,10 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
                               String value;
 
                               if (label == "Inventory Age") {
-                                final invAge = item["inv-age-0-to-30-days"] ?? 0;
-                                final invAge60 = item["inv-age-31-to-60-days"] ?? 0;
-                                final invAge90 = item["inv-age-61-to-90-days"] ?? 0;
-                                final invAge180 = item["inv-age-91-to-180-days"] ?? 0;
+                                final invAge = item["inv_age_0_to_30_days"] ?? 0;
+                                final invAge60 = item["inv_age_31_to_60_days"] ?? 0;
+                                final invAge90 = item["inv_age_61_to_90_days"] ?? 0;
+                                final invAge180 = item["inv_age_91_to_180_days"] ?? 0;
                                 value = (invAge + invAge60 + invAge90 + invAge180).toString();
                               } else {
                                 value = item[fieldMapping[label]]?.toString() ?? "0";

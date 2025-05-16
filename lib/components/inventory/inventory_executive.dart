@@ -275,13 +275,14 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
   Future<void> fetchExecutiveData() async {
     try {
       var dio = Dio();
-      var response = await dio.get(ApiConfig.ukInventory);
+      var response = await dio.get('${ApiConfig.baseUrl}/inventory');
+      //var response = await dio.get(ApiConfig.ukInventory);
 
       if (response.statusCode == 200) {
         setState(() {
           inventoryList = response.data;
           int totalQuantity = getTotalFulfillableQuantity(inventoryList);
-          print("Total afn-fulfillable-quantity: $totalQuantity");
+          print("Total afn_fulfillable_quantity: $totalQuantity");
           Amazoninventorysum=totalQuantity.toString();
 
 
@@ -321,8 +322,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
   int getTotalFulfillableQuantity(List<dynamic> inventoryList) {
     int total = 0;
     for (var item in inventoryList) {
-      if (item['afn-fulfillable-quantity'] != null) {
-        total += int.tryParse(item['afn-fulfillable-quantity'].toString()) ?? 0;
+      if (item['afn_fulfillable_quantity'] != null) {
+        total += int.tryParse(item['afn_fulfillable_quantity'].toString()) ?? 0;
 
       }
     }
@@ -356,8 +357,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
     int count = 0;
 
     for (var item in inventoryList) {
-      if (item['days-of-supply'] != null) {
-        total += int.tryParse(item['days-of-supply'].toString()) ?? 0;
+      if (item['days_of_supply'] != null) {
+        total += int.tryParse(item['days_of_supply'].toString()) ?? 0;
         count++;
       }
     }
@@ -389,8 +390,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
   int getTotalLISFCOST(List<dynamic> inventoryList) {
     int total = 0;
     for (var item in inventoryList) {
-      if (item['estimated-storage-cost-next-month'] != null) {
-        total += int.tryParse(item['estimated-storage-cost-next-month'].toString()) ?? 0;
+      if (item['estimated_storage_cost_next_month'] != null) {
+        total += int.tryParse(item['estimated_storage_cost_next_month'].toString()) ?? 0;
       }
     }
     return total;
@@ -400,8 +401,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
   int getStorageCostQuantity(List<dynamic> inventoryList) {
     int total = 0;
     for (var item in inventoryList) {
-      if (item['quantity-to-be-charged-ais-301-330-days'] != null) {
-        total += int.tryParse(item['quantity-to-be-charged-ais-301-330-days'].toString()) ?? 0;
+      if (item['quantity_to_be_charged_ais_301_330_days'] != null) {
+        total += int.tryParse(item['quantity_to_be_charged_ais_301_330_days'].toString()) ?? 0;
       }
     }
     return total;
@@ -413,9 +414,9 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
     double total = 0.0;
 
     for (var item in inventoryList) {
-      double day301to330 = double.tryParse(item['estimated-ais-241-270-days']?.toString() ?? '0') ?? 0.0;
-      double day271to300 = double.tryParse(item['quantity-to-be-charged-ais-301-330-days']?.toString() ?? '0') ?? 0.0;
-      double day241to270 = double.tryParse(item['estimated-ais-301-330-days']?.toString() ?? '0') ?? 0.0;
+      double day301to330 = double.tryParse(item['estimated_ais_241_270_days']?.toString() ?? '0') ?? 0.0;
+      double day271to300 = double.tryParse(item['quantity_to_be_charged_ais_301_330_days']?.toString() ?? '0') ?? 0.0;
+      double day241to270 = double.tryParse(item['estimated_ais_301_330_days']?.toString() ?? '0') ?? 0.0;
 
       double sumForItem = day301to330 + day271to300 + day241to270;
 
@@ -444,7 +445,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
               Expanded(
                 child: MetricCard(
                   title: 'Storage Cost',
-                  value: "\$${Storagecostsum}",
+                  value: "£ ${Storagecostsum}",
                   description: 'Estimated cost for next month',
                  // value: inventoryList[1].SKU,
                 ),
@@ -455,7 +456,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
               Expanded(
                 child: MetricCard(
                   title: 'LTSF Cost',
-                  value: "\$${LTSFsum}",
+                  value: "£ ${LTSFsum}",
                   description: 'Storage cost for stock (more than 180 days)',
                 ),
               ),
