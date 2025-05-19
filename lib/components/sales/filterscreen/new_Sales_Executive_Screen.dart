@@ -441,7 +441,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
       // appBar: AppBar(title: const Text("Sales Data Viewer")),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Column(
+        child: ListView(
           children: [
 
             SingleChildScrollView(
@@ -579,7 +579,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
 
 
             const SizedBox(height: 20),
-            BarChartSample(values: values, labels: labels),
+            BarChartSample(values: values, labels: labels,isWeb: true,),
 
             Expanded(
               child: SingleChildScrollView(

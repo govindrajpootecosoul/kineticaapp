@@ -4,8 +4,9 @@ import 'package:fl_chart/fl_chart.dart';
 class BarChartSample extends StatelessWidget {
   final List<double> values;
   final List<String> labels;
+  final bool isWeb;
 
-  const BarChartSample({required this.values, required this.labels, Key? key}) : super(key: key);
+  const BarChartSample({required this.values, required this.labels, Key? key, this.isWeb = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class BarChartSample extends StatelessWidget {
     double maxY = values.isNotEmpty ? values.reduce((a, b) => a > b ? a : b) + 10 : 10;
 
     return Container(
-      height: 270,
+      height: isWeb ? 450 : 270,
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
@@ -57,8 +58,7 @@ class BarChartSample extends StatelessWidget {
       x: x,
       barRods: [
         BarChartRodData(
-          toY: y,
-          width: 10,
+          width: isWeb ? 20 : 30,
           color: Color(0xFF073349),
           borderRadius: BorderRadius.circular(2),
         ),
