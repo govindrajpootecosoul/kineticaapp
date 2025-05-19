@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:intl/intl.dart';
 
 import '../../../comman_Screens/productcard.dart';
 import '../../../graph/commanbarchar_file.dart';
@@ -52,6 +53,11 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
  // bool isLoading = false;
   Map<String, dynamic>? salesData;
   Map<String, dynamic>? adssales;
+
+
+  List<double> values=[];
+  List<String> labels=[];
+  Map<String, double> monthlyTotals = {};
 
   bool isLoading = true;
 
@@ -142,15 +148,176 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
     try {
       http.StreamedResponse response = await request.send();
 
+
+
       if (response.statusCode == 200) {
         final data = await response.stream.bytesToString();
         setState(() {
-
           salesData = json.decode(data);
+          print("Salesdata::::: ${salesData}");
+
+          final breakdown = salesData!['breakdown'];
+
+          // Extract totalSales and date
+          // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+          // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+          print("filte typee :: ${selectedFilterType}");
+
+
+
+          if(selectedFilterType== "last30days")
+          {
+            print("last30days");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).roundToDouble())
+                .toList();
+
+            labels = breakdown
+                .map<String>((item) {
+              final date = DateTime.parse(item['date']);
+              return '${date.month.toString().padLeft(1, '0')}-${date.day.toString().padLeft(1, '0')}';
+            })
+                .toList();
+
+          }
+          if(selectedFilterType== "monthtodate")
+          {
+            print("monthtodate");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).roundToDouble())
+                .toList();
+
+// Format dates to MM-DD
+            labels = breakdown
+                .map<String>((item) {
+              DateTime date = DateTime.parse(item['date']);
+              return "${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+            })
+                .toList();
+
+
+          }
+
+          if(selectedFilterType== "6months")
+          {
+            print("6666666 months");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+
+
+            Map<String, double> monthlyTotals = {};
+
+            for (var item in breakdown) {
+              final fullDate = item['date'].toString(); // e.g., "January 2025"
+
+              DateTime? date;
+              try {
+                // Use DateFormat to parse "January 2025"
+                date = DateFormat('MMMM yyyy').parseStrict(fullDate);
+              } catch (e) {
+                continue; // skip invalid date
+              }
+
+              final month = DateFormat('MMM').format(date); // "Jan"
+              final year = date.year.toString().substring(2); // "25"
+              final label = '$month $year'; // e.g., "Jan 25"
+
+              final sale = (item['totalSales'] as num).toInt().toDouble();
+              monthlyTotals[label] = (monthlyTotals[label] ?? 0) + sale;
+            }
+
+// Step 2: Convert to chart-friendly lists
+            labels = monthlyTotals.keys.toList();
+            values = monthlyTotals.values.toList();
+
+            print("6 month${labels}");
+            print("6 month${values}");
+
+          }
+
+          if(selectedFilterType== "yeartodate")
+          {
+            print("yeartodate");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            Map<String, double> monthlyTotals = {};
+
+// Summing totalSales by month
+            for (var item in breakdown) {
+              DateTime date = DateTime.parse(item['date']);
+              String monthLabel = DateFormat('MMM').format(date); // e.g., Jan, Feb
+              double totalSales = (item['totalSales'] as num).toDouble();
+
+              if (monthlyTotals.containsKey(monthLabel)) {
+                monthlyTotals[monthLabel] = monthlyTotals[monthLabel]! + totalSales;
+              } else {
+                monthlyTotals[monthLabel] = totalSales;
+              }
+            }
+
+// Convert the map to separate lists for chart use
+            labels = monthlyTotals.keys.toList(); // ['Jan', 'Feb', ...]
+            values = monthlyTotals.values.map((val) => val.roundToDouble()).toList(); // Whole numbers
+
+
+          }
+          if(selectedFilterType== "custom")
+          {
+            print("custom");
+            Map<String, double> monthlyTotals = {};
+
+            for (var item in breakdown) {
+              final fullDate = item['date'].toString(); // e.g., "January 2025"
+
+              DateTime? date;
+              try {
+                // Use DateFormat to parse "January 2025"
+                date = DateFormat('MMMM yyyy').parseStrict(fullDate);
+              } catch (e) {
+                continue; // skip invalid date
+              }
+
+              final month = DateFormat('MMM').format(date); // "Jan"
+              final year = date.year.toString().substring(2); // "25"
+              final label = '$month $year'; // e.g., "Jan 25"
+
+              final sale = (item['totalSales'] as num).toInt().toDouble();
+              monthlyTotals[label] = (monthlyTotals[label] ?? 0) + sale;
+            }
+
+// Step 2: Convert to chart-friendly lists
+            labels = monthlyTotals.keys.toList();
+            values = monthlyTotals.values.toList();
+          }
+
+          print("📊 values: $values");
+          print("📅 labels: $labels");
+
           fetchAdData();
           isLoading = false;
         });
-      } else {
+      }
+
+
+      // if (response.statusCode == 200) {
+      //   final data = await response.stream.bytesToString();
+      //   setState(() {
+      //
+      //     salesData = json.decode(data);
+      //     fetchAdData();
+      //     isLoading = false;
+      //   });
+      // }
+      else {
         setState(() {
           errorMessage = response.reasonPhrase ?? "Failed to fetch data.";
           isLoading = false;
@@ -263,8 +430,8 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
   }
 
 
-  final List<double> values = [100, 150, 300, 112, 403, 500, 207, 270];
-  final List<String> labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Next'];
+  // final List<double> values = [100, 150, 300, 112, 403, 500, 207, 270];
+  // final List<String> labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Next'];
 
 
 
@@ -284,14 +451,14 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
 
                   SizedBox(
                     width: 190,
-                    height: 33, // Fixed height
+                    height: 50, // Fixed height
                     child: DropdownButtonFormField<String>(
                       isDense: true, // Makes dropdown compact
                       style: TextStyle(fontSize: 12, color: Colors.black), // Smaller font
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Tight padding
                         hintText: "Select Filter Type",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.blue, width: 1),
                         ),
@@ -331,7 +498,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                   SizedBox(width: 8), // optional spacing
                   SizedBox(
                     width: 150,
-                    height: 33,
+                    height: 50,
                     child: DropdownSearch<String>(
                       items: states,
                       selectedItem: selectedState,
@@ -350,6 +517,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                           border: OutlineInputBorder(),
                         ),
                       ),
+                      clearButtonProps: ClearButtonProps(isVisible: true),
                       onChanged: (val) => onDropdownChanged(val, 'state'),
                     ),
                   ),
@@ -357,7 +525,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                   SizedBox(width: 8),
                   SizedBox(
                     width: 150,
-                    height: 33,
+                    height: 50,
                     child: DropdownSearch<String>(
                       items: cities,
                       selectedItem: selectedCity,
@@ -376,6 +544,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                           border: OutlineInputBorder(),
                         ),
                       ),
+                      clearButtonProps: ClearButtonProps(isVisible: true),
                       onChanged: (val) => onDropdownChanged(val, 'city'),
                     ),
                   ),
@@ -383,7 +552,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                   SizedBox(width: 8),
                   SizedBox(
                     width: 150,
-                    height: 33,
+                    height: 50,
                     child: DropdownSearch<String>(
                       items: skus,
                       selectedItem: selectedSku,
@@ -402,9 +571,11 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                           border: OutlineInputBorder(),
                         ),
                       ),
+                      clearButtonProps: ClearButtonProps(isVisible: true),
                       onChanged: (val) => onDropdownChanged(val, 'sku'),
                     ),
-                  ),
+                  )
+
 
                 ],
               ),
