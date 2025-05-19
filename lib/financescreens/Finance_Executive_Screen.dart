@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -14,7 +13,7 @@ class FinanceExecutiveScreen extends StatefulWidget {
 
 class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
   List<dynamic> allData = [];
-  dynamic selectedMonthData;
+  Map<String, double>? selectedMonthData;
   List<String> availableMonths = [];
   String? selectedMonth;
 
@@ -24,34 +23,29 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
     fetchData();
   }
 
-  DateTime excelDateToDateTime(double serial) {
-    return DateTime.fromMillisecondsSinceEpoch(
-        ((serial - 25569) * 86400000).round(),
-        isUtc: true);
-  }
   Future<void> fetchData() async {
     try {
       final response = await http.get(Uri.parse(ApiConfig.pnlData));
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final List<dynamic> data = json.decode(response.body);
+
+        // Store data locally
         allData = data;
 
-        final monthsSet = allData.map((e) {
-          final serial = (e['Year-Month'] as num).toDouble();
-          final date = excelDateToDateTime(serial);
-          return DateFormat.yMMMM().format(date);
-        }).toSet();
+        // Extract unique months in "yyyy-MM" format, then convert to readable "MMMM yyyy"
+        final monthsSet = allData.map<String>((e) => e['Year-Month'] as String).toSet();
 
-        final months = monthsSet.toList();
-        months.sort((a, b) {
-          final dateA = DateFormat.yMMMM().parse(a);
-          final dateB = DateFormat.yMMMM().parse(b);
+        // Sort months in ascending order
+        final monthsList = monthsSet.toList();
+        monthsList.sort((a, b) {
+          final dateA = DateFormat('yyyy-MM').parse(a);
+          final dateB = DateFormat('yyyy-MM').parse(b);
           return dateA.compareTo(dateB);
         });
 
         setState(() {
-          availableMonths = months;
-          selectedMonth = months.isNotEmpty ? months.first : null;
+          availableMonths = monthsList.map((e) => DateFormat('MMMM yyyy').format(DateFormat('yyyy-MM').parse(e))).toList();
+          selectedMonth = availableMonths.isNotEmpty ? availableMonths.first : null;
           updateSelectedMonthData();
         });
       } else {
@@ -65,36 +59,49 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
   void updateSelectedMonthData() {
     if (selectedMonth == null) return;
 
-    final selectedMonthList = allData.where((e) {
-      return DateFormat.yMMMM().format(excelDateToDateTime(e['Year-Month'])) == selectedMonth;
-    }).toList();
+    // Convert selectedMonth "MMMM yyyy" back to "yyyy-MM" for filtering
+    final selectedYearMonth = DateFormat('yyyy-MM').format(DateFormat('MMMM yyyy').parse(selectedMonth!));
 
-    // Sum up all values for the selected month
-    selectedMonthData = {
-      'Total Sales': selectedMonthList.fold(0.0, (sum, e) => sum + (e['Total Sales'] ?? 0.0)),
-      'Total Returns': selectedMonthList.fold(0.0, (sum, e) => sum + (e['Total Returns'] ?? 0.0)),
-      'COGS': selectedMonthList.fold(0.0, (sum, e) => sum + (e['COGS'] ?? 0.0)),
-      'CM1': selectedMonthList.fold(0.0, (sum, e) => sum + (e['CM1'] ?? 0.0)),
-      'Inventory': selectedMonthList.fold(0.0, (sum, e) => sum + (e['Inventory'] ?? 0.0)),
-      'Liquidations': selectedMonthList.fold(0.0, (sum, e) => sum + (e['Liquidations'] ?? 0.0)),
-      'FBA Reimbursement': selectedMonthList.fold(0.0, (sum, e) => sum + (e['FBA Reimbursement'] ?? 0.0)),
-      'Storage Fee': selectedMonthList.fold(0.0, (sum, e) => sum + (e['Storage Fee'] ?? 0.0)),
-      'Shipping Service': selectedMonthList.fold(0.0, (sum, e) => sum + (e['Shipping Service'] ?? 0.0)),
-      'Ad Spend': selectedMonthList.fold(0.0, (sum, e) => sum + (e['Spend'] ?? 0.0)),
-      'Discounts': selectedMonthList.fold(0.0, (sum, e) => sum + (e['promotional rebates'] ?? 0.0)),
-      'Net Selling Fee': selectedMonthList.fold(0.0, (sum, e) => sum + (e['selling fees'] ?? 0.0)),
-      'Final Service Fee': selectedMonthList.fold(0.0, (sum, e) => sum + (e['fba fees'] ?? 0.0)),
-      'CM2': selectedMonthList.fold(0.0, (sum, e) => sum + (e['CM2'] ?? 0.0)),
-      'CM3': selectedMonthList.fold(0.0, (sum, e) => sum + (e['CM3'] ?? 0.0)),
-    };
+    // Filter data by selected month
+    final selectedMonthList = allData.where((e) => e['Year-Month'] == selectedYearMonth).toList();
 
-    setState(() {});
+    // Sum up all required fields safely, defaulting to 0.0 if null
+    double sumField(List<dynamic> list, String key) {
+      return list.fold(0.0, (sum, e) {
+        final val = e[key];
+        if (val == null) return sum;
+        if (val is int) return sum + val.toDouble();
+        if (val is double) return sum + val;
+        if (val is String) return sum + (double.tryParse(val) ?? 0.0);
+        return sum;
+      });
+    }
+
+
+    setState(() {
+      selectedMonthData = {
+        'Total Sales': sumField(selectedMonthList, 'Total Sales'),
+        'Total Returns': sumField(selectedMonthList, 'Total Units'), // Assuming returns are 'Total Units', adjust if needed
+        'COGS': 0.0, // Your JSON doesn't have COGS? Set 0 or handle accordingly
+        'CM1': sumField(selectedMonthList, 'CM1'),
+        'Inventory': 0.0, // No inventory key in JSON, adjust if you have one
+        'Liquidations': sumField(selectedMonthList, 'Liquidations'),
+        'FBA Reimbursement': sumField(selectedMonthList, 'FBA Reimbursement'),
+        'Storage Fee': sumField(selectedMonthList, 'Storage Fee'),
+        'Shipping Service': 0.0, // No shipping service key in JSON
+        'Ad Spend': sumField(selectedMonthList, 'Spend'),
+        'Discounts': sumField(selectedMonthList, 'promotional rebates'),
+        'Net Selling Fee': sumField(selectedMonthList, 'selling fees'),
+        'Final Service Fee': sumField(selectedMonthList, 'fba fees'),
+        'CM2': sumField(selectedMonthList, 'CM2'),
+        'CM3': sumField(selectedMonthList, 'CM3'),
+      };
+    });
   }
 
-  Widget dataRow(String title, dynamic value, {Color? valueColor}) {
-    // Check for negative values and apply red color
-    valueColor = value != null && value < 0 ? Colors.red : valueColor;
-
+  Widget dataRow(String title, double? value, {Color? valueColor}) {
+    value ??= 0.0;
+    valueColor = value < 0 ? Colors.red : valueColor;
     bool isCM = title == 'CM1' || title == 'CM2' || title == 'CM3';
 
     final rowContent = Padding(
@@ -111,7 +118,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
             ),
           ),
           Text(
-            '\$ ${value != null ? value.toStringAsFixed(2) : "0.00"}',
+            '\$ ${value.toStringAsFixed(2)}',
             style: TextStyle(
               color: valueColor ?? Colors.black,
               fontWeight: isCM ? FontWeight.bold : FontWeight.w600,
@@ -148,8 +155,13 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Profit & Loss",style: TextStyle(fontWeight: FontWeight.w700,color: Colors.brown,fontSize: 24),),
-
+                Text(
+                  "Profit & Loss",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: Colors.brown,
+                      fontSize: 24),
+                ),
                 SizedBox(
                   width: 160,
                   child: DropdownButton<String>(
@@ -178,38 +190,70 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      dataRow("Amazon Revenue", selectedMonthData['Total Sales'],
-                          valueColor: selectedMonthData['Total Sales'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Amazon Returns", selectedMonthData['Total Returns'],
-                          valueColor: selectedMonthData['Total Returns'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Net Revenue", selectedMonthData['Total Sales'],
-                          valueColor: selectedMonthData['Total Sales'] < 0 ? Colors.red : Colors.green),
-                      dataRow("COGS", selectedMonthData['COGS'],
-                          valueColor: selectedMonthData['COGS'] < 0 ? Colors.red : Colors.green),
-                      dataRow("CM1", selectedMonthData['CM1'],
-                          valueColor: selectedMonthData['CM1'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Inventory", selectedMonthData['Inventory'],
-                          valueColor: selectedMonthData['Inventory'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Liquidation Cost", selectedMonthData['Liquidations'],
-                          valueColor: selectedMonthData['Liquidations'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Reimbursement", selectedMonthData['FBA Reimbursement'],
-                          valueColor: selectedMonthData['FBA Reimbursement'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Storage Fee", selectedMonthData['Storage Fee'],
-                          valueColor: selectedMonthData['Storage Fee'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Shipping Service", selectedMonthData['Shipping Service'],
-                          valueColor: selectedMonthData['Shipping Service'] < 0 ? Colors.red : Colors.green),
-                      dataRow("CM2", selectedMonthData['CM2'],
-                          valueColor: selectedMonthData['CM2'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Ad Spend", selectedMonthData['Ad Spend'],
-                          valueColor: selectedMonthData['Ad Spend'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Discounts", selectedMonthData['Discounts'],
-                          valueColor: selectedMonthData['Discounts'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Net Selling Fee", selectedMonthData['Net Selling Fee'],
-                          valueColor: selectedMonthData['Net Selling Fee'] < 0 ? Colors.red : Colors.green),
-                      dataRow("Final Service Fee", selectedMonthData['Final Service Fee'],
-                          valueColor: selectedMonthData['Final Service Fee'] < 0 ? Colors.red : Colors.green),
-                      dataRow("CM3", selectedMonthData['CM3'],
-                          valueColor: selectedMonthData['CM3'] < 0 ? Colors.red : Colors.green),
+                      dataRow("Amazon Revenue", selectedMonthData!['Total Sales'],
+                          valueColor: selectedMonthData!['Total Sales']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Amazon Returns", selectedMonthData!['Total Returns'],
+                          valueColor: selectedMonthData!['Total Returns']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Net Revenue", selectedMonthData!['Total Sales'],
+                          valueColor: selectedMonthData!['Total Sales']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("COGS", selectedMonthData!['COGS'],
+                          valueColor: selectedMonthData!['COGS']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("CM1", selectedMonthData!['CM1'],
+                          valueColor: selectedMonthData!['CM1']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Inventory", selectedMonthData!['Inventory'],
+                          valueColor: selectedMonthData!['Inventory']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Liquidation Cost", selectedMonthData!['Liquidations'],
+                          valueColor: selectedMonthData!['Liquidations']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Reimbursement", selectedMonthData!['FBA Reimbursement'],
+                          valueColor: selectedMonthData!['FBA Reimbursement']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Storage Fee", selectedMonthData!['Storage Fee'],
+                          valueColor: selectedMonthData!['Storage Fee']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Shipping Service", selectedMonthData!['Shipping Service'],
+                          valueColor: selectedMonthData!['Shipping Service']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("CM2", selectedMonthData!['CM2'],
+                          valueColor: selectedMonthData!['CM2']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Ad Spend", selectedMonthData!['Ad Spend'],
+                          valueColor: selectedMonthData!['Ad Spend']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Discounts", selectedMonthData!['Discounts'],
+                          valueColor: selectedMonthData!['Discounts']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Net Selling Fee", selectedMonthData!['Net Selling Fee'],
+                          valueColor: selectedMonthData!['Net Selling Fee']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("Final Service Fee", selectedMonthData!['Final Service Fee'],
+                          valueColor: selectedMonthData!['Final Service Fee']! < 0
+                              ? Colors.red
+                              : Colors.green),
+                      dataRow("CM3", selectedMonthData!['CM3'],
+                          valueColor: selectedMonthData!['CM3']! < 0
+                              ? Colors.red
+                              : Colors.green),
                     ],
                   ),
                 ),
@@ -220,5 +264,3 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
     );
   }
 }
-
-
