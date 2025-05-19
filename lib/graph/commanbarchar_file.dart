@@ -9,7 +9,8 @@ class BarChartSample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double maxY = values.reduce((a, b) => a > b ? a : b) + 00;
+    //double maxY = values.reduce((a, b) => a > b ? a : b) + 00;
+    double maxY = values.isNotEmpty ? values.reduce((a, b) => a > b ? a : b) + 10 : 10;
 
     return Container(
       height: 270,
@@ -22,7 +23,7 @@ class BarChartSample extends StatelessWidget {
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 40,
+                reservedSize: 42,
               ),
             ),
             rightTitles: AxisTitles(
@@ -35,7 +36,7 @@ class BarChartSample extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) => getBottomTitles(value, meta),
-                reservedSize: 42,
+                reservedSize: 52,
               ),
             ),
           ),
@@ -57,7 +58,7 @@ class BarChartSample extends StatelessWidget {
       barRods: [
         BarChartRodData(
           toY: y,
-          width: 30,
+          width: 10,
           color: Color(0xFF073349),
           borderRadius: BorderRadius.circular(2),
         ),

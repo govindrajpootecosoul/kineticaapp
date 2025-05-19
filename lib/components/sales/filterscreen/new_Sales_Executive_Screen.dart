@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:intl/intl.dart';
 
 import '../../../comman_Screens/productcard.dart';
 import '../../../graph/commanbarchar_file.dart';
@@ -56,6 +57,10 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
 
   String? errorMsg;
   String errorMessage = '';
+  List<double> values=[];
+  List<String> labels=[];
+  Map<String, double> monthlyTotals = {};
+
 
   // @override
   // void initState() {
@@ -141,14 +146,177 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
     try {
       http.StreamedResponse response = await request.send();
 
+      // if (response.statusCode == 200) {
+      //   final data = await response.stream.bytesToString();
+      //   setState(() {
+      //     salesData = json.decode(data);
+      //     print("Salesdata::::: ${salesData}");
+      //
+      //     // {totalQuantity: 13955, totalSales: 648487.5799999939, breakdown: [{date: December 2024, totalQuantity: 120, totalSales: 4762.249999999998}, {date: January 2025, totalQuantity: 3808, totalSales: 162701.46000000305}, {date: February 2025, totalQuantity: 2731, totalSales: 133437.4900000035}, {date: March 2025, totalQuantity: 3174, totalSales: 151182.1700000036}, {date: April 2025, totalQuantity: 3594, totalSales: 171572.9800000041}, {date: May 2025, totalQuantity: 528, totalSales: 24831.230000000054}], comparison: {previousTotalQuantity: 0, previousTotalSales: 0, quantityChangePercent: 100% Profit, salesChangePercent: 100% Profit}}
+      //
+      //     fetchAdData();
+      //     isLoading = false;
+      //   });
+      // }
+
       if (response.statusCode == 200) {
         final data = await response.stream.bytesToString();
         setState(() {
           salesData = json.decode(data);
+          print("Salesdata::::: ${salesData}");
+
+          final breakdown = salesData!['breakdown'];
+
+          // Extract totalSales and date
+          // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+          // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+          print("filte typee :: ${selectedFilterType}");
+
+
+
+          if(selectedFilterType== "last30days")
+          {
+            print("last30days");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).roundToDouble())
+                .toList();
+
+            labels = breakdown
+                .map<String>((item) {
+              final date = DateTime.parse(item['date']);
+              return '${date.month.toString().padLeft(1, '0')}-${date.day.toString().padLeft(1, '0')}';
+            })
+                .toList();
+
+          }
+          if(selectedFilterType== "monthtodate")
+          {
+            print("monthtodate");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).roundToDouble())
+                .toList();
+
+// Format dates to MM-DD
+            labels = breakdown
+                .map<String>((item) {
+              DateTime date = DateTime.parse(item['date']);
+              return "${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+            })
+                .toList();
+
+
+          }
+
+          if(selectedFilterType== "6months")
+          {
+            print("6666666 months");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+
+
+            Map<String, double> monthlyTotals = {};
+
+            for (var item in breakdown) {
+              final fullDate = item['date'].toString(); // e.g., "January 2025"
+
+              DateTime? date;
+              try {
+                // Use DateFormat to parse "January 2025"
+                date = DateFormat('MMMM yyyy').parseStrict(fullDate);
+              } catch (e) {
+                continue; // skip invalid date
+              }
+
+              final month = DateFormat('MMM').format(date); // "Jan"
+              final year = date.year.toString().substring(2); // "25"
+              final label = '$month $year'; // e.g., "Jan 25"
+
+              final sale = (item['totalSales'] as num).toInt().toDouble();
+              monthlyTotals[label] = (monthlyTotals[label] ?? 0) + sale;
+            }
+
+// Step 2: Convert to chart-friendly lists
+            labels = monthlyTotals.keys.toList();
+            values = monthlyTotals.values.toList();
+
+            print("6 month${labels}");
+            print("6 month${values}");
+
+          }
+
+          if(selectedFilterType== "yeartodate")
+          {
+            print("yeartodate");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            Map<String, double> monthlyTotals = {};
+
+// Summing totalSales by month
+            for (var item in breakdown) {
+              DateTime date = DateTime.parse(item['date']);
+              String monthLabel = DateFormat('MMM').format(date); // e.g., Jan, Feb
+              double totalSales = (item['totalSales'] as num).toDouble();
+
+              if (monthlyTotals.containsKey(monthLabel)) {
+                monthlyTotals[monthLabel] = monthlyTotals[monthLabel]! + totalSales;
+              } else {
+                monthlyTotals[monthLabel] = totalSales;
+              }
+            }
+
+// Convert the map to separate lists for chart use
+            labels = monthlyTotals.keys.toList(); // ['Jan', 'Feb', ...]
+            values = monthlyTotals.values.map((val) => val.roundToDouble()).toList(); // Whole numbers
+
+
+          }
+          if(selectedFilterType== "custom")
+          {
+            print("custom");
+            Map<String, double> monthlyTotals = {};
+
+            for (var item in breakdown) {
+              final fullDate = item['date'].toString(); // e.g., "January 2025"
+
+              DateTime? date;
+              try {
+                // Use DateFormat to parse "January 2025"
+                date = DateFormat('MMMM yyyy').parseStrict(fullDate);
+              } catch (e) {
+                continue; // skip invalid date
+              }
+
+              final month = DateFormat('MMM').format(date); // "Jan"
+              final year = date.year.toString().substring(2); // "25"
+              final label = '$month $year'; // e.g., "Jan 25"
+
+              final sale = (item['totalSales'] as num).toInt().toDouble();
+              monthlyTotals[label] = (monthlyTotals[label] ?? 0) + sale;
+            }
+
+// Step 2: Convert to chart-friendly lists
+            labels = monthlyTotals.keys.toList();
+            values = monthlyTotals.values.toList();
+          }
+
+          print("📊 values: $values");
+          print("📅 labels: $labels");
+
           fetchAdData();
           isLoading = false;
         });
-      } else {
+      }
+
+      else {
         setState(() {
           errorMessage = response.reasonPhrase ?? "Failed to fetch data.";
           isLoading = false;
@@ -263,8 +431,8 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
 
 
 
-  final List<double> values = [10, 15, 30, 12, 43, 50, 27, 20];
-  final List<String> labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Next'];
+  // final List<double> values = [10, 15, 30, 12, 43, 50, 27, 20];
+  // final List<String> labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Next'];
 
 
   @override
@@ -277,9 +445,9 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
           children: [
 
             SingleChildScrollView(
-            //  scrollDirection: Axis.horizontal,
+              //  scrollDirection: Axis.horizontal,
               child: Row(
-               // crossAxisAlignment: CrossAxisAlignment.end,
+                // crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
 
@@ -329,7 +497,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
                       ),
                     ),
 
-             /*     SizedBox(width: 8), // optional spacing
+                  /*     SizedBox(width: 8), // optional spacing
                   SizedBox(
                     width: 150,
                     child: DropdownSearch<String>(
@@ -420,83 +588,123 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
                     : errorMessage.isNotEmpty
                     ? Center(child: Text(errorMessage))
                     : Padding(
-                    padding: const EdgeInsets.all(1.0),
-                    child: Column(
-                      children: [
-                        Row(children: [
-                          Expanded(
-                              child: MetricCard(
-                                title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
-                          const SizedBox(width: 8),
-                          Expanded(
+                  padding: const EdgeInsets.all(1.0),
+                  child: Column(
+                    children: [
+                      Row(children: [
+                        Expanded(
                             child: MetricCard(
-                              title: "Units Orders", value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",),),
+                              title: "Overall Sales",
+                              value: '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
+                              compared: "${salesData?['comparison']['salesChangePercent']}",)),
+                        // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: MetricCard(
+                            title: "Units Orders",
+                            value: "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
+                            compared: "${salesData?['comparison']['quantityChangePercent']}",
+                            //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
+                          ),),
 
-                        ],),
-                        SizedBox(height: 8,),
-                        // Row(children: [
-                        //   Expanded(
-                        //       child: MetricCard(
-                        //         title: "Organic Sales", value: '\$${salesData!['totalSales'].toStringAsFixed(2)}', compared: "${salesData!['comparison']['salesChangePercent']}",)),
-                        //   const SizedBox(width: 8),
-                        //   Expanded(
-                        //     child: MetricCard(
-                        //       title: "Units Orders", value:"${salesData!['totalQuantity']}", compared: "${salesData!['comparison']['quantityChangePercent']}",),),
-                        //
-                        // ],),
+                      ],),
+                      SizedBox(height: 8,),
+                      // Row(children: [
+                      //   Expanded(
+                      //       child: MetricCard(
+                      //         title: "Organic Sales", value: '\$${salesData!['totalSales'].toStringAsFixed(2)}', compared: "${salesData!['comparison']['salesChangePercent']}",)),
+                      //   const SizedBox(width: 8),
+                      //   Expanded(
+                      //     child: MetricCard(
+                      //       title: "Units Orders", value:"${salesData!['totalQuantity']}", compared: "${salesData!['comparison']['quantityChangePercent']}",),),
+                      //
+                      // ],),
 
 
-                        SizedBox(height: 10,),
-                        Row(
-                          children: [
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+
+                          if(selectedFilterType!= "last30days")
                             Expanded(
                               child: MetricCardcm(
                                 title: "AOV",
                                 //value: "",
-                                value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
-
-
-
+                                value: "£ ${NumberFormat('#,###').format(
+                                    (((salesData?['totalSales'] ?? 0.0) as num) /
+                                        ((adssales?['totalOrders'] ?? 1) as num)).toInt()
+                                )}",
+                                //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
                                 //  totalOrders
                               ),
                             ),
-                            const SizedBox(width: 8),
+                          if(selectedFilterType== "last30days")
                             Expanded(
                               child: MetricCardcm(
-                                title: "Organic Sale",
-                                value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
-
-
+                                title: "AOV",
+                                //value: "",
+                                value: "£ 00",
+                                //  totalOrders
                               ),
                             ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        Row(
-                          children: [
+                          const SizedBox(width: 8),
+                          if(selectedFilterType!= "last30days")
+
                             Expanded(
-                              child: MetricCardcm(
-                                title: "Ad Spend",
-                                value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
+                            child: MetricCardcm(
+                              title: "Organic Sale",
+                              value: "£ ${NumberFormat('#,###').format(
+                                  ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
+                              )}",
+                              //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
 
-
-                              ),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: MetricCardcm(
-                                title: "Ad Sales",
-                                value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+                          ),
 
+                          if(selectedFilterType== "last30days")
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Organic Sale",
+                         value: "£ 00",
+                              //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
 
-
-                              ),
                             ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        Row(
-                          children: [
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Ad Spend",
+                              value: "£ ${NumberFormat('#,###').format(
+                                  (adssales?['totalAdSpend'] ?? 0).toDouble().round()
+                              )}",
+                              // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Ad Sales",
+                              value: "£ ${NumberFormat('#,###').format(
+                                  (adssales?['totalAdSales'] ?? 0).toDouble().round()
+                              )}",
+                              //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+
+
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          if(selectedFilterType!= "last30days")
                             Expanded(
                               child: MetricCardcm(
                                 title: "ACOS",
@@ -504,40 +712,55 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
 
                               ),
                             ),
-                            const SizedBox(width: 8),
+                          if(selectedFilterType== "last30days")
                             Expanded(
                               child: MetricCardcm(
-                                title: "TACOS",
-                                value: "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 1) * 100).toStringAsFixed(2)} %",
+                                title: "ACOS",
+                                value: "0.00 %",
+
                               ),
                             ),
-                          ],
-                        ),
-                        SizedBox(height: 8,),
-                        Row(
-                          children: [
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "TACOS",
+                              value: "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 1) * 100).toStringAsFixed(2)} %",
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8,),
+                      Row(
+                        children: [
+                          if(selectedFilterType!= "last30days")
                             Expanded(
                               child: MetricCardcm(
                                 title: "Organic Sale",
                                 value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
-
-
                               ),
                             ),
-                            const SizedBox(width: 8),
+
+                          if(selectedFilterType== "last30days")
                             Expanded(
                               child: MetricCardcm(
-                                title: "",//DOS
-                                value: "",
-                                // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
-
+                                title: "Organic Sale",
+                                value: "0.00 %",
                               ),
                             ),
-                          ],
-                        ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "",//DOS
+                              value: "",
+                              // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
 
-                      ],
-                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ],
+                  ),
 
                   // ListView(
                   //   children: [

@@ -156,7 +156,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           salesData = json.decode(data);
           isLoading = false;
         });
-      } else {
+      }
+      else {
         setState(() {
           errorMessage = response.reasonPhrase ?? "Failed to fetch data.";
           isLoading = false;

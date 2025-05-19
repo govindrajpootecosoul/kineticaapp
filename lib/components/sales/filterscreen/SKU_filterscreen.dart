@@ -155,7 +155,10 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
         }
 
         setState(() => salesData = tempSalesData);
-      } else {
+      }
+
+
+      else {
         print('Failed to fetch sales data: ${response.reasonPhrase}');
       }
     } catch (e) {
@@ -234,6 +237,7 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
                         );
                       }).toList(),
                       value: selectedFilterType,
+
                       onChanged: (val) => onDropdownChanged(val, 'filter'),
                     ),
                   ),
@@ -253,59 +257,10 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
                       ),
                     ),
 
-                  // SizedBox(width: 8), // optional spacing
-                  // SizedBox(
-                  //   width: 150,
-                  //   child: DropdownSearch<String>(
-                  //     items: states,
-                  //     selectedItem: selectedState,
-                  //     popupProps: PopupProps.menu(
-                  //       showSearchBox: true,
-                  //       searchFieldProps: TextFieldProps(
-                  //         decoration: InputDecoration(
-                  //           hintText: "Search State",
-                  //           border: OutlineInputBorder(),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     dropdownDecoratorProps: DropDownDecoratorProps(
-                  //       dropdownSearchDecoration: InputDecoration(
-                  //         labelText: "State",
-                  //         border: OutlineInputBorder(),
-                  //       ),
-                  //     ),
-                  //     onChanged: (val) => onDropdownChanged(val, 'state'),
-                  //   ),
-                  // ),
-
-                  // SizedBox(width: 8),
-                  // SizedBox(
-                  //   width: 150,
-                  //   child: DropdownSearch<String>(
-                  //     items: cities,
-                  //     selectedItem: selectedCity,
-                  //     popupProps: PopupProps.menu(
-                  //       showSearchBox: true,
-                  //       searchFieldProps: TextFieldProps(
-                  //         decoration: InputDecoration(
-                  //           hintText: "Search City",
-                  //           border: OutlineInputBorder(),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     dropdownDecoratorProps: DropDownDecoratorProps(
-                  //       dropdownSearchDecoration: InputDecoration(
-                  //         labelText: "City",
-                  //         border: OutlineInputBorder(),
-                  //       ),
-                  //     ),
-                  //     onChanged: (val) => onDropdownChanged(val, 'city'),
-                  //   ),
-                  // ),
-
                   SizedBox(width: 8),
                   SizedBox(
                     width: 150,
+                    height: 50,
                     child: DropdownSearch<String>(
                       items: skus,
                       selectedItem: selectedSku,
@@ -324,6 +279,7 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
                           border: OutlineInputBorder(),
                         ),
                       ),
+                      clearButtonProps: ClearButtonProps(isVisible: true),
                       onChanged: (val) => onDropdownChanged(val, 'sku'),
                     ),
                   ),
@@ -507,3 +463,117 @@ class SalesSku {
     required this.records,
   });
 }
+
+
+//
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+//
+// class Filter_SalesSkuScreen extends StatefulWidget {
+//   const Filter_SalesSkuScreen({super.key});
+//
+//   @override
+//   State<Filter_SalesSkuScreen> createState() => _Filter_SalesSkuScreenState();
+// }
+//
+// class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
+//   List<dynamic> salesData = [];
+//   bool loading = true;
+//   String? error;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchSalesData();
+//   }
+//
+//   Future<void> fetchSalesData() async {
+//     var request = http.Request(
+//       'GET',
+//       Uri.parse('http://192.168.50.92:3000/api/sales?filterType=6months&sku=&city=&state='),
+//     );
+//
+//     try {
+//       http.StreamedResponse response = await request.send();
+//
+//       if (response.statusCode == 200) {
+//         final responseBody = await response.stream.bytesToString();
+//         final List<dynamic> jsonData = json.decode(responseBody);
+//
+//         setState(() {
+//           salesData = jsonData;
+//           loading = false;
+//         });
+//       } else {
+//         setState(() {
+//           error = 'Error: ${response.reasonPhrase}';
+//           loading = false;
+//         });
+//       }
+//     } catch (e) {
+//       setState(() {
+//         error = 'Exception: $e';
+//         loading = false;
+//       });
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     if (loading) {
+//       return const Scaffold(
+//       //  appBar: AppBar(title: Text('Sales Data')),
+//         body: Center(child: CircularProgressIndicator()),
+//       );
+//     }
+//
+//     if (error != null) {
+//       return Scaffold(
+//         appBar: AppBar(title: const Text('Sales Data')),
+//         body: Center(child: Text(error!)),
+//       );
+//     }
+//
+//     return Scaffold(
+//      // appBar: AppBar(title: const Text('Sales Data')),
+//       body: ListView.builder(
+//         itemCount: salesData.length,
+//         itemBuilder: (context, index) {
+//           final item = salesData[index];
+//
+//           return Card(
+//             margin: const EdgeInsets.all(10),
+//             child: Padding(
+//               padding: const EdgeInsets.all(12),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(item['productName'] ?? 'No Product Name',
+//                       style: const TextStyle(
+//                           fontWeight: FontWeight.bold, fontSize: 16)),
+//                   const SizedBox(height: 8),
+//                   Text('SKU: ${item['SKU'] ?? ''}'),
+//                   Text('Total Quantity: ${item['totalQuantity'] ?? ''}'),
+//                   Text('Total Sales: ${item['totalSales'] ?? ''}'),
+//                   Text('Purchase Date: ${item['purchaseDate'] ?? ''}'),
+//                   Text('ASIN: ${item['asin'] ?? ''}'),
+//                   Text('Month/Year: ${item['monthYear'] ?? ''}'),
+//                   Text('Pincode: ${item['pincodeNew'] ?? ''}'),
+//                   Text('Average Unit Price: ${item['averageUnitPriceAmount'] ?? ''}'),
+//                   Text('City: ${item['city'] ?? ''}'),
+//                   Text('State: ${item['state'] ?? ''}'),
+//                   Text('Country: ${item['country'] ?? ''}'),
+//                 ],
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
+//
+//
+//
+//
