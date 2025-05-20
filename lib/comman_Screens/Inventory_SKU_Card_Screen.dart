@@ -89,7 +89,7 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SizedBox (height: 120,width: 120, child: Center(child: Text("📦", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),))),
+                  SizedBox (height: 120,width: 120, child: Center(child: Text("📦", style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),))),
                   // Flexible(
                   //   flex: 3,
                   //   child: Image.network(
