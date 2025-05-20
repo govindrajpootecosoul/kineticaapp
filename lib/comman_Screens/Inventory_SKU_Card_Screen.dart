@@ -38,6 +38,7 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
   Widget buildLabelValueExpend(String label, dynamic value) {
     return Container(
       padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         //color: const Color(0xECD5B0),
         color: Colors.white60,
@@ -88,6 +89,7 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  SizedBox (height: 120,width: 120, child: Center(child: Text("📦", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),))),
                   // Flexible(
                   //   flex: 3,
                   //   child: Image.network(
@@ -102,6 +104,7 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
                         buildLabelValue("SKU", product['SKU'] ?? "00"),
                         buildLabelValue("Available Inventory",
                             (product['afn_total_quantity'] ?? 0)),
@@ -137,12 +140,7 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     ),
                   ),
                 ),
-                GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 3,
-                  physics: const NeverScrollableScrollPhysics(),
+                Wrap(
                   children: [
                     buildLabelValueExpend("Warehouse Inventory", product['afn_warehouse_quantity'] ?? "00"),
                     buildLabelValueExpend("Total Sellable", product['afn_fulfillable_quantity'] ?? "00"),
