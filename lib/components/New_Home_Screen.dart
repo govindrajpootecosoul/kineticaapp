@@ -4,6 +4,7 @@ import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../../comman_Screens/productcard.dart';
@@ -42,6 +43,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
 
   List<String> filterTypes = [
     // "today",
+      "week",
     "last30days",
     "monthtodate",
     '6months',
@@ -73,6 +75,10 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
   bool isLoading = false;
   String? errorMsg;
 
+  List<double> values=[];
+  List<String> labels=[];
+  Map<String, double> monthlyTotals = {};
+
   @override
   void initState() {
     super.initState();
@@ -95,6 +101,8 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
     switch (filter) {
       case 'today':
         return 'Today';
+        case 'week':
+        return 'Week';
       case '6months':
         return 'Last 6 Months';
       case 'last30days':
@@ -166,14 +174,175 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
     try {
       http.StreamedResponse response = await request.send();
 
+      // if (response.statusCode == 200) {
+      //   final data = await response.stream.bytesToString();
+      //
+      //   setState(() {
+      //     salesData = json.decode(data);
+      //     isLoading = false;
+      //   });
+      // }
+
+
       if (response.statusCode == 200) {
         final data = await response.stream.bytesToString();
-
         setState(() {
           salesData = json.decode(data);
+          print("Salesdata::::: ${salesData}");
+
+          final breakdown = salesData!['breakdown'];
+
+          // Extract totalSales and date
+          // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+          // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+          print("filte typee :: ${selectedFilterType}");
+
+
+
+          if(selectedFilterType== "last30days")
+          {
+            print("last30days");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).roundToDouble())
+                .toList();
+
+            labels = breakdown
+                .map<String>((item) {
+              final date = DateTime.parse(item['date']);
+              return '${date.month.toString().padLeft(1, '0')}-${date.day.toString().padLeft(1, '0')}';
+            })
+                .toList();
+
+          }
+          if(selectedFilterType== "monthtodate")
+          {
+            print("monthtodate");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).roundToDouble())
+                .toList();
+
+// Format dates to MM-DD
+            labels = breakdown
+                .map<String>((item) {
+              DateTime date = DateTime.parse(item['date']);
+              return "${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+            })
+                .toList();
+
+
+          }
+
+          if(selectedFilterType== "6months")
+          {
+            print("6666666 months");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+
+
+            Map<String, double> monthlyTotals = {};
+
+            for (var item in breakdown) {
+              final fullDate = item['date'].toString(); // e.g., "January 2025"
+
+              DateTime? date;
+              try {
+                // Use DateFormat to parse "January 2025"
+                date = DateFormat('MMMM yyyy').parseStrict(fullDate);
+              } catch (e) {
+                continue; // skip invalid date
+              }
+
+              final month = DateFormat('MMM').format(date); // "Jan"
+              final year = date.year.toString().substring(2); // "25"
+              final label = '$month $year'; // e.g., "Jan 25"
+
+              final sale = (item['totalSales'] as num).toInt().toDouble();
+              monthlyTotals[label] = (monthlyTotals[label] ?? 0) + sale;
+            }
+
+// Step 2: Convert to chart-friendly lists
+            labels = monthlyTotals.keys.toList();
+            values = monthlyTotals.values.toList();
+
+            print("6 month${labels}");
+            print("6 month${values}");
+
+          }
+
+          if(selectedFilterType== "yeartodate")
+          {
+            print("yeartodate");
+            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+
+            Map<String, double> monthlyTotals = {};
+
+// Summing totalSales by month
+            for (var item in breakdown) {
+              DateTime date = DateTime.parse(item['date']);
+              String monthLabel = DateFormat('MMM').format(date); // e.g., Jan, Feb
+              double totalSales = (item['totalSales'] as num).toDouble();
+
+              if (monthlyTotals.containsKey(monthLabel)) {
+                monthlyTotals[monthLabel] = monthlyTotals[monthLabel]! + totalSales;
+              } else {
+                monthlyTotals[monthLabel] = totalSales;
+              }
+            }
+
+// Convert the map to separate lists for chart use
+            labels = monthlyTotals.keys.toList(); // ['Jan', 'Feb', ...]
+            values = monthlyTotals.values.map((val) => val.roundToDouble()).toList(); // Whole numbers
+
+
+          }
+          if(selectedFilterType== "custom")
+          {
+            print("custom");
+            Map<String, double> monthlyTotals = {};
+
+            for (var item in breakdown) {
+              final fullDate = item['date'].toString(); // e.g., "January 2025"
+
+              DateTime? date;
+              try {
+                // Use DateFormat to parse "January 2025"
+                date = DateFormat('MMMM yyyy').parseStrict(fullDate);
+              } catch (e) {
+                continue; // skip invalid date
+              }
+
+              final month = DateFormat('MMM').format(date); // "Jan"
+              final year = date.year.toString().substring(2); // "25"
+              final label = '$month $year'; // e.g., "Jan 25"
+
+              final sale = (item['totalSales'] as num).toInt().toDouble();
+              monthlyTotals[label] = (monthlyTotals[label] ?? 0) + sale;
+            }
+
+// Step 2: Convert to chart-friendly lists
+            labels = monthlyTotals.keys.toList();
+            values = monthlyTotals.values.toList();
+          }
+
+          print("📊 values: $values");
+          print("📅 labels: $labels");
+
+          fetchAdData();
           isLoading = false;
         });
       }
+
+
+
       else {
         setState(() {
           errorMessage = response.reasonPhrase ?? "Failed to fetch data.";
@@ -343,17 +512,17 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
     }
   }
 
-  final List<double> values = [10, 1500, 3000, 1102, 4003, 5000, 2007, 2700];
-  final List<String> labels = [
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun',
-    'Next'
-  ];
+  // final List<double> values = [10, 1500, 3000, 1102, 4003, 5000, 2007, 2700];
+  // final List<String> labels = [
+  //   'Mon',
+  //   'Tue',
+  //   'Wed',
+  //   'Thu',
+  //   'Fri',
+  //   'Sat',
+  //   'Sun',
+  //   'Next'
+  // ];
 
   void _showDateRangePicker(BuildContext context) async {
     showDialog(
@@ -433,22 +602,45 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   bottom: TabBar(
+      //     controller: _tabController,
+      //     tabs: myTabs,
+      //     indicatorSize: TabBarIndicatorSize.tab,
+      //     tabAlignment: TabAlignment.fill,
+      //     indicator: BoxDecoration(
+      //       color: AppColors.gold,
+      //       // borderRadius: BorderRadius.circular(50),
+      //     ),
+      //
+      //     indicatorColor: Colors.black,
+      //     labelColor: Colors.white,
+      //     unselectedLabelColor: Colors.black,
+      //   ),
+      // ),
+
+
+
+
       appBar: AppBar(
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: myTabs,
-          indicatorSize: TabBarIndicatorSize.tab,
-          tabAlignment: TabAlignment.fill,
-          indicator: BoxDecoration(
-            color: AppColors.gold,
-            // borderRadius: BorderRadius.circular(50),
+        toolbarHeight: 0, // Removes extra space above TabBar
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: TabBar(
+            controller: _tabController,
+            tabs: myTabs,
+            indicatorSize: TabBarIndicatorSize.tab,
+            tabAlignment: TabAlignment.fill,
+            indicator: BoxDecoration(
+              color: AppColors.gold,
+            ),
+            indicatorColor: Colors.black,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.black,
           ),
-          
-          indicatorColor: Colors.black,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.black,
         ),
       ),
+
       body: TabBarView(
         controller: _tabController,
         children: [
@@ -871,6 +1063,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
               // ),
             ],
           )),
+
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: ListView(

@@ -59,6 +59,7 @@ class BarChartSample extends StatelessWidget {
       barRods: [
         BarChartRodData(
           width: isWeb ? 20 : 30,
+          toY: y,
           color: Color(0xFF073349),
           borderRadius: BorderRadius.circular(2),
         ),
