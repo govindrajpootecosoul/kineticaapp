@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/utils/colors.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import '../../financescreens/finance_sku.dart';
 import '../../graph/barchart.dart';
@@ -12,7 +14,8 @@ import 'new_inventory_details.dart';
 import 'new_shipment_deatils.dart';
 
 class InventoryTabScreen extends StatelessWidget {
-  final Color selectedTabColor = Color(0xFFECD5B0); // Hex: #ECD5B0
+  // final Color selectedTabColor = Color(0xFFECD5B0); // Hex: #ECD5B0
+  final Color selectedTabColor = Color(0xFF745E39); // Hex: #ECD5B0
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +23,21 @@ class InventoryTabScreen extends StatelessWidget {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
+          toolbarHeight: 0.0,
          // title: Text("Inventory Tabs"),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           bottom: TabBar(
-            labelColor: selectedTabColor,
-            unselectedLabelColor: Colors.grey,
+            tabAlignment: TabAlignment.fill,
+            indicatorWeight: 3.0,
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.black,
             indicatorColor: selectedTabColor,
+            indicator: BoxDecoration(
+            color: AppColors.gold,
+            // borderRadius: BorderRadius.circular(50),
+          ),
             tabs: const [
               Tab(text: "Executive"),
               Tab(text: "SKU"),
