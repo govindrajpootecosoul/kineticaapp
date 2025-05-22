@@ -43,11 +43,12 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
 
   List<String> filterTypes = [
     // "today",
-      "week",
-    "last30days",
+    //"week",
+    //"last30days",
     "monthtodate",
-    '6months',
-    "yeartodate",
+    "lastmonth",
+    //'6months',
+    //"yeartodate",
     "custom",
   ];
 
@@ -75,7 +76,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
   bool isLoading = false;
   String? errorMsg;
 
-  List<double> values=[];
+  List<double> values=[10,20,30];
   List<String> labels=[];
   Map<String, double> monthlyTotals = {};
 
@@ -84,7 +85,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
     super.initState();
     isWeb = checkPlatform();
     _tabController = TabController(length: myTabs.length, vsync: this);
-    selectedFilterType = '6months'; // Set default to "6months"
+    selectedFilterType = 'lastmonth'; // Set default to "6months"
     fetchDropdownData();
 
     fetchFilteredData();
@@ -99,23 +100,23 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
 
   String formatFilterType(String filter) {
     switch (filter) {
-      case 'today':
-        return 'Today';
-        case 'week':
-        return 'Week';
-      case '6months':
-        return 'Last 6 Months';
-      case 'last30days':
-        return 'Last 30 Days';
-      case 'yeartodate':
-        return 'Year to Date';
+      // case 'today':
+      //   return 'Today';
+      //   case 'week':
+      //   return 'Week';
+      // case '6months':
+      //   return 'Last 6 Months';
+      // case 'last30days':
+      //   return 'Last 30 Days';
+      // case 'yeartodate':
+      //   return 'Year to Date';
       case 'monthtodate':
         return 'Month to Date';
 
       // case 'year':
       //   return 'This Year';
-      // case 'lastmonth':
-      //   return 'Last Month';
+      case 'lastmonth':
+        return 'Last Month';
       case 'custom':
         return 'Custom Range';
       default:
@@ -232,14 +233,15 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
             labels = breakdown
                 .map<String>((item) {
               DateTime date = DateTime.parse(item['date']);
-              return "${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+              return "${date.day.toString().padLeft(1, '0')}";
+              //return "${date.month.toString().padLeft(0, '0')}-${date.day.toString().padLeft(1, '0')}";
             })
                 .toList();
 
 
           }
 
-          if(selectedFilterType== "6months")
+          if(selectedFilterType== "lastmonth")
           {
             print("6666666 months");
             // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
@@ -414,65 +416,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
     }
   }
 
-/*  Future<void> fetchAdData() async {
-    if (selectedFilterType == null) return;
-    setState(() => isLoading = true);
-    // final url = Uri.parse(
-    //   'http://localhost:4000/api/data/filterData?range=custom&startDate=2025-01-01&endDate=2025-05-01&sku=200855',
-    // );
-    String url = '';
-
-    if (selectedFilterType == 'custom') {
-      if (startDate == null || endDate == null) {
-        setState(() => isLoading = false);
-        return;
-      }
-
-      final from = formatDate(startDate!);
-      final to = formatDate(endDate!);
-
-
-      print(to);
-      print(from);
-      print("objectttt");
-
-      url ='http://192.168.50.92:4000/api/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}}';
-      print("print custom url ${url}");
-    } else {
-      url ='http://192.168.50.92:4000/api/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}';
-      print("print url ${url}");
-    }
-
-    try {
-
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-
-        setState(() {
-          totalAdSales = double.parse((jsonResponse['totalAdSales']?.toDouble() ?? 0.0).toStringAsFixed(2));
-          totalAdSpend = double.parse((jsonResponse['totalAdSpend']?.toDouble() ?? 0.0).toStringAsFixed(2));
-          print("qwertyuio:: ${totalAdSales}");
-          print("qwertyuio:: ${totalAdSpend}");
-          isLoading = false;
-        });
-
-
-      } else {
-        setState(() {
-          errorMsg = 'Failed to load data: ${response.statusCode}';
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        errorMsg = '❌ Error: $e';
-        isLoading = false;
-      });
-    }
-  }*/
-
   void onDropdownChanged(String? value, String type) {
     setState(() {
       if (type == 'filter') {
@@ -512,17 +455,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
     }
   }
 
-  // final List<double> values = [10, 1500, 3000, 1102, 4003, 5000, 2007, 2700];
-  // final List<String> labels = [
-  //   'Mon',
-  //   'Tue',
-  //   'Wed',
-  //   'Thu',
-  //   'Fri',
-  //   'Sat',
-  //   'Sun',
-  //   'Next'
-  // ];
+
 
   void _showDateRangePicker(BuildContext context) async {
     showDialog(
@@ -709,81 +642,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
                           ),
                         ),
                       ),
-        
-                    // SizedBox(width: 8), // optional spacing
-                    // SizedBox(
-                    //   width: 150,
-                    //   child: DropdownSearch<String>(
-                    //     items: states,
-                    //     selectedItem: selectedState,
-                    //     popupProps: PopupProps.menu(
-                    //       showSearchBox: true,
-                    //       searchFieldProps: TextFieldProps(
-                    //         decoration: InputDecoration(
-                    //           hintText: "Search State",
-                    //           border: OutlineInputBorder(),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     dropdownDecoratorProps: DropDownDecoratorProps(
-                    //       dropdownSearchDecoration: InputDecoration(
-                    //         labelText: "State",
-                    //         border: OutlineInputBorder(),
-                    //       ),
-                    //     ),
-                    //     onChanged: (val) => onDropdownChanged(val, 'state'),
-                    //   ),
-                    // ),
-                    //
-                    // SizedBox(width: 8),
-                    // SizedBox(
-                    //   width: 150,
-                    //   child: DropdownSearch<String>(
-                    //     items: cities,
-                    //     selectedItem: selectedCity,
-                    //     popupProps: PopupProps.menu(
-                    //       showSearchBox: true,
-                    //       searchFieldProps: TextFieldProps(
-                    //         decoration: InputDecoration(
-                    //           hintText: "Search City",
-                    //           border: OutlineInputBorder(),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     dropdownDecoratorProps: DropDownDecoratorProps(
-                    //       dropdownSearchDecoration: InputDecoration(
-                    //         labelText: "City",
-                    //         border: OutlineInputBorder(),
-                    //       ),
-                    //     ),
-                    //     onChanged: (val) => onDropdownChanged(val, 'city'),
-                    //   ),
-                    // ),
-                    //
-                    // SizedBox(width: 8),
-                    // SizedBox(
-                    //   width: 150,
-                    //   child: DropdownSearch<String>(
-                    //     items: skus,
-                    //     selectedItem: selectedSku,
-                    //     popupProps: PopupProps.menu(
-                    //       showSearchBox: true,
-                    //       searchFieldProps: TextFieldProps(
-                    //         decoration: InputDecoration(
-                    //           hintText: "Search SKU",
-                    //           border: OutlineInputBorder(),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     dropdownDecoratorProps: DropDownDecoratorProps(
-                    //       dropdownSearchDecoration: InputDecoration(
-                    //         labelText: "SKU",
-                    //         border: OutlineInputBorder(),
-                    //       ),
-                    //     ),
-                    //     onChanged: (val) => onDropdownChanged(val, 'sku'),
-                    //   ),
-                    // ),
+
                   ],
                 ),
               ),
@@ -800,7 +659,184 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
                     : errorMessage.isNotEmpty
                         ? Center(child: Text(errorMessage))
                         : SingleChildScrollView(
-                            child: Column(
+                            child:
+
+                            Column(
+                              children: [
+                                Row(children: [
+                                  Expanded(
+                                      child: MetricCard(
+                                        title: "Overall Sales",
+                                        value: '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
+                                        compared: "${salesData?['comparison']['salesChangePercent']??"0"}",)
+                                  ),
+                                  // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
+                                  SizedBox(width: 8),
+                                  Expanded(
+                                    child: MetricCard(
+                                      title: "Units Ordered",
+                                      value: "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
+                                      compared: "${salesData?['comparison']['quantityChangePercent']}",
+                                      //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
+                                    ),),
+
+                                ],),
+                                SizedBox(height: 8,),
+                                // Row(children: [
+                                //   Expanded(
+                                //       child: MetricCard(
+                                //         title: "Organic Sales", value: '\$${salesData!['totalSales'].toStringAsFixed(2)}', compared: "${salesData!['comparison']['salesChangePercent']}",)),
+                                //   const SizedBox(width: 8),
+                                //   Expanded(
+                                //     child: MetricCard(
+                                //       title: "Units Orders", value:"${salesData!['totalQuantity']}", compared: "${salesData!['comparison']['quantityChangePercent']}",),),
+                                //
+                                // ],),
+
+
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+
+                                    if(selectedFilterType!= "last30days")
+                                      Expanded(
+                                        child: MetricCardcm(
+                                          title: "AOV",
+                                          //value: "",
+                                          value: "£ ${NumberFormat('#,###').format(
+                                              (((salesData?['totalSales'] ?? 0.0) as num) /
+                                                  ((adssales?['totalOrders'] ?? 1) as num)).toInt()
+                                          )}",
+                                          //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+                                          //  totalOrders
+                                        ),
+                                      ),
+                                    if(selectedFilterType== "last30days")
+                                      Expanded(
+                                        child: MetricCardcm(
+                                          title: "AOV",
+                                          //value: "",
+                                          value: "£ 00",
+                                          //  totalOrders
+                                        ),
+                                      ),
+                                    const SizedBox(width: 8),
+                                    if(selectedFilterType!= "last30days")
+
+                                      Expanded(
+                                        child: MetricCardcm(
+                                          title: "Organic Sales",
+                                          value: "£ ${NumberFormat('#,###').format(
+                                              ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
+                                          )}",
+                                          //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+
+                                        ),
+                                      ),
+
+                                    if(selectedFilterType== "last30days")
+                                      Expanded(
+                                        child: MetricCardcm(
+                                          title: "Organic Sales",
+                                          value: "£ 00",
+                                          //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: MetricCardcm(
+                                        title: "Ad Spend",
+                                        value: "£ ${NumberFormat('#,###').format(
+                                            (adssales?['totalAdSpend'] ?? 0).toDouble().round()
+                                        )}",
+                                        // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: MetricCardcm(
+                                        title: "Ad Sales",
+                                        value: "£ ${NumberFormat('#,###').format(
+                                            (adssales?['totalAdSales'] ?? 0).toDouble().round()
+                                        )}",
+                                        //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+
+
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    if(selectedFilterType!= "last30days")
+                                      Expanded(
+                                        child: MetricCardcm(
+                                          title: "ACOS",
+                                          value: "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
+
+                                        ),
+                                      ),
+                                    if(selectedFilterType== "last30days")
+                                      Expanded(
+                                        child: MetricCardcm(
+                                          title: "ACOS",
+                                          value: "0.00 %",
+
+                                        ),
+                                      ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: MetricCardcm(
+                                        title: "TACOS",
+                                        value: "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 1) * 100).toStringAsFixed(2)} %",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8,),
+                                Row(
+                                  children: [
+                                    if(selectedFilterType!= "last30days")
+                                      Expanded(
+                                        child: MetricCardcm(
+                                          title: "Organic Sales",
+                                          value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
+                                        ),
+                                      ),
+
+                                    if(selectedFilterType== "last30days")
+                                      Expanded(
+                                        child: MetricCardcm(
+                                          title: "Organic Sales",
+                                          value: "0.00 %",
+                                        ),
+                                      ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: MetricCardcm(
+                                        title: "",//DOS
+                                        value: "",
+                                        // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
+
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                              ],
+                            ),
+
+
+                            /*Column(
                               children: [
                                 // Your sales data cards here
                                 Row(
@@ -808,19 +844,21 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
                                     Expanded(
                                       child: MetricCard(
                                         title: "Overall Sales",
-                                        value:
-                                            '£ ${salesData?['totalSales'].toStringAsFixed(2)}',
-                                        compared:
-                                            "${salesData?['comparison']['salesChangePercent']}",
-                                      ),
+                              value: '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? "0").round())}',
+                              compared: "${salesData?['comparison']['salesChangePercent']??"0"}",)
+                                        // value:
+                                        //     '£ ${salesData?['totalSales'].toStringAsFixed(0)??"0"}',
+                                        // compared:
+                                        //     "${salesData?['comparison']['salesChangePercent']??"0"}",
+                                     // ),
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: MetricCard(
-                                        title: "Units Orders",
-                                        value: "${salesData?['totalQuantity']}",
-                                        compared:
-                                            "${salesData?['comparison']['quantityChangePercent']}",
+                                        title: "Units Ordered",
+                                       // value: "${salesData?['totalQuantity']?? "0"}", compared:"${salesData?['comparison']['quantityChangePercent']??"0"}",
+                                        value: "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? "0").round())}",
+                                        compared: "${salesData?['comparison']['quantityChangePercent']??"0"}",
                                       ),
                                     ),
                                   ],
@@ -955,7 +993,12 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
         
                                 const SizedBox(height: 16),
                               ],
-                            ),
+                            ),*/
+
+
+
+
+
                           ),
               ),
         

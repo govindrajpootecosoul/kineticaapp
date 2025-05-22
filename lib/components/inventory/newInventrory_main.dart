@@ -38,13 +38,13 @@
 //   }
 // }
 
+
+
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/utils/check_platform.dart';
 import 'package:provider/provider.dart';
 
 import '../../Provider/sales_SKU_Provider.dart';
 import '../../comman_Screens/Inventory_SKU_Card_Screen.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class NewInventoryMain extends StatefulWidget {
   const NewInventoryMain({super.key});
@@ -55,12 +55,10 @@ class NewInventoryMain extends StatefulWidget {
 
 class _NewInventoryMainState extends State<NewInventoryMain> {
   String selectedSku = 'All';
-  bool isWeb = false;
 
   @override
   void initState() {
     super.initState();
-    isWeb = checkPlatform();
     final provider = Provider.of<InventoryProvider>(context, listen: false);
     provider.fetchSKUs().then((_) {
       provider.fetchAllInventory();
@@ -82,91 +80,44 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
           return Column(
             children: [
               const SizedBox(height: 20),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 16),
-              //   child: DropdownButtonFormField<String>(
-              //     value: selectedSku,
-              //     items: dropdownItems.map((sku) {
-              //       return DropdownMenuItem(value: sku, child: Text(sku));
-              //     }).toList(),
-              //     onChanged: (value) {
-              //       setState(() => selectedSku = value!);
-              //       if (value == 'All') {
-              //         provider.fetchAllInventory();
-              //       } else {
-              //         provider.fetchInventoryBySku(value!);
-              //       }
-              //     },
-              //     decoration: const InputDecoration(
-              //       labelText: 'Select SKU',
-              //       border: OutlineInputBorder(),
-              //     ),
-              //   ),
-              // ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth:
-                          isWeb ? 400 : double.infinity, // Limit width on web
-                    ),
-                    child: DropdownButtonFormField<String>(
-                      value: selectedSku,
-                      items: dropdownItems.map((sku) {
-                        return DropdownMenuItem(value: sku, child: Text(sku));
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() => selectedSku = value!);
-                        if (value == 'All') {
-                          provider.fetchAllInventory();
-                        } else {
-                          provider.fetchInventoryBySku(value!);
-                        }
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Select SKU',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
+                child: DropdownButtonFormField<String>(
+                  value: selectedSku,
+                  items: dropdownItems.map((sku) {
+                    return DropdownMenuItem(value: sku, child: Text(sku));
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() => selectedSku = value!);
+                    if (value == 'All') {
+                      provider.fetchAllInventory();
+                    } else {
+                      provider.fetchInventoryBySku(value!);
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Select SKU',
+                    border: OutlineInputBorder(),
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
               if (provider.isLoading)
                 const CircularProgressIndicator()
               else if (provider.error.isNotEmpty)
                 Text(provider.error)
               else if (provider.inventoryList.isEmpty)
-                const Text('No inventory data found.')
-              else
-                isWeb
-                    ? Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: MasonryGridView.count(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
-                            itemCount: provider.inventoryList.length,
-                            itemBuilder: (context, index) {
-                              final product = provider.inventoryList[index];
-                              return InventorySkuCardScreen(product: product);
-                            },
-                          ),
-                        ),
-                      )
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: provider.inventoryList.length,
-                          itemBuilder: (context, index) {
-                            final product = provider.inventoryList[index];
-                            return InventorySkuCardScreen(product: product);
-                          },
-                        ),
-                      ),
+                  const Text('No inventory data found.')
+                else
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: provider.inventoryList.length,
+                      itemBuilder: (context, index) {
+                        final product = provider.inventoryList[index];
+                        return InventorySkuCardScreen(product: product);
+                      },
+                    ),
+                  ),
             ],
           );
         },
@@ -418,3 +369,4 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
 //     );
 //   }
 // }
+

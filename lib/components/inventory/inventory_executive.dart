@@ -284,7 +284,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
           int totalQuantity = getTotalFulfillableQuantity(inventoryList);
           print("Total afn_fulfillable_quantity: $totalQuantity");
           Amazoninventorysum=totalQuantity.toString();
-
+//estimated_storage_cost_next_month
 
           int totalsdtorageQuantity = getTotalDOSQuantity(inventoryList);
           print("Storage sum: $totalsdtorageQuantity");

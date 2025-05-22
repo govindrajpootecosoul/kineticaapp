@@ -14,7 +14,7 @@ class BarChartSample extends StatelessWidget {
     double maxY = values.isNotEmpty ? values.reduce((a, b) => a > b ? a : b) + 10 : 10;
 
     return Container(
-      height: isWeb ? 450 : 270,
+      height: isWeb ? 450 : 280,
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
@@ -58,7 +58,7 @@ class BarChartSample extends StatelessWidget {
       x: x,
       barRods: [
         BarChartRodData(
-          width: isWeb ? 20 : 30,
+          width: isWeb ? 20 : 10,
           toY: y,
           color: Color(0xFF073349),
           borderRadius: BorderRadius.circular(2),
