@@ -39,6 +39,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/comman_Screens/Inventory_SKU_Card_Web_Screen.dart';
 import 'package:flutter_application_1/utils/check_platform.dart';
 import 'package:provider/provider.dart';
 
@@ -153,7 +154,7 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
                             itemCount: provider.inventoryList.length,
                             itemBuilder: (context, index) {
                               final product = provider.inventoryList[index];
-                              return InventorySkuCardScreen(product: product);
+                              return InventorySkuCardWebScreen(product: product);
                             },
                           ),
                         ),
