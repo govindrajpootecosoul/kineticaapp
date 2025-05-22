@@ -437,6 +437,8 @@ import 'package:intl/intl.dart';
 import '../../utils/ApiConfig.dart';
 import '../../utils/colors.dart';
 import 'aging_screen.dart';
+import 'package:flutter/foundation.dart';
+
 
 class New_inventrory_details extends StatefulWidget {
   const New_inventrory_details({super.key});
@@ -446,11 +448,7 @@ class New_inventrory_details extends StatefulWidget {
 }
 
 class _New_inventrory_detailsState extends State<New_inventrory_details> {
-  List<String> _selectedItems = [
-    "Warehouse Inventory",
-    "Total Sellable",
-    "Amazon Reserved"
-  ];
+  List<String> _selectedItems = [];
 
   final List<String> _options = [
     "Warehouse Inventory",
@@ -488,8 +486,29 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   @override
   void initState() {
     super.initState();
+    initializeSelectedItems();
     fetchSkuList();
   }
+
+  void initializeSelectedItems() {
+  if (kIsWeb) {
+    _selectedItems = [
+      "Warehouse Inventory",
+      "Total Sellable",
+      "Amazon Reserved",
+      "Inventory Age",
+      "DOS",
+      "Customer Reserved",
+    ]; // 6 items for Web
+  } else {
+    _selectedItems = [
+      "Warehouse Inventory",
+      "Total Sellable",
+      "Amazon Reserved",
+    ]; // 3 items for Mobile
+  }
+}
+
 
   // Function to fetch the list of SKUs
   Future<void> fetchSkuList() async {

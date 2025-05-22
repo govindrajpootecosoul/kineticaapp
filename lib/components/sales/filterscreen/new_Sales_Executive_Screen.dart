@@ -948,12 +948,12 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
 
 
   List<String> filterTypes = [
-     "today",
+     //"today",
     //"last30days",
     "lastmonth",
     "monthtodate",
-    '6months',
-    "yeartodate",
+    //'6months',
+    //"yeartodate",
     "custom",
   ];
 
@@ -986,7 +986,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
   @override
   void initState() {
     super.initState();
-    selectedFilterType = '6months'; // Set default to "6months"
+    selectedFilterType = 'lastmonth'; // Set default to "6months"
     fetchDropdownData();
     fetchFilteredData(); // Automatically fetch data for 6 months on screen load
   }
@@ -1135,7 +1135,8 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
             labels = breakdown
                 .map<String>((item) {
               DateTime date = DateTime.parse(item['date']);
-              return "${date.month.toString().padLeft(1, '0')}-${date.day.toString().padLeft(1, '0')}";
+              return "${date.day.toString().padLeft(1, '0')}";
+             // return "${date.month.toString().padLeft(1, '0')}-${date.day.toString().padLeft(1, '0')}";
             })
                 .toList();
 
