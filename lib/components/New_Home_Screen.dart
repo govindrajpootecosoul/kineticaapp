@@ -582,69 +582,66 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
           child: ListView(
             // mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              SingleChildScrollView(
-                // scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 190,
-                      height: 33, // Fixed height
-                      child: DropdownButtonFormField<String>(
-                        isDense: true, // Makes dropdown compact
-                        style: TextStyle(
-                            fontSize: 12, color: Colors.black), // Smaller font
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8), // Tight padding
-                          hintText: "Select Filter Type",
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue, width: 1,),
-                            borderRadius: BorderRadius.circular(50)
-                          ),
-                          
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: 190,
+                    height: 33, // Fixed height
+                    child: DropdownButtonFormField<String>(
+                      isDense: true, // Makes dropdown compact
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.black), // Smaller font
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8), // Tight padding
+                        hintText: "Select Filter Type",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50)),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue, width: 1,),
+                          borderRadius: BorderRadius.circular(50)
                         ),
-                        items: filterTypes.map((type) {
-                          return DropdownMenuItem(
-                            onTap: (){},
-                            value: type,
-                            child: Padding(
-                             padding: const EdgeInsets.only(right: 10), 
-                              child: Text(
-                                formatFilterType(type),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: TextStyle(fontSize: 12, color: Colors.black),
-                              ),
+
+                      ),
+                      items: filterTypes.map((type) {
+                        return DropdownMenuItem(
+                          onTap: (){},
+                          value: type,
+                          child: Padding(
+                           padding: const EdgeInsets.only(right: 10),
+                            child: Text(
+                              formatFilterType(type),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(fontSize: 12, color: Colors.black),
                             ),
-                          );
-                        }).toList(),
-                        value: selectedFilterType,
-                        onChanged: (val) => onDropdownChanged(val, 'filter'),
+                          ),
+                        );
+                      }).toList(),
+                      value: selectedFilterType,
+                      onChanged: (val) => onDropdownChanged(val, 'filter'),
+                    ),
+                  ),
+
+                  if (selectedFilterType == 'custom')
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showDateRangePicker(context),
+                        // onPressed: () => selectDateRange(context),
+
+                        icon: Icon(Icons.date_range),
+                        label: Text(
+                          startDate != null && endDate != null
+                              ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
+                              : "Select Date Range",
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
-        
-                    if (selectedFilterType == 'custom')
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: ElevatedButton.icon(
-                          onPressed: () => _showDateRangePicker(context),
-                          // onPressed: () => selectDateRange(context),
-        
-                          icon: Icon(Icons.date_range),
-                          label: Text(
-                            startDate != null && endDate != null
-                                ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
-                                : "Select Date Range",
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
 
-                  ],
-                ),
+                ],
               ),
               // 🔼 Your dropdown and filter widgets here...
         
