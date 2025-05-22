@@ -352,7 +352,15 @@ class _SalesSkuPageState extends State<NewFinanceSkuScreen> {
       // appBar: AppBar(title: const Text('Sales SKU Data')),
 
       appBar: AppBar(
-        title: Image.asset('assets/logo.png'),
+        // title: Image.asset('assets/logo.png'),
+        title: const Text(
+          'Finance SKU',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: AppColors.primaryBlue,
         iconTheme: IconThemeData(color: Colors.white),
