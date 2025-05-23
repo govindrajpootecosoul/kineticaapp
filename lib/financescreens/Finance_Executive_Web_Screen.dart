@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/utils/colors.dart';
+import 'package:flutter_application_1/utils/formatNumberStringWithComma.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -91,9 +92,10 @@ class _FinanceExecutiveWebScreenState extends State<FinanceExecutiveWebScreen> {
         'Total Sales': sumField(selectedMonthList, 'Total Sales'),
         'Total Returns': sumField(selectedMonthList,
             'Total Units'), // Assuming returns are 'Total Units', adjust if needed
-        'COGS': 0.0, // Your JSON doesn't have COGS? Set 0 or handle accordingly
+        'COGS': sumField(selectedMonthList,
+            'Cogs'), // Your JSON doesn't have COGS? Set 0 or handle accordingly
         'CM1': sumField(selectedMonthList, 'CM1'),
-        'Inventory': 0.0, // No inventory key in JSON, adjust if you have one
+        'Inventory': sumField(selectedMonthList, 'FBA Inventory Fee'),
         'Liquidations': sumField(selectedMonthList, 'Liquidations'),
         'FBA Reimbursement': sumField(selectedMonthList, 'FBA Reimbursement'),
         'Storage Fee': sumField(selectedMonthList, 'Storage Fee'),
@@ -127,7 +129,8 @@ class _FinanceExecutiveWebScreenState extends State<FinanceExecutiveWebScreen> {
             ),
           ),
           Text(
-            '\$ ${value.toStringAsFixed(2)}',
+            //  '\£ ${value.toStringAsFixed(2)}',
+            '\£ ${formatNumberStringWithComma(value.round().toString())}',
             style: TextStyle(
               color: valueColor ?? Colors.black,
               fontWeight: isCM ? FontWeight.bold : FontWeight.w600,
@@ -157,21 +160,42 @@ class _FinanceExecutiveWebScreenState extends State<FinanceExecutiveWebScreen> {
         backgroundColor: AppColors.primaryBlue,
         iconTheme: IconThemeData(
             color: Colors.white), // 👈 sets back arrow color to white
-        title: Expanded(
-          child: Text(
-            'Finance > Executive',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+             const Text(
+              'Finance > Executive',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
+            Image.asset(
+              'assets/logo.png',
+              height: 72,
+            ),
+           const SizedBox(width: 8),
+           const SizedBox(width: 8),
+          ],
         ),
-        flexibleSpace: Container(
-          child: Center(
-            child: Image.asset('assets/logo.png'),
-          ),
-        ),
+        centerTitle: true,
+
+        // title: Expanded(
+        //   child: Text(
+        //     'Finance > Executive',
+        //     style: TextStyle(
+        //       color: Colors.white,
+        //       fontSize: 18,
+        //       fontWeight: FontWeight.w600,
+        //     ),
+        //   ),
+        // ),
+        // flexibleSpace: Container(
+        //   child: Center(
+        //     child: Image.asset('assets/logo.png'),
+        //   ),
+        // ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
