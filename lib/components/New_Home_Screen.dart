@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/financescreens/Finance_Executive_Web_Screen.dart';
 import 'package:flutter_application_1/utils/check_platform.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:http/http.dart' as http;
@@ -964,7 +966,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
+                                          builder: (context) => kIsWeb ? FinanceExecutiveWebScreen() :
                                               FinanceExecutiveScreen(),
                                         ),
                                       );
