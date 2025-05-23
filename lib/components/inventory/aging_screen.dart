@@ -194,7 +194,201 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
       //     ),
       //   ),
       // ),
-      body: Column(
+      body: kIsWeb ? Container(
+       margin: const EdgeInsets.symmetric(horizontal: 180, vertical: 8),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DropdownButton<String>(
+                value: selectedSku,
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedSku = newValue;
+                    isLoading =
+                        true; // Set loading state before fetching new data
+                    fetchInventoryData(); // Fetch data with the new SKU
+                  });
+                },
+                items: skuList.map<DropdownMenuItem<String>>((String sku) {
+                  return DropdownMenuItem<String>(
+                    value: sku,
+                    child: Text(sku),
+                  );
+                }).toList(),
+              ),
+            ),
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : error.isNotEmpty
+                      ? Center(child: Text(error))
+                      : ListView.builder(
+                          itemCount: inventoryList.length,
+                          itemBuilder: (context, index) {
+                            var item = inventoryList[index];
+        
+                            return Card(
+                              color: AppColors.beige,
+                              elevation: 0,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Row(
+                                    children: [
+                                      Column(
+                                        children: [
+                                          // Icon(Icons.icecream_outlined),
+                                          SizedBox(
+                                            width: 100,
+                                            child: Text(
+                                              '📦',
+                                              //Product: name
+                                              // "${item['SKU'].toString()}",
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 50,
+                                                  color: Colors.brown),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              // ClipRRect(
+                                              //   borderRadius: BorderRadius.circular(8),
+                                              //   child: Image.network(
+                                              //     'https://www.kineticasports.com/cdn/shop/files/kinetica-sports-227kg-whey-choc-974567.png?v=1715782106&width=1200',
+                                              //     width: 100,
+                                              //     height: 120,
+                                              //     fit: BoxFit.cover,
+                                              //     errorBuilder: (context, error,
+                                              //         stackTrace) =>
+                                              //     const Icon(
+                                              //         Icons.image_not_supported,
+                                              //         size: 80),
+                                              //   ),
+                                              // ),
+                                              // const SizedBox(width: 12),
+        
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  // SizedBox(height: 8),
+        
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text("SKU",
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                              color: AppColors
+                                                                  .gold)),
+                                                      SizedBox(
+                                                        width:
+                                                            100, // tweak this value to achieve a wrap around 15 characters
+                                                        child: Text(
+                                                          item['SKU'].toString(),
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                            color: AppColors
+                                                                .primaryBlue,
+                                                          ),
+                                                          softWrap: true,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  //_buildInfoRow("SKU", "product['sellerSku'].toUpperCase()"),
+        
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text("ASIN",
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                              color: AppColors
+                                                                  .gold)),
+                                                      SizedBox(
+                                                        width:
+                                                            100, // tweak this value to achieve a wrap around 15 characters
+                                                        child: Text(
+                                                          item['ASIN'].toString(),
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                            color: AppColors
+                                                                .primaryBlue,
+                                                          ),
+                                                          softWrap: true,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  // _buildInfoRow("ASIN", "product['asin'].toUpperCase()"),
+                                                ],
+                                              ),
+                                              //  SizedBox(width: 16),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      // Column(
+                                      //   crossAxisAlignment:
+                                      //       CrossAxisAlignment.start,
+                                      //   children: [
+                                      //     Row(
+                                      //       crossAxisAlignment:
+                                      //           CrossAxisAlignment.start,
+                                      //       children: _selectedItems
+                                      //           .map((label) => buildInfoRow(
+                                      //               label,
+                                      //               item[fieldMapping[label]]
+                                      //                       ?.toString() ??
+                                      //                   "0"))
+                                      //           .toList(),
+                                      //     ),
+                                      //     SizedBox(
+                                      //       height: 10,
+                                      //     ),
+                                      //     Row(
+                                      //       crossAxisAlignment:
+                                      //           CrossAxisAlignment.start,
+                                      //       children: _selectedItemss
+                                      //           .map((label) => buildInfoRow(
+                                      //               label,
+                                      //               item[fieldMapping[label]]
+                                      //                       ?.toString() ??
+                                      //                   "0"))
+                                      //           .toList(),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      showAgeingContent(item),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+            ),
+          ],
+        ),
+      ) :
+      Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),

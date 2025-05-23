@@ -234,6 +234,7 @@
 // }
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/utils/formatNumberStringWithComma.dart';
 
@@ -406,101 +407,200 @@ double calculateTotalEstimatedAisCost(List<dynamic> data) {
 
 
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(16),
+  //     child: Column(
+  //       children: [
+  //         Row(
+  //           children: [
+  //             Expanded(
+  //               child: MetricCard(
+  //                 title: 'Storage Cost',
+  //                 value: "£ ${Storagecostsum}",
+  //                 description: 'Estimated cost for next month',
+  //                 // value: inventoryList[1].SKU,
+  //               ),
+  //             ),
+  //             SizedBox(width: 16),
+  //             Expanded(
+  //               child: MetricCard(
+  //                 title: 'LTSF Cost',
+  //                 value: "£ ${LTSFsum}",
+  //                 description: 'Storage cost for stock (more than 180 days)',
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         SizedBox(height: 16),
+  //         Row(
+  //           children: [
+  //             Expanded(
+  //               child: MetricCard(
+  //                 title: 'Amazon Inventory',
+  //                 value: Amazoninventorysum,
+  //                 description: 'As of Today',
+  //               ),
+  //             ),
+  //             SizedBox(width: 16),
+  //             Expanded(
+  //               child: MetricCard(
+  //                 title: 'DOS',
+  //                 value: "${DOSsum} Days",
+  //                 description: 'For all SKU Average basis',
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
+Widget build(BuildContext context) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      // Determine card width based on platform and screen width
+      double screenWidth = constraints.maxWidth;
+      double cardWidth = kIsWeb
+          ? (screenWidth > 800 ? screenWidth / 2.5 : screenWidth / 1.1)
+          : screenWidth / 1.1;
+
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Center(
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
             children: [
-              Expanded(
-                child: MetricCard(
-                  title: 'Storage Cost',
-                  value: "£ ${Storagecostsum}",
-                  description: 'Estimated cost for next month',
-                  // value: inventoryList[1].SKU,
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: MetricCard(
-                  title: 'LTSF Cost',
-                  value: "£ ${LTSFsum}",
-                  description: 'Storage cost for stock (more than 180 days)',
-                ),
-              ),
+              _buildMetricCard('Storage Cost', "£ $Storagecostsum",
+                  'Estimated cost for next month', cardWidth),
+              _buildMetricCard('LTSF Cost', "£ $LTSFsum",
+                  'Storage cost for stock (more than 180 days)', cardWidth),
+              _buildMetricCard('Amazon Inventory', Amazoninventorysum,
+                  'As of Today', cardWidth),
+              _buildMetricCard('DOS', "$DOSsum Days",
+                  'For all SKU Average basis', cardWidth),
             ],
           ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: MetricCard(
-                  title: 'Amazon Inventory',
-                  value: Amazoninventorysum,
-                  description: 'As of Today',
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: MetricCard(
-                  title: 'DOS',
-                  value: "${DOSsum} Days",
-                  description: 'For all SKU Average basis',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      );
+    },
+  );
 }
+
+// Helper to wrap MetricCard with width
+Widget _buildMetricCard(String title, String value, String desc, double width) {
+  return SizedBox(
+    width: width,
+    child: MetricCard(
+      title: title,
+      value: value,
+      description: desc,
+    ),
+  );
+}
+
+}
+
+// class MetricCard extends StatelessWidget {
+//   final String title;
+//   final String value;
+//   final String description; // New field
+
+//   const MetricCard({
+//     Key? key,
+//     required this.title,
+//     required this.value,
+//     required this.description, // Required param
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       height: 170,
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         color: Color(0xFFFFFAEB),
+//         borderRadius: BorderRadius.circular(16),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             title,
+//             style: TextStyle(
+//               color: Colors.brown.shade700,
+//               fontSize: 16,
+//               fontWeight: FontWeight.w500,
+//             ),
+//           ),
+//           SizedBox(height: 8),
+//           Text(
+//             value,
+//             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+//           ),
+//           Spacer(),
+//           Text(
+//             description,
+//             style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
 
 class MetricCard extends StatelessWidget {
   final String title;
   final String value;
-  final String description; // New field
+  final String description;
 
   const MetricCard({
     Key? key,
     required this.title,
     required this.value,
-    required this.description, // Required param
+    required this.description,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 170,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Color(0xFFFFFAEB),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.brown.shade700,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+      child: IntrinsicHeight(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.brown.shade700,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          Spacer(),
-          Text(
-            description,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-          ),
-        ],
+            SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Spacer(),
+            Text(
+              description,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+            ),
+          ],
+        ),
       ),
     );
   }
