@@ -34,10 +34,11 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
 
   List<String> filterTypes = [
     //"today",
-    "last30days",
+    //"last30days",
     "monthtodate",
-    '6months',
-    "yeartodate",
+    "lastmonth",
+    //'6months',
+    //"yeartodate",
     "custom",
   ];
 
@@ -72,7 +73,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
   @override
   void initState() {
     super.initState();
-    selectedFilterType = '6months'; // Set default to "6months"
+    selectedFilterType = 'monthtodate'; // Set default to "6months"
     fetchDropdownData();
     fetchFilteredData(); // Automatically fetch data for 6 months on screen load
   }
@@ -89,12 +90,12 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
       case 'yeartodate':
         return 'Year to Date';
     case 'monthtodate':
-      return 'Month to Date';
+      return 'Current Month';
 
     // case 'year':
     //   return 'This Year';
-    // case 'lastmonth':
-    //   return 'Last Month';
+    case 'lastmonth':
+      return 'Last Month';
       case 'custom':
         return 'Custom Range';
       default:
@@ -126,6 +127,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
     setState(() => isLoading = true);
 
     String url = '';
+    print("selectedFilterType :::>>>  ${selectedFilterType}");
 
     if (selectedFilterType == 'custom') {
       if (startDate == null || endDate == null) {
@@ -198,14 +200,15 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
             labels = breakdown
                 .map<String>((item) {
               DateTime date = DateTime.parse(item['date']);
-              return "${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+              return "${date.day.toString().padLeft(2, '0')}";
+              //return "${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
             })
                 .toList();
 
 
           }
 
-          if(selectedFilterType== "6months")
+          if(selectedFilterType== "lastmonth")
           {
             print("6666666 months");
             // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
@@ -593,7 +596,186 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                     ? Center(child: Text(errorMessage))
                     : Padding(
                   padding: const EdgeInsets.all(1.0),
-                  child: Column(
+                  child:
+
+
+
+                  Column(
+                    children: [
+                      Row(children: [
+                        Expanded(
+                            child: MetricCard(
+                              title: "Overall Sales",
+                              value: '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? "0").round())}',
+                              compared: "${salesData?['comparison']['salesChangePercent']??"0"}",)
+                        ),
+                        // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: MetricCard(
+                            title: "Units Ordered",
+                            value: "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
+                            compared: "${salesData?['comparison']['quantityChangePercent']}",
+                            //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
+                          ),),
+
+                      ],),
+                      SizedBox(height: 8,),
+                      // Row(children: [
+                      //   Expanded(
+                      //       child: MetricCard(
+                      //         title: "Organic Sales", value: '\$${salesData!['totalSales'].toStringAsFixed(2)}', compared: "${salesData!['comparison']['salesChangePercent']}",)),
+                      //   const SizedBox(width: 8),
+                      //   Expanded(
+                      //     child: MetricCard(
+                      //       title: "Units Orders", value:"${salesData!['totalQuantity']}", compared: "${salesData!['comparison']['quantityChangePercent']}",),),
+                      //
+                      // ],),
+
+
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+
+                          if(selectedFilterType!= "last30days")
+                            Expanded(
+                              child: MetricCardcm(
+                                title: "AOV",
+                                //value: "",
+                                value: "£ ${NumberFormat('#,###').format(
+                                    (((salesData?['totalSales'] ?? 0.0) as num) /
+                                        ((adssales?['totalOrders'] ?? 1) as num)).toInt()
+                                )}",
+                                //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+                                //  totalOrders
+                              ),
+                            ),
+                          if(selectedFilterType== "last30days")
+                            Expanded(
+                              child: MetricCardcm(
+                                title: "AOV",
+                                //value: "",
+                                value: "£ 00",
+                                //  totalOrders
+                              ),
+                            ),
+                          const SizedBox(width: 8),
+                          if(selectedFilterType!= "last30days")
+
+                            Expanded(
+                              child: MetricCardcm(
+                                title: "Organic Sale",
+                                value: "£ ${NumberFormat('#,###').format(
+                                    ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
+                                )}",
+                                //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+
+                              ),
+                            ),
+
+                          if(selectedFilterType== "last30days")
+                            Expanded(
+                              child: MetricCardcm(
+                                title: "Organic Sales",
+                                value: "£ 00",
+                                //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+
+                              ),
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Ad Spend",
+                              value: "£ ${NumberFormat('#,###').format(
+                                  (adssales?['totalAdSpend'] ?? 0).toDouble().round()
+                              )}",
+                              // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "Ad Sales",
+                              value: "£ ${NumberFormat('#,###').format(
+                                  (adssales?['totalAdSales'] ?? 0).toDouble().round()
+                              )}",
+                              //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+
+
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          if(selectedFilterType!= "last30days")
+                            Expanded(
+                              child: MetricCardcm(
+                                title: "ACOS",
+                                value: "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
+
+                              ),
+                            ),
+                          if(selectedFilterType== "last30days")
+                            Expanded(
+                              child: MetricCardcm(
+                                title: "ACOS",
+                                value: "0.00 %",
+
+                              ),
+                            ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "TACOS",
+                              value: "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 1) * 100).toStringAsFixed(2)} %",
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8,),
+                      Row(
+                        children: [
+                          if(selectedFilterType!= "last30days")
+                            Expanded(
+                              child: MetricCardcm(
+                                title: "Organic Sales",
+                                value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
+                              ),
+                            ),
+
+                          if(selectedFilterType== "last30days")
+                            Expanded(
+                              child: MetricCardcm(
+                                title: "Organic Sales",
+                                value: "0.00 %",
+                              ),
+                            ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetricCardcm(
+                              title: "",//DOS
+                              value: "",
+                              // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
+
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ],
+                  ),
+
+
+                 /* Column(
                     children: [
                       Row(children: [
               
@@ -707,7 +889,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
               
               
                     ],
-                  )
+                  )*/
               
                   // ListView(
                   //   children: [

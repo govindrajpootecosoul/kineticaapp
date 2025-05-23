@@ -1,33 +1,30 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_application_1/utils/ApiConfig.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:dropdown_search/dropdown_search.dart';
 
-import '../../../comman_Screens/productcard.dart'; // Import the package
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
+
+import '../../../utils/ApiConfig.dart';
 
 class Filter_SalesSkuScreen extends StatefulWidget {
   @override
-  State<Filter_SalesSkuScreen> createState() => _Filter_SalesSkuScreenState();
+  _SalesScreenState createState() => _SalesScreenState();
 }
 
-class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
+class _SalesScreenState extends State<Filter_SalesSkuScreen> {
+  List<dynamic> salesData = [];
+  bool isLoading = true;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchSalesData();
+  // }
+
   List<String> states = [];
   List<String> cities = [];
   List<String> skus = [];
-
-  // List<String> filterTypes = [
-  //   '6months',
-  //   "yeartodate",
-  //   "monthtodate",
-  //   "last30days",
-  //   "year",
-  //   "lastmonth",
-  //   "today",
-  //   "custom",
-  // ];
-
-
 
   List<String> filterTypes = [
     "today",
@@ -38,48 +35,39 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
     "custom",
   ];
 
+
   String? selectedState;
   String? selectedCity;
   String? selectedSku;
-  String? selectedFilterType;
+  String? selectedFilterType = '6months';
 
   DateTime? startDate;
   DateTime? endDate;
 
-  List<SalesSku> salesData = [];
-  bool isLoading = false;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   fetchDropdownData();
-  // }
+
 
   @override
   void initState() {
     super.initState();
-    selectedFilterType = '6months'; // Set default to "6months"
+    selectedFilterType = 'monthtodate'; // Set default to "6months"
     fetchDropdownData();
-    fetchFilteredData(); // Automatically fetch data for 6 months on screen load
+    fetchSalesData(); // Automatically fetch data for 6 months on screen load
   }
+
 
   String formatFilterType(String filter) {
     switch (filter) {
       case 'today':
         return 'Today';
-      case '6months':
-        return 'Last 6 Months';
       case 'last30days':
         return 'Last 30 Days';
-      case 'yeartodate':
-        return 'Year to Date';
       case 'monthtodate':
         return 'Month to Date';
-
-      // case 'year':
-      //   return 'This Year';
-      // case 'lastmonth':
-      //   return 'Last Month';
+      case '6months':
+        return 'Last 6 Months';
+      case 'yeartodate':
+        return 'Year to Date';
       case 'custom':
         return 'Custom Range';
       default:
@@ -87,15 +75,25 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
     }
   }
 
+
+  String formatDate(DateTime date) =>
+      "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
   Future<void> fetchDropdownData() async {
     try {
       final stateRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/state?q='));
       final cityRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/city?q='));
       final skuRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/sku'));
 
-      if (stateRes.statusCode == 200) states = List<String>.from(json.decode(stateRes.body));
-      if (cityRes.statusCode == 200) cities = List<String>.from(json.decode(cityRes.body));
-      if (skuRes.statusCode == 200) skus = List<String>.from(json.decode(skuRes.body));
+      if (stateRes.statusCode == 200) {
+        states = List<String>.from(json.decode(stateRes.body));
+      }
+      if (cityRes.statusCode == 200) {
+        cities = List<String>.from(json.decode(cityRes.body));
+      }
+      if (skuRes.statusCode == 200) {
+        skus = List<String>.from(json.decode(skuRes.body));
+      }
 
       setState(() {});
     } catch (e) {
@@ -104,67 +102,48 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
   }
 
 
-  String formatDate(DateTime date) =>
-      "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  Future<void> fetchSalesData() async {
 
-  Future<void> fetchFilteredData() async {
     if (selectedFilterType == null) return;
     setState(() => isLoading = true);
 
-    String url = '';
+    String url;
+    print("filterTypes::::: ${selectedFilterType}");
 
     if (selectedFilterType == 'custom') {
       if (startDate == null || endDate == null) {
         setState(() => isLoading = false);
         return;
       }
-
       final from = formatDate(startDate!);
       final to = formatDate(endDate!);
-
-      url =
-      '${ApiConfig.baseUrl}/sales?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      url = '${ApiConfig.baseUrl}/sales?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     } else {
-      url =
-      '${ApiConfig.baseUrl}/sales?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+
+      url = '${ApiConfig.baseUrl}/sales?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      //url='https://api.thrivebrands.ai/api/sales?filterType=lastmonth';
     }
     try {
-      final response = await http.get(Uri.parse(url));
+      var dio = Dio();
+      //var response = await dio.get('https://api.thrivebrands.ai/api/sales?filterType=lastmonth');
+      var response = await dio.get(url);
+
       if (response.statusCode == 200) {
-        final parsedJson = json.decode(response.body);
-        List<SalesSku> tempSalesData = [];
-
-        for (var item in parsedJson) {
-          print("qwertyuiop::: ${parsedJson}");
-          var sku = item['SKU'];
-          var totalQuantity = item['totalQuantity'];
-          var totalSales = item['totalSales'];
-          var records = item['records'];
-
-          List<SalesRecord> recordList = [];
-          for (var record in records) {
-            recordList.add(SalesRecord.fromJson(record));
-          }
-
-          tempSalesData.add(SalesSku(
-            sku: sku,
-            totalQuantity: totalQuantity,
-            totalSales: totalSales,
-            records: recordList,
-          ));
-        }
-
-        setState(() => salesData = tempSalesData);
-      }
-
-
-      else {
-        print('Failed to fetch sales data: ${response.reasonPhrase}');
+        setState(() {
+          salesData = response.data; // direct assign JSON List<dynamic>
+          isLoading = false;
+        });
+      } else {
+        print('Error: ${response.statusMessage}');
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e) {
-      print('Error fetching filtered data: $e');
-    } finally {
-      setState(() => isLoading = false);
+      print('Exception: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -172,18 +151,16 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
     setState(() {
       if (type == 'filter') {
         selectedFilterType = value;
-        if (value != 'custom') {
-          fetchFilteredData();
-        }
+        if (value != 'custom') fetchSalesData();
       } else if (type == 'state') {
         selectedState = value;
-        fetchFilteredData();
+        fetchSalesData();
       } else if (type == 'city') {
         selectedCity = value;
-        fetchFilteredData();
+        fetchSalesData();
       } else if (type == 'sku') {
         selectedSku = value;
-        fetchFilteredData();
+        fetchSalesData();
       }
     });
   }
@@ -201,379 +178,131 @@ class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
         startDate = picked.start;
         endDate = picked.end;
       });
-      fetchFilteredData();
+      fetchSalesData();
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        // appBar: AppBar(title: Text('Sales Data')),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
-     // appBar: AppBar(title: const Text("Sales Data Viewer")),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-
-                  SizedBox(
-                    width: 190,
-                    child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        hintText: "Select Filter Type",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 1),
-                        ),
+      // appBar: AppBar(title: Text('Sales Data')),
+      body: Column(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 190,
+                  child: DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      hintText: "Select Filter Type",
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue, width: 1),
                       ),
-                      items: filterTypes.map((type) {
-                        return DropdownMenuItem(
-                          value: type,
-                          child: Text(formatFilterType(type),
-                            overflow: TextOverflow.ellipsis,),
-                        );
-                      }).toList(),
-                      value: selectedFilterType,
+                    ),
+                    items: filterTypes.map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(formatFilterType(type), overflow: TextOverflow.ellipsis),
+                      );
+                    }).toList(),
+                    value: selectedFilterType,
+                    onChanged: (val) => onDropdownChanged(val, 'filter'),
+                  ),
+                ),
 
-                      onChanged: (val) => onDropdownChanged(val, 'filter'),
+                if (selectedFilterType == 'custom')
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: ElevatedButton.icon(
+                      onPressed: () => selectDateRange(context),
+                      icon: Icon(Icons.date_range),
+                      label: Text(
+                        startDate != null && endDate != null
+                            ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
+                            : "Select Date Range",
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
 
-                  if (selectedFilterType == 'custom')
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: ElevatedButton.icon(
-                        onPressed: () => selectDateRange(context),
-                        icon: Icon(Icons.date_range),
-                        label: Text(
-                          startDate != null && endDate != null
-                              ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
-                              : "Select Date Range",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
+                SizedBox(width: 8),
 
-                  SizedBox(width: 8),
-                  SizedBox(
-                    width: 150,
-                    height: 50,
-                    child: DropdownSearch<String>(
-                      items: skus,
-                      selectedItem: selectedSku,
-                      popupProps: PopupProps.menu(
-                        showSearchBox: true,
-                        searchFieldProps: TextFieldProps(
-                          decoration: InputDecoration(
-                            hintText: "Search SKU",
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                      dropdownDecoratorProps: DropDownDecoratorProps(
-                        dropdownSearchDecoration: InputDecoration(
-                          labelText: "SKU",
+                SizedBox(
+                  width: 150,
+                  height: 50,
+                  child: DropdownSearch<String>(
+                    items: skus,
+                    selectedItem: selectedSku,
+                    popupProps: PopupProps.menu(
+                      showSearchBox: true,
+                      searchFieldProps: TextFieldProps(
+                        decoration: InputDecoration(
+                          hintText: "Search SKU",
                           border: OutlineInputBorder(),
                         ),
                       ),
-                      clearButtonProps: ClearButtonProps(isVisible: true),
-                      onChanged: (val) => onDropdownChanged(val, 'sku'),
                     ),
+                    dropdownDecoratorProps: DropDownDecoratorProps(
+                      dropdownSearchDecoration: InputDecoration(
+                        labelText: "SKU",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    clearButtonProps: ClearButtonProps(isVisible: true),
+                    onChanged: (val) => onDropdownChanged(val, 'sku'),
                   ),
-
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
 
+          const SizedBox(height: 20),
+          Expanded(
+            child: ListView.builder(
+              itemCount: salesData.length,
+              itemBuilder: (context, index) {
+                var item = salesData[index];
+                var records = item['records'] as List<dynamic>;
 
-
-            const SizedBox(height: 20),
-
-            // Expanded(
-            //   child: isLoading
-            //       ? const Center(child: CircularProgressIndicator())
-            //       : salesData.isEmpty
-            //       ? const Center(child: Text("No records found"))
-            //       : ListView.builder(
-            //     itemCount: salesData.length,
-            //     itemBuilder: (context, index) {
-            //       final data = salesData[index];
-            //       return
-            //
-            //
-            //         Card(
-            //         margin: const EdgeInsets.symmetric(vertical: 5),
-            //         child: ListTile(
-            //           title: Text(data.sku),
-            //           subtitle: Column(
-            //            // crossAxisAlignment: CrossAxisAlignment.start,
-            //            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //
-            //             children: [
-            //               // Text("Total Quantity: ${data.totalQuantity}"),
-            //               // Text("Total Sales: £${data.totalSales}"),
-            //               Column(
-            //                 children: data.records.map((r) {
-            //                   return ListTile(
-            //                   //  title: Text(r.productName),
-            //                     subtitle: Column(
-            //                       //crossAxisAlignment: CrossAxisAlignment.start,
-            //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //                       children: [
-            //                         Row(children: [
-            //                           Text("SKU\n${data.sku}"),
-            //                           Text("Unitorder\n${data.totalQuantity}"),
-            //                           Text("Organic Sales\n${r.purchaseDate.split('T')[0]}"),
-            //                         ],),
-            //
-            //                         Row(
-            //                           crossAxisAlignment:CrossAxisAlignment.start,
-            //                           children: [
-            //                           Text("ASIN \n${r.asin}"),
-            //                           Text("OverAll Sales\n ${data.totalQuantity}"),
-            //                           Text("Return Revenue %\n${"N/A"}"),
-            //                         ],),
-            //
-            //                         // Text("Order ID: ${r.orderID}"),
-            //                         // Text("asin ID: ${r.asin}"),
-            //                         // Text("Date: ${r.purchaseDate.split('T')[0]}"),
-            //                         // Text("City: ${r.city}, State: ${r.state}"),
-            //                         // Text("Qty: ${r.quantity}, Total: £${r.totalSales}"),
-            //                       ],
-            //                     ),
-            //                   );
-            //                 }).toList(),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // ),
-
-
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : salesData.isEmpty
-                  ? const Center(child: Text("No data found."))
-                  : ListView(
-                children: salesData.expand((skuData) {
-                  return skuData.records.map((record) {
-                    final Map<String, dynamic> product = {
-                      'name': record.productName,
-                      'SKU': skuData.sku,
-                      'Quantity': skuData.totalQuantity,
-                      //'organicSales': record.organicSalesPercentage,
-                      'asin': record.asin,
-                      'Total_Sales': skuData.totalSales,
-                      //'returnRevenue': record.returnRevenuePercentage,
-                    };
-                    return ProductCard(product: product);
-                  }).toList();
-                }).toList(),
-              ),
+                return Card(
+                  margin: EdgeInsets.all(8),
+                  child: ExpansionTile(
+                    title: Text('SKU: ${item['SKU']}'),
+                    subtitle: Text(
+                        'Total Quantity: ${item['totalQuantity']}, Total Sales: £${(item['totalSales'] as num).toStringAsFixed(2)}'),
+                    children: records.map<Widget>((record) {
+                      return ListTile(
+                        title: Text(record['productName']),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Order ID: ${record['orderID']}'),
+                            Text('Purchase Date: ${record['purchaseDate'].split("T")[0]}'),
+                            Text('Status: ${record['orderStatus']}'),
+                            Text('Quantity: ${record['quantity']}'),
+                            Text('Sales: £${(record['totalSales'] as num).toStringAsFixed(2)}'),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
             ),
-
-
-            // Expanded(
-            //   child: isLoading
-            //       ? const Center(child: CircularProgressIndicator())
-            //       : salesData.isEmpty
-            //       ? const Center(child: Text("No data found."))
-            //       : ListView.builder(
-            //     itemCount: salesData.length,
-            //     itemBuilder: (context, index) {
-            //       final skuData = salesData[index];
-            //       return Column(
-            //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         children: skuData.records.map((record) {
-            //           final Map<String, dynamic> product = {
-            //             'name': record.productName,
-            //             'SKU': skuData.sku,
-            //             'Quantity': skuData.totalQuantity,
-            //             //'organicSales': record.organicSalesPercentage,
-            //             'asin': record.asin,
-            //             'Total_Sales': skuData.totalSales,
-            //             //'returnRevenue': record.returnRevenuePercentage,
-            //           };
-            //           return ProductCard(product: product);
-            //         }).toList(),
-            //       );
-            //     },
-            //   ),
-            // ),
-
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
-
-class SalesRecord {
-  final String orderID;
-  final String purchaseDate;
-  final String productName;
-  final String asin;
-  final int quantity;
-  final double totalSales;
-  final String city;
-  final String state;
-
-  SalesRecord({
-    required this.orderID,
-    required this.purchaseDate,
-    required this.productName,
-    required this.asin,
-    required this.quantity,
-    required this.totalSales,
-    required this.city,
-    required this.state,
-  });
-
-  factory SalesRecord.fromJson(Map<String, dynamic> json) {
-    return SalesRecord(
-      orderID: json['orderID'],
-      purchaseDate: json['purchaseDate'],
-      productName: json['productName'],
-      asin: json['asin'],
-      quantity: json['quantity'],
-      totalSales: (json['totalSales'] as num).toDouble(),
-      city: json['city'],
-      state: json['state'],
-    );
-  }
-}
-
-class SalesSku {
-  final String sku;
-  final int totalQuantity;
-  final double totalSales;
-  final List<SalesRecord> records;
-
-  SalesSku({
-    required this.sku,
-    required this.totalQuantity,
-    required this.totalSales,
-    required this.records,
-  });
-}
-
-
-//
-// import 'dart:convert';
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-//
-// class Filter_SalesSkuScreen extends StatefulWidget {
-//   const Filter_SalesSkuScreen({super.key});
-//
-//   @override
-//   State<Filter_SalesSkuScreen> createState() => _Filter_SalesSkuScreenState();
-// }
-//
-// class _Filter_SalesSkuScreenState extends State<Filter_SalesSkuScreen> {
-//   List<dynamic> salesData = [];
-//   bool loading = true;
-//   String? error;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     fetchSalesData();
-//   }
-//
-//   Future<void> fetchSalesData() async {
-//     var request = http.Request(
-//       'GET',
-//       Uri.parse('http://192.168.50.92:3000/api/sales?filterType=6months&sku=&city=&state='),
-//     );
-//
-//     try {
-//       http.StreamedResponse response = await request.send();
-//
-//       if (response.statusCode == 200) {
-//         final responseBody = await response.stream.bytesToString();
-//         final List<dynamic> jsonData = json.decode(responseBody);
-//
-//         setState(() {
-//           salesData = jsonData;
-//           loading = false;
-//         });
-//       } else {
-//         setState(() {
-//           error = 'Error: ${response.reasonPhrase}';
-//           loading = false;
-//         });
-//       }
-//     } catch (e) {
-//       setState(() {
-//         error = 'Exception: $e';
-//         loading = false;
-//       });
-//     }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     if (loading) {
-//       return const Scaffold(
-//       //  appBar: AppBar(title: Text('Sales Data')),
-//         body: Center(child: CircularProgressIndicator()),
-//       );
-//     }
-//
-//     if (error != null) {
-//       return Scaffold(
-//         appBar: AppBar(title: const Text('Sales Data')),
-//         body: Center(child: Text(error!)),
-//       );
-//     }
-//
-//     return Scaffold(
-//      // appBar: AppBar(title: const Text('Sales Data')),
-//       body: ListView.builder(
-//         itemCount: salesData.length,
-//         itemBuilder: (context, index) {
-//           final item = salesData[index];
-//
-//           return Card(
-//             margin: const EdgeInsets.all(10),
-//             child: Padding(
-//               padding: const EdgeInsets.all(12),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text(item['productName'] ?? 'No Product Name',
-//                       style: const TextStyle(
-//                           fontWeight: FontWeight.bold, fontSize: 16)),
-//                   const SizedBox(height: 8),
-//                   Text('SKU: ${item['SKU'] ?? ''}'),
-//                   Text('Total Quantity: ${item['totalQuantity'] ?? ''}'),
-//                   Text('Total Sales: ${item['totalSales'] ?? ''}'),
-//                   Text('Purchase Date: ${item['purchaseDate'] ?? ''}'),
-//                   Text('ASIN: ${item['asin'] ?? ''}'),
-//                   Text('Month/Year: ${item['monthYear'] ?? ''}'),
-//                   Text('Pincode: ${item['pincodeNew'] ?? ''}'),
-//                   Text('Average Unit Price: ${item['averageUnitPriceAmount'] ?? ''}'),
-//                   Text('City: ${item['city'] ?? ''}'),
-//                   Text('State: ${item['state'] ?? ''}'),
-//                   Text('Country: ${item['country'] ?? ''}'),
-//                 ],
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-//
-//
-//
-//
