@@ -1074,13 +1074,15 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
                   //   ],
                   // ),
                   const SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   if (!isLoading)
                     TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FinanceExecutiveScreen(),
+                            builder: (context) => kIsWeb ? FinanceExecutiveWebScreen() :
+                            FinanceExecutiveScreen(),
                           ),
                         );
                       },
@@ -1095,11 +1097,40 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Icon(Icons.arrow_forward, color: AppColors.gold),
+                          Icon(Icons.arrow_forward,
+                              color: AppColors.gold),
                         ],
                       ),
                     ),
                   Divider(color: AppColors.gold, thickness: 0.5),
+
+
+                  // if (!isLoading)
+                  //   TextButton(
+                  //     onPressed: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => FinanceExecutiveScreen(),
+                  //         ),
+                  //       );
+                  //     },
+                  //     child: Row(
+                  //       mainAxisAlignment: MainAxisAlignment.center,
+                  //       children: [
+                  //         Text(
+                  //           'View full P&L',
+                  //           style: TextStyle(
+                  //             fontWeight: FontWeight.bold,
+                  //             color: AppColors.gold,
+                  //           ),
+                  //         ),
+                  //         const SizedBox(width: 8),
+                  //         Icon(Icons.arrow_forward, color: AppColors.gold),
+                  //       ],
+                  //     ),
+                  //   ),
+                 // Divider(color: AppColors.gold, thickness: 0.5),
                 ],
               ),
             ],
