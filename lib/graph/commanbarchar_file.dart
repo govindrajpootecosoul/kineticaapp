@@ -11,7 +11,7 @@ class BarChartSample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //double maxY = values.reduce((a, b) => a > b ? a : b) + 00;
-    double maxY = values.isNotEmpty ? values.reduce((a, b) => a > b ? a : b) + 10 : 10;
+    double maxY = values.isNotEmpty ? values.reduce((a, b) => a > b ? a : b) + 00 : 00;
 
     return Container(
       height: isWeb ? 450 : 280,

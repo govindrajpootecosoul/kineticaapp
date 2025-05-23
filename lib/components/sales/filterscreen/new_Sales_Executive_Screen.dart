@@ -986,7 +986,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
   @override
   void initState() {
     super.initState();
-    selectedFilterType = 'lastmonth'; // Set default to "6months"
+    selectedFilterType = 'monthtodate'; // Set default to "6months"
     fetchDropdownData();
     fetchFilteredData(); // Automatically fetch data for 6 months on screen load
   }
@@ -1005,7 +1005,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
       case 'yeartodate':
         return 'Year to Date';
       case 'monthtodate':
-        return 'Month to Date';
+        return 'Current Month';
 
     // case 'year':
     //   return 'This Year';
@@ -1537,7 +1537,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
                         SizedBox(width: 8),
                         Expanded(
                           child: MetricCard(
-                            title: "Units Orders",
+                            title: "Units Ordered",
                             value: "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
                             compared: "${salesData?['comparison']['quantityChangePercent']}",
                             //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
@@ -1588,7 +1588,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
 
                             Expanded(
                               child: MetricCardcm(
-                                title: "Organic Sale",
+                                title: "Organic Sales",
                                 value: "£ ${NumberFormat('#,###').format(
                                     ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
                                 )}",
@@ -1671,7 +1671,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
                           if(selectedFilterType!= "last30days")
                             Expanded(
                               child: MetricCardcm(
-                                title: "Organic Sale",
+                                title: "Organic Sales",
                                 value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
                               ),
                             ),
@@ -1679,16 +1679,15 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
                           if(selectedFilterType== "last30days")
                             Expanded(
                               child: MetricCardcm(
-                                title: "Organic Sale",
+                                title: "Organic Sales",
                                 value: "0.00 %",
                               ),
                             ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: MetricCardcm(
-                              title: "",//DOS
-                              value: "",
-                              // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
+                              title: "ROAS",
+                              value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
 
                             ),
                           ),

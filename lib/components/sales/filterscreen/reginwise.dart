@@ -73,7 +73,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
   @override
   void initState() {
     super.initState();
-    selectedFilterType = 'lastmonth'; // Set default to "6months"
+    selectedFilterType = 'monthtodate'; // Set default to "6months"
     fetchDropdownData();
     fetchFilteredData(); // Automatically fetch data for 6 months on screen load
   }
@@ -90,12 +90,12 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
       case 'yeartodate':
         return 'Year to Date';
     case 'monthtodate':
-      return 'Month to Date';
+      return 'Current Month';
 
     // case 'year':
     //   return 'This Year';
-    // case 'lastmonth':
-    //   return 'Last Month';
+    case 'lastmonth':
+      return 'Last Month';
       case 'custom':
         return 'Custom Range';
       default:
@@ -127,6 +127,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
     setState(() => isLoading = true);
 
     String url = '';
+    print("selectedFilterType :::>>>  ${selectedFilterType}");
 
     if (selectedFilterType == 'custom') {
       if (startDate == null || endDate == null) {
@@ -207,7 +208,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
 
           }
 
-          if(selectedFilterType== "6months")
+          if(selectedFilterType== "lastmonth")
           {
             print("6666666 months");
             // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
@@ -612,7 +613,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                         SizedBox(width: 8),
                         Expanded(
                           child: MetricCard(
-                            title: "Units Orders",
+                            title: "Units Ordered",
                             value: "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
                             compared: "${salesData?['comparison']['quantityChangePercent']}",
                             //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
@@ -675,7 +676,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                           if(selectedFilterType== "last30days")
                             Expanded(
                               child: MetricCardcm(
-                                title: "Organic Sale",
+                                title: "Organic Sales",
                                 value: "£ 00",
                                 //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
 
@@ -746,7 +747,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                           if(selectedFilterType!= "last30days")
                             Expanded(
                               child: MetricCardcm(
-                                title: "Organic Sale",
+                                title: "Organic Sales",
                                 value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
                               ),
                             ),
@@ -754,7 +755,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                           if(selectedFilterType== "last30days")
                             Expanded(
                               child: MetricCardcm(
-                                title: "Organic Sale",
+                                title: "Organic Sales",
                                 value: "0.00 %",
                               ),
                             ),

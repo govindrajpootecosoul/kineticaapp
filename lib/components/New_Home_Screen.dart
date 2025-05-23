@@ -85,7 +85,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
     super.initState();
     isWeb = checkPlatform();
     _tabController = TabController(length: myTabs.length, vsync: this);
-    selectedFilterType = 'lastmonth'; // Set default to "6months"
+    selectedFilterType = 'monthtodate'; // Set default to "6months"
     fetchDropdownData();
 
     fetchFilteredData();
@@ -111,7 +111,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
       // case 'yeartodate':
       //   return 'Year to Date';
       case 'monthtodate':
-        return 'Month to Date';
+        return 'Current Month';
 
       // case 'year':
       //   return 'This Year';
@@ -794,7 +794,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
                                     Expanded(
                                       child: MetricCardcm(
                                         title: "TACOS",
-                                        value: "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 1) * 100).toStringAsFixed(2)} %",
+                                        value: "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 0) * 100).toStringAsFixed(2)} %",
                                       ),
                                     ),
                                   ],
@@ -820,9 +820,8 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: MetricCardcm(
-                                        title: "",//DOS
-                                        value: "",
-                                        // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
+                                        title: "ROAS",
+                                        value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
 
                                       ),
                                     ),
@@ -1000,107 +999,107 @@ class _NewHomeScreenState extends State<NewHomeScreen>  with SingleTickerProvide
               ),
         
               /// 🔽 Fixed bottom section (not scrollable)
-              // Column(
-              //   mainAxisSize: MainAxisSize.min,
-              //   children: [
-              //     // Row(
-              //     //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //     //   children: [
-              //     //     Expanded(
-              //     //         child: InkWell(
-              //     //             onTap: () {
-              //     //               print("CM1 Clicked");
-              //     //               showDialog(
-              //     //                 context: context,
-              //     //                 builder: (_) => AlertDialog(
-              //     //                   title: Text('CM1 '),
-              //     //                   content: Text('This is a popup message'),
-              //     //                   actions: [
-              //     //                     TextButton(
-              //     //                       onPressed: () => Navigator.pop(context),
-              //     //                       child: Text('OK'),
-              //     //                     )
-              //     //                   ],
-              //     //                 ),
-              //     //               );
-              //     //             },
-              //     //         child: MetricCardcm(title: "CM ₁", value: "00.0")),
-              //     //     ),
-              //     //     const SizedBox(width: 8),
-              //     //     Expanded(
-              //     //
-              //     //       child: InkWell(
-              //     //           onTap: () {
-              //     //             print("CM2 Clicked");
-              //     //             showDialog(
-              //     //               context: context,
-              //     //               builder: (_) => AlertDialog(
-              //     //                 title: Text('CM2 '),
-              //     //                 content: Text('This is a popup message'),
-              //     //                 actions: [
-              //     //                   TextButton(
-              //     //                     onPressed: () => Navigator.pop(context),
-              //     //                     child: Text('OK'),
-              //     //                   )
-              //     //                 ],
-              //     //               ),
-              //     //             );
-              //     //           },
-              //     //           child: MetricCardcm(title: "CM ₂", value: "00.0")),
-              //     //     ),
-              //     //     const SizedBox(width: 8),
-              //     //     Expanded(
-              //     //
-              //     //       child: InkWell(
-              //     //           onTap: () {
-              //     //             print("CM3 Clicked");
-              //     //             showDialog(
-              //     //               context: context,
-              //     //               builder: (_) => AlertDialog(
-              //     //                 title: Text('CM3 '),
-              //     //                 content: Text('This is a popup message'),
-              //     //                 actions: [
-              //     //                   TextButton(
-              //     //                     onPressed: () => Navigator.pop(context),
-              //     //                     child: Text('OK'),
-              //     //                   )
-              //     //                 ],
-              //     //               ),
-              //     //             );
-              //     //           },
-              //     //           child: MetricCardcm(title: "CM ₃", value: "00.0")),
-              //     //     ),
-              //     //   ],
-              //     // ),
-              //     const SizedBox(height: 10),
-              //     if (!isLoading)
-              //       TextButton(
-              //         onPressed: () {
-              //           Navigator.push(
-              //             context,
-              //             MaterialPageRoute(
-              //               builder: (context) => FinanceExecutiveScreen(),
-              //             ),
-              //           );
-              //         },
-              //         child: Row(
-              //           mainAxisAlignment: MainAxisAlignment.center,
-              //           children: [
-              //             Text(
-              //               'View full P&L',
-              //               style: TextStyle(
-              //                 fontWeight: FontWeight.bold,
-              //                 color: AppColors.gold,
-              //               ),
-              //             ),
-              //             const SizedBox(width: 8),
-              //             Icon(Icons.arrow_forward, color: AppColors.gold),
-              //           ],
-              //         ),
-              //       ),
-              //     Divider(color: AppColors.gold, thickness: 0.5),
-              //   ],
-              // ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //   children: [
+                  //     Expanded(
+                  //         child: InkWell(
+                  //             onTap: () {
+                  //               print("CM1 Clicked");
+                  //               showDialog(
+                  //                 context: context,
+                  //                 builder: (_) => AlertDialog(
+                  //                   title: Text('CM1 '),
+                  //                   content: Text('This is a popup message'),
+                  //                   actions: [
+                  //                     TextButton(
+                  //                       onPressed: () => Navigator.pop(context),
+                  //                       child: Text('OK'),
+                  //                     )
+                  //                   ],
+                  //                 ),
+                  //               );
+                  //             },
+                  //         child: MetricCardcm(title: "CM ₁", value: "00.0")),
+                  //     ),
+                  //     const SizedBox(width: 8),
+                  //     Expanded(
+                  //
+                  //       child: InkWell(
+                  //           onTap: () {
+                  //             print("CM2 Clicked");
+                  //             showDialog(
+                  //               context: context,
+                  //               builder: (_) => AlertDialog(
+                  //                 title: Text('CM2 '),
+                  //                 content: Text('This is a popup message'),
+                  //                 actions: [
+                  //                   TextButton(
+                  //                     onPressed: () => Navigator.pop(context),
+                  //                     child: Text('OK'),
+                  //                   )
+                  //                 ],
+                  //               ),
+                  //             );
+                  //           },
+                  //           child: MetricCardcm(title: "CM ₂", value: "00.0")),
+                  //     ),
+                  //     const SizedBox(width: 8),
+                  //     Expanded(
+                  //
+                  //       child: InkWell(
+                  //           onTap: () {
+                  //             print("CM3 Clicked");
+                  //             showDialog(
+                  //               context: context,
+                  //               builder: (_) => AlertDialog(
+                  //                 title: Text('CM3 '),
+                  //                 content: Text('This is a popup message'),
+                  //                 actions: [
+                  //                   TextButton(
+                  //                     onPressed: () => Navigator.pop(context),
+                  //                     child: Text('OK'),
+                  //                   )
+                  //                 ],
+                  //               ),
+                  //             );
+                  //           },
+                  //           child: MetricCardcm(title: "CM ₃", value: "00.0")),
+                  //     ),
+                  //   ],
+                  // ),
+                  const SizedBox(height: 10),
+                  if (!isLoading)
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FinanceExecutiveScreen(),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'View full P&L',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.gold,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(Icons.arrow_forward, color: AppColors.gold),
+                        ],
+                      ),
+                    ),
+                  Divider(color: AppColors.gold, thickness: 0.5),
+                ],
+              ),
             ],
           )),
 
