@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/financescreens/product_info_card.dart';
 import 'package:flutter_application_1/utils/check_platform.dart';
+import 'package:flutter_application_1/utils/custom_dropdown.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
@@ -398,8 +399,9 @@ class _SalesSkuPageState extends State<NewFinanceSkuScreen> {
                 // ),
                 SizedBox(
                   width: 160,
-                  child: DropdownButton<String>(
+                  child: DropdownButtonFormField<String>(
                       value: selectedMonth,
+                      decoration: customInputDecoration(),
                       isExpanded: true,
                       items: availableMonths
                           .map((month) => DropdownMenuItem(

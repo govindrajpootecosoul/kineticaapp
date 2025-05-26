@@ -3,6 +3,7 @@ import 'package:flutter_application_1/components/barchart.dart';
 import 'package:flutter_application_1/components/info_card.dart';
 import 'package:flutter_application_1/utils/api_service.dart';
 import 'package:flutter_application_1/utils/colors.dart';
+import 'package:flutter_application_1/utils/custom_dropdown.dart';
 import 'package:flutter_application_1/utils/data_mapping_serive.dart';
 import 'package:flutter_application_1/utils/date_utils.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -147,9 +148,12 @@ class _SalesskuDetailsState extends State<SalesskuDetails> {
 
   Widget _buildDropdown(String label, List<String> items, String selectedValue,
       Function(String?) onChanged) {
-    return DropdownButton<String>(
+    return DropdownButtonFormField<String>(
       value: selectedValue,
       dropdownColor: AppColors.white,
+      decoration: customInputDecoration(
+        hintText: "Select Filter Type",
+      ),
       borderRadius: BorderRadius.circular(10),
       style: GoogleFonts.montserrat(
           color: AppColors.gold, fontSize: 14, fontWeight: FontWeight.bold),

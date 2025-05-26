@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_application_1/utils/custom_dropdown.dart';
 
 import '../../utils/ApiConfig.dart';
 import '../../utils/colors.dart';
@@ -198,10 +199,16 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
        margin: const EdgeInsets.symmetric(horizontal: 180, vertical: 8),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                value: selectedSku,
+            SizedBox(height: 15),
+           ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 300),
+              child: DropdownButtonFormField<String>(
+                isExpanded: true,
+                    value: selectedSku,
+                     decoration: customInputDecoration(
+                      hintText: "Select SKU",
+                      labelText: "SKU",
+                    ),
                 onChanged: (newValue) {
                   setState(() {
                     selectedSku = newValue;
@@ -218,6 +225,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
                 }).toList(),
               ),
             ),
+             SizedBox(height: 15),
             Expanded(
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())

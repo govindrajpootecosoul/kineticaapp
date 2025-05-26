@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/utils/colors.dart';
+import 'package:flutter_application_1/utils/custom_dropdown.dart';
 import 'package:flutter_application_1/utils/formatNumberStringWithComma.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -194,8 +195,9 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
                         ),
                         SizedBox(
                           width: 160,
-                          child: DropdownButton<String>(
+                          child: DropdownButtonFormField<String>(
                             value: selectedMonth,
+                            decoration: customInputDecoration(),
                             isExpanded: true,
                             items: availableMonths
                                 .map((month) => DropdownMenuItem(
