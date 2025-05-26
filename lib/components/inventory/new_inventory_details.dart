@@ -432,6 +432,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_application_1/utils/custom_dropdown.dart';
 import 'package:intl/intl.dart';
 
 import '../../utils/ApiConfig.dart';
@@ -572,10 +573,11 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+       preferredSize: const Size.fromHeight(80), 
         child: AppBar(
+          toolbarHeight: 100,
           title: Container(
-            margin: const EdgeInsets.only(top: 20),
+            margin: const EdgeInsets.only(top: 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 
@@ -583,10 +585,15 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
                 SizedBox(
                   width: kIsWeb ? 200 : 0,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButton<String>(
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 300),
+                  child: DropdownButtonFormField<String>(
+                    isExpanded: true,
                     value: selectedSku,
+                     decoration: customInputDecoration(
+                      hintText: "Select SKU",
+                      labelText: "SKU",
+                    ),
                     onChanged: (newValue) {
                       setState(() {
                         selectedSku = newValue;
