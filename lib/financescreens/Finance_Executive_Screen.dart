@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../utils/ApiConfig.dart';
+import '../utils/colors.dart';
 
 class FinanceExecutiveScreen extends StatefulWidget {
   @override
@@ -82,9 +83,9 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
       selectedMonthData = {
         'Total Sales': sumField(selectedMonthList, 'Total Sales'),
         'Total Returns': sumField(selectedMonthList, 'Total Units'), // Assuming returns are 'Total Units', adjust if needed
-        'COGS': 0.0, // Your JSON doesn't have COGS? Set 0 or handle accordingly
+        'COGS': sumField(selectedMonthList, 'Cogs'),
         'CM1': sumField(selectedMonthList, 'CM1'),
-        'Inventory': 0.0, // No inventory key in JSON, adjust if you have one
+        'Inventory': sumField(selectedMonthList, 'FBA Inventory Fee'),
         'Liquidations': sumField(selectedMonthList, 'Liquidations'),
         'FBA Reimbursement': sumField(selectedMonthList, 'FBA Reimbursement'),
         'Storage Fee': sumField(selectedMonthList, 'Storage Fee'),
@@ -118,7 +119,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
             ),
           ),
           Text(
-            '\$ ${value.toStringAsFixed(2)}',
+            '\£ ${value.toStringAsFixed(2)}',
             style: TextStyle(
               color: valueColor ?? Colors.black,
               fontWeight: isCM ? FontWeight.bold : FontWeight.w600,
@@ -142,123 +143,143 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Finance Executive')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: allData.isEmpty
-            ? Center(child: CircularProgressIndicator())
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Month filter dropdown
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Profit & Loss",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.brown,
-                      fontSize: 24),
-                ),
-                SizedBox(
-                  width: 160,
-                  child: DropdownButton<String>(
-                    value: selectedMonth,
-                    isExpanded: true,
-                    items: availableMonths
-                        .map((month) => DropdownMenuItem(
-                      value: month,
-                      child: Text(month),
-                    ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedMonth = value;
-                        updateSelectedMonthData();
-                      });
-                    },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          // centerTitle: true,
+          backgroundColor: AppColors.primaryBlue,
+          iconTheme: IconThemeData(
+              color: Colors.white), // 👈 sets back arrow color to white
+          // title: Expanded(
+          //   child: Text(
+          //     'Finance > Executive',
+          //     style: TextStyle(
+          //       color: Colors.white,
+          //       fontSize: 18,
+          //       fontWeight: FontWeight.w600,
+          //     ),
+          //   ),
+          // ),
+          flexibleSpace: Container(
+            child: Image.asset('assets/logo.png'),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: allData.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Month filter dropdown
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Profit & Loss",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.brown,
+                        fontSize: 24),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            if (selectedMonthData != null)
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      dataRow("Amazon Revenue", selectedMonthData!['Total Sales'],
-                          valueColor: selectedMonthData!['Total Sales']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Amazon Returns", selectedMonthData!['Total Returns'],
-                          valueColor: selectedMonthData!['Total Returns']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Net Revenue", selectedMonthData!['Total Sales'],
-                          valueColor: selectedMonthData!['Total Sales']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("COGS", selectedMonthData!['COGS'],
-                          valueColor: selectedMonthData!['COGS']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("CM1", selectedMonthData!['CM1'],
-                          valueColor: selectedMonthData!['CM1']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Inventory", selectedMonthData!['Inventory'],
-                          valueColor: selectedMonthData!['Inventory']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Liquidation Cost", selectedMonthData!['Liquidations'],
-                          valueColor: selectedMonthData!['Liquidations']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Reimbursement", selectedMonthData!['FBA Reimbursement'],
-                          valueColor: selectedMonthData!['FBA Reimbursement']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Storage Fee", selectedMonthData!['Storage Fee'],
-                          valueColor: selectedMonthData!['Storage Fee']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Shipping Service", selectedMonthData!['Shipping Service'],
-                          valueColor: selectedMonthData!['Shipping Service']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("CM2", selectedMonthData!['CM2'],
-                          valueColor: selectedMonthData!['CM2']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Ad Spend", selectedMonthData!['Ad Spend'],
-                          valueColor: selectedMonthData!['Ad Spend']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Discounts", selectedMonthData!['Discounts'],
-                          valueColor: selectedMonthData!['Discounts']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Net Selling Fee", selectedMonthData!['Net Selling Fee'],
-                          valueColor: selectedMonthData!['Net Selling Fee']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("Final Service Fee", selectedMonthData!['Final Service Fee'],
-                          valueColor: selectedMonthData!['Final Service Fee']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                      dataRow("CM3", selectedMonthData!['CM3'],
-                          valueColor: selectedMonthData!['CM3']! < 0
-                              ? Colors.red
-                              : Colors.green),
-                    ],
+                  SizedBox(
+                    width: 160,
+                    child: DropdownButton<String>(
+                      value: selectedMonth,
+                      isExpanded: true,
+                      items: availableMonths
+                          .map((month) => DropdownMenuItem(
+                        value: month,
+                        child: Text(month),
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedMonth = value;
+                          updateSelectedMonthData();
+                        });
+                      },
+                    ),
                   ),
-                ),
+                ],
               ),
-          ],
+              SizedBox(height: 20),
+              if (selectedMonthData != null)
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        dataRow("Amazon Revenue", selectedMonthData!['Total Sales'],
+                            valueColor: selectedMonthData!['Total Sales']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Amazon Returns", selectedMonthData!['Total Returns'],
+                            valueColor: selectedMonthData!['Total Returns']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Net Revenue", selectedMonthData!['Total Sales'],
+                            valueColor: selectedMonthData!['Total Sales']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("COGS", selectedMonthData!['COGS'],
+                            valueColor: selectedMonthData!['COGS']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("CM1", selectedMonthData!['CM1'],
+                            valueColor: selectedMonthData!['CM1']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Inventory", selectedMonthData!['Inventory'],
+                            valueColor: selectedMonthData!['Inventory']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Liquidation Cost", selectedMonthData!['Liquidations'],
+                            valueColor: selectedMonthData!['Liquidations']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Reimbursement", selectedMonthData!['FBA Reimbursement'],
+                            valueColor: selectedMonthData!['FBA Reimbursement']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Storage Fee", selectedMonthData!['Storage Fee'],
+                            valueColor: selectedMonthData!['Storage Fee']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Shipping Service", selectedMonthData!['Shipping Service'],
+                            valueColor: selectedMonthData!['Shipping Service']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("CM2", selectedMonthData!['CM2'],
+                            valueColor: selectedMonthData!['CM2']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Ad Spend", selectedMonthData!['Ad Spend'],
+                            valueColor: selectedMonthData!['Ad Spend']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Discounts", selectedMonthData!['Discounts'],
+                            valueColor: selectedMonthData!['Discounts']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Net Selling Fee", selectedMonthData!['Net Selling Fee'],
+                            valueColor: selectedMonthData!['Net Selling Fee']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("Final Service Fee", selectedMonthData!['Final Service Fee'],
+                            valueColor: selectedMonthData!['Final Service Fee']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                        dataRow("CM3", selectedMonthData!['CM3'],
+                            valueColor: selectedMonthData!['CM3']! < 0
+                                ? Colors.red
+                                : Colors.green),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
