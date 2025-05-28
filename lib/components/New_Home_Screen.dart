@@ -14,7 +14,8 @@ import '../../../comman_Screens/productcard.dart';
 import '../../../utils/colors.dart';
 import '../financescreens/Finance_Executive_Screen.dart';
 import '../graph/commanbarchar_file.dart';
-import '../utils/ApiConfig.dart'; // Import the package
+import '../utils/ApiConfig.dart';
+import 'Dashboard.dart'; // Import the package
 
 class NewHomeScreen extends StatefulWidget {
   @override
@@ -1068,15 +1069,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                   ),
                 ],
               )),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ListView(
-              children: [
-                // Your second tab content here
-                Center(child: Text("Second Tab Content")),
-              ],
-            ),
-          ),
+          Dashboard(),
         ],
       ),
 
