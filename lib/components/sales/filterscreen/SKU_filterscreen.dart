@@ -1,8 +1,13 @@
 import 'dart:convert';
 
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_application_1/components/sales/filterscreen/sales_sku_expandable_card.dart.dart';
+import 'package:flutter_application_1/components/sales/filterscreen/sales_sku_expandable_web_card.dart';
+import 'package:flutter_application_1/utils/custom_dropdown.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../utils/ApiConfig.dart';
@@ -35,7 +40,6 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     "custom",
   ];
 
-
   String? selectedState;
   String? selectedCity;
   String? selectedSku;
@@ -44,9 +48,6 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
   DateTime? startDate;
   DateTime? endDate;
 
-
-
-
   @override
   void initState() {
     super.initState();
@@ -54,7 +55,6 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     fetchDropdownData();
     fetchSalesData(); // Automatically fetch data for 6 months on screen load
   }
-
 
   String formatFilterType(String filter) {
     switch (filter) {
@@ -75,13 +75,13 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     }
   }
 
-
   String formatDate(DateTime date) =>
       "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
   Future<void> fetchDropdownData() async {
     try {
-      final stateRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/state?q='));
+      final stateRes =
+          await http.get(Uri.parse('${ApiConfig.baseUrl}/state?q='));
       final cityRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/city?q='));
       final skuRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/sku'));
 
@@ -101,9 +101,7 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     }
   }
 
-
   Future<void> fetchSalesData() async {
-
     if (selectedFilterType == null) return;
     setState(() => isLoading = true);
 
@@ -117,10 +115,11 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
       }
       final from = formatDate(startDate!);
       final to = formatDate(endDate!);
-      url = '${ApiConfig.baseUrl}/sales?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      url =
+          '${ApiConfig.baseUrl}/sales?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     } else {
-
-      url = '${ApiConfig.baseUrl}/sales?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      url =
+          '${ApiConfig.baseUrl}/sales?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
       //url='https://api.thrivebrands.ai/api/sales?filterType=lastmonth';
     }
     try {
@@ -182,7 +181,6 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -196,31 +194,43 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
       // appBar: AppBar(title: Text('Sales Data')),
       body: Column(
         children: [
+          SizedBox(height: 20),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
                 SizedBox(
                   width: 190,
-                  child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
+                  child:
+                      // DropdownButtonFormField<String>(
+                      //   decoration: InputDecoration(
+                      //     hintText: "Select Filter Type",
+                      //     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                      //     enabledBorder: OutlineInputBorder(
+                      //       borderSide: BorderSide(color: Colors.blue, width: 1),
+                      //     ),
+                      //   ),
+                      DropdownButtonFormField<String>(
+                    isDense: true,
+                    // value: value,
+                    // onChanged: onChanged,
+                    style: TextStyle(fontSize: 12, color: Colors.black),
+                    iconEnabledColor: Colors.black,
+                    dropdownColor: Colors.white,
+                    decoration: customInputDecoration(
                       hintText: "Select Filter Type",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue, width: 1),
-                      ),
                     ),
                     items: filterTypes.map((type) {
                       return DropdownMenuItem(
                         value: type,
-                        child: Text(formatFilterType(type), overflow: TextOverflow.ellipsis),
+                        child: Text(formatFilterType(type),
+                            overflow: TextOverflow.ellipsis),
                       );
                     }).toList(),
                     value: selectedFilterType,
                     onChanged: (val) => onDropdownChanged(val, 'filter'),
                   ),
                 ),
-
                 if (selectedFilterType == 'custom')
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
@@ -235,11 +245,9 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
                       ),
                     ),
                   ),
-
                 SizedBox(width: 8),
-
                 SizedBox(
-                  width: 150,
+                  width: 250,
                   height: 50,
                   child: DropdownSearch<String>(
                     items: skus,
@@ -254,9 +262,12 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
                       ),
                     ),
                     dropdownDecoratorProps: DropDownDecoratorProps(
-                      dropdownSearchDecoration: InputDecoration(
+                      // dropdownSearchDecoration: InputDecoration(
+                      //   labelText: "SKU",
+                      //   border: OutlineInputBorder(),
+                      // ),
+                      dropdownSearchDecoration: customInputDecoration(
                         labelText: "SKU",
-                        border: OutlineInputBorder(),
                       ),
                     ),
                     clearButtonProps: ClearButtonProps(isVisible: true),
@@ -266,38 +277,63 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
               ],
             ),
           ),
-
           const SizedBox(height: 20),
+          // Expanded(
+          //   child: ListView.builder(
+          //     itemCount: salesData.length,
+          //     itemBuilder: (context, index) {
+          //       var item = salesData[index];
+          //       var records = item['records'] as List<dynamic>;
+
+          //       return Card(
+          //         margin: EdgeInsets.all(8),
+          //         child: ExpansionTile(
+          //           title: Text('SKU: ${item['SKU']}'),
+          //           subtitle: Text(
+          //               'Total Quantity: ${item['totalQuantity']}, Total Sales: £${(item['totalSales'] as num).toStringAsFixed(2)}'),
+          //           children: records.map<Widget>((record) {
+          //             return ListTile(
+          //               title: Text(record['productName']),
+          //               subtitle: Column(
+          //                 crossAxisAlignment: CrossAxisAlignment.start,
+          //                 children: [
+          //                   Text('Order ID: ${record['orderID']}'),
+          //                   Text(
+          //                       'Purchase Date: ${record['purchaseDate'].split("T")[0]}'),
+          //                   Text('Status: ${record['orderStatus']}'),
+          //                   Text('Quantity: ${record['quantity']}'),
+          //                   Text(
+          //                       'Sales: £${(record['totalSales'] as num).toStringAsFixed(2)}'),
+          //                 ],
+          //               ),
+          //             );
+          //           }).toList(),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
+          kIsWeb
+              ? Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: MasonryGridView.count(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                            itemCount: salesData.length,
+                            itemBuilder: (context, index) {
+                              return SalesSkuExpandableWebCard(item: salesData[index]);
+                            },
+                          ),
+                        ),
+                      )
+              : 
           Expanded(
             child: ListView.builder(
               itemCount: salesData.length,
               itemBuilder: (context, index) {
-                var item = salesData[index];
-                var records = item['records'] as List<dynamic>;
-
-                return Card(
-                  margin: EdgeInsets.all(8),
-                  child: ExpansionTile(
-                    title: Text('SKU: ${item['SKU']}'),
-                    subtitle: Text(
-                        'Total Quantity: ${item['totalQuantity']}, Total Sales: £${(item['totalSales'] as num).toStringAsFixed(2)}'),
-                    children: records.map<Widget>((record) {
-                      return ListTile(
-                        title: Text(record['productName']),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Order ID: ${record['orderID']}'),
-                            Text('Purchase Date: ${record['purchaseDate'].split("T")[0]}'),
-                            Text('Status: ${record['orderStatus']}'),
-                            Text('Quantity: ${record['quantity']}'),
-                            Text('Sales: £${(record['totalSales'] as num).toStringAsFixed(2)}'),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                );
+                return SalesSkuExpandableCard(item: salesData[index]);
               },
             ),
           ),

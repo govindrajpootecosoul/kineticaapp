@@ -41,6 +41,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/comman_Screens/Inventory_SKU_Card_Web_Screen.dart';
 import 'package:flutter_application_1/utils/check_platform.dart';
+import 'package:flutter_application_1/utils/custom_dropdown.dart';
 import 'package:provider/provider.dart';
 
 import '../../Provider/sales_SKU_Provider.dart';
@@ -126,9 +127,8 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
                           provider.fetchInventoryBySku(value!);
                         }
                       },
-                      decoration: const InputDecoration(
+                      decoration: customInputDecoration(
                         labelText: 'Select SKU',
-                        border: OutlineInputBorder(),
                       ),
                     ),
                   ),
@@ -154,7 +154,8 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
                             itemCount: provider.inventoryList.length,
                             itemBuilder: (context, index) {
                               final product = provider.inventoryList[index];
-                              return InventorySkuCardWebScreen(product: product);
+                              return InventorySkuCardWebScreen(
+                                  product: product);
                             },
                           ),
                         ),

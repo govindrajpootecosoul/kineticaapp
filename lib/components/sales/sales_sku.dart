@@ -3,6 +3,7 @@ import 'package:flutter_application_1/components/sales/salessku_details.dart';
 import 'package:flutter_application_1/utils/api_service.dart';
 import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/utils/currency_handler.dart';
+import 'package:flutter_application_1/utils/custom_dropdown.dart';
 import 'package:flutter_application_1/utils/date_utils.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,10 +63,12 @@ class _SalesSkuPageState extends State<SalesSkuPage> {
 
   Widget _buildDropdown(String label, List<String> items, String selectedValue,
       Function(String?) onChanged) {
-    return DropdownButton<String>(
+    return DropdownButtonFormField<String>(
       value: selectedValue,
       dropdownColor: AppColors.white,
-      borderRadius: BorderRadius.circular(10),
+      decoration: customInputDecoration(
+        hintText: "Select Filter Type",
+      ),
       style: GoogleFonts.montserrat(
           color: AppColors.gold, fontSize: 14, fontWeight: FontWeight.bold),
       items: items.map((item) {
@@ -423,24 +426,24 @@ class _SalesSkuPageState extends State<SalesSkuPage> {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel',
-                  style: TextStyle(color: AppColors.gold),),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: AppColors.gold),
+                  ),
                   onPressed: () {
                     _selectedTime = 'Last 12 months';
-                    String range =
-                                  DateUtilsHelper.getDateRange(_selectedTime);
-                              _fetchData(range);
+                    String range = DateUtilsHelper.getDateRange(_selectedTime);
+                    _fetchData(range);
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: Text('Apply',
-                   style: TextStyle(color: AppColors.gold)),
+                  child: Text('Apply', style: TextStyle(color: AppColors.gold)),
                   onPressed: () {
                     if (selectedRange != null) {
                       setState(() {
-                        String range =
-                                  DateUtilsHelper.getDateRangeFromDates(selectedRange?.startDate, selectedRange?.endDate);
+                        String range = DateUtilsHelper.getDateRangeFromDates(
+                            selectedRange?.startDate, selectedRange?.endDate);
                         _fetchData(range);
                       });
                       Navigator.of(context).pop();
