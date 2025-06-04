@@ -148,12 +148,15 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     buildLabelValueExpend("Total Sellable", product['afn_fulfillable_quantity'] ?? "00"),
                     buildLabelValueExpend("Inventory Age", (product['inv_age_0_to_30_days'] ?? "00")+(product['inv_age_31_to_60_days'] ?? "00")+(product['inv_age_61_to_90_days'] ?? "00")+(product['inv_age_91_to_180_days'] ?? "00")+(product['inv_age_181_to_270_days'] ?? "00")+(product['inv_age_271_to_365_days'] ?? "00")+(product['inv_age_365_plus_days'] ?? "00")),
 
-                    buildLabelValueExpend("DOS", product['days_of_supply'] ?? "00"),
+                    //buildLabelValueExpend("DOS", product['days_of_supply'] ?? "00"),
                     buildLabelValueExpend("Customer Reserved", product['Customer_reserved'] ?? "00"),
                     buildLabelValueExpend("FC Transfer", product['FC_Transfer'] ?? "00"),
                     buildLabelValueExpend("FC Processing", product['FC_Processing'] ?? "00"),
-                    buildLabelValueExpend("Unfullfilled", product['afn_unsellable_quantity'] ?? "00"),
-                    buildLabelValueExpend("Inbound Recieving", product['afn_inbound_receiving_quantity'] ?? "00"),
+
+
+                    buildLabelValueExpend("MTQ", product['MTQ'] ?? "00"),
+                    buildLabelValueExpend("Instock Rate", "${product['InStock_Rate_Percent']} %" ?? "00"),
+                    buildLabelValueExpend("Days In Stock", "${product['Days_In_Stock']}/${product['Total_Days']}" ?? "00"),
                   ],
                 ),
                 const Divider(height: 30),

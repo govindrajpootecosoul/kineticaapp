@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/financescreens/Finance_Executive_Web_Screen.dart';
@@ -11,20 +12,46 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../../comman_Screens/productcard.dart';
 import '../../../utils/colors.dart';
+import '../cm1.dart';
 import '../financescreens/Finance_Executive_Screen.dart';
 import '../graph/commanbarchar_file.dart';
-import '../utils/ApiConfig.dart'; // Import the package
+import '../utils/ApiConfig.dart';
+import '../utils/formatNumberStringWithComma.dart';
+import 'inventory/inventory_executive.dart'; // Import the package
 
 class Dashboard extends StatefulWidget {
+  ///final List<dynamic> data;
   @override
   State<Dashboard> createState() => _DashboardState();
 }
+
 
 class _DashboardState extends State<Dashboard>{
   List<String> states = [];
   List<String> cities = [];
   List<String> skus = [];
   bool isWeb = false;
+
+
+  List<dynamic> inventoryList = [];
+  //bool isLoading = true;
+  String error = '';
+
+  // String Instock = '00';
+  // String Overstock = '00';
+  // String Understock = '00';
+  String DaysInStock = '00';
+
+  int understockCount = 0;
+  int overstockCount = 0;
+  int balancedCount = 0;
+  int zeroInStockRateSkuCount = 0;
+
+  //final Map<String, int> stockCounts = countStockStatus();
+
+
+
+
   //late TabController _tabController;
 
   // final List<Tab> myTabs = const [
@@ -87,10 +114,11 @@ class _DashboardState extends State<Dashboard>{
     super.initState();
     isWeb = checkPlatform();
     //_tabController = TabController(length: myTabs.length, vsync: this);
-    selectedFilterType = 'monthtodate'; // Set default to "6months"
+    selectedFilterType = 'lastmonth'; // Set default to "6months"
     fetchDropdownData();
 
     fetchFilteredData();
+    fetchExecutiveData();
     fetchAdData(); // Automatically fetch data for 6 months on screen load
   }
 
@@ -99,6 +127,206 @@ class _DashboardState extends State<Dashboard>{
    // _tabController.dispose();
     super.dispose();
   }
+  //inventory data
+  // double calculateTotalDaysInStock(List<dynamic> data) {
+  //   double totalCost = 0.0;
+  //
+  //   for (var item in data) {
+  //     final cost = double.tryParse(
+  //         item['InStock_Rate_Percent'].toString()) ??
+  //         0.0;
+  //     totalCost += cost;
+  //   }
+  //   // Round to nearest whole number
+  //   return totalCost.roundToDouble();
+  // }
+
+
+  Map<String, int> countStockStatus(List<dynamic> data) {
+    Map<String, int> statusCounts = {
+      'Understock': 0,
+      'Overstock': 0,
+      'Balanced': 0,
+    };
+
+    for (var item in data) {
+      final status = item['Stock_Status']?.toString();
+      if (status != null && statusCounts.containsKey(status)) {
+        statusCounts[status] = statusCounts[status]! + 1;
+      }
+    }
+
+    return statusCounts;
+  }
+
+
+  int calculateTotalDaysInStock(List<dynamic> data) {
+    double totalCost = 0.0;
+    int count = 0;
+
+    for (var item in data) {
+      final cost = double.tryParse(item['InStock_Rate_Percent'].toString());
+      if (cost != null) {
+        totalCost += cost;
+        count++;
+      }
+    }
+
+    if (count == 0) return 0;
+
+    // Return rounded whole number
+    return (totalCost / count).round();
+  }
+
+
+
+  // Future<void> fetchExecutiveData() async {
+  //   try {
+  //     var dio = Dio();
+  //     var response = await dio.get('${ApiConfig.baseUrl}/inventory');
+  //
+  //     if (response.statusCode == 200) {
+  //       List<dynamic> data = response.data;
+  //
+  //       // Calculate DaysInStock average
+  //       double totaldayinstock = calculateTotalDaysInStock(data);
+  //       String daysInStockFormatted = formatNumberStringWithComma(totaldayinstock.toString());
+  //
+  //       // Count stock statuses
+  //       Map<String, int> statusCounts = {
+  //         'Understock': 0,
+  //         'Overstock': 0,
+  //         'Balanced': 0,
+  //       };
+  //
+  //       for (var item in data) {
+  //         final status = item['Stock_Status']?.toString();
+  //         if (status != null && statusCounts.containsKey(status)) {
+  //           statusCounts[status] = statusCounts[status]! + 1;
+  //         }
+  //       }
+  //
+  //       setState(() {
+  //         inventoryList = data;
+  //         DaysInStock = daysInStockFormatted;
+  //
+  //         understockCount = statusCounts['Understock'] ?? 0;
+  //         overstockCount = statusCounts['Overstock'] ?? 0;
+  //         balancedCount = statusCounts['Balanced'] ?? 0;
+  //
+  //         isLoading = false;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         error = 'Error: ${response.statusMessage}';
+  //         isLoading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       error = 'Exception: $e';
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
+
+
+  Future<void> fetchExecutiveData() async {
+    try {
+      var dio = Dio();
+      var response = await dio.get('${ApiConfig.baseUrl}/inventory');
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+
+        // Calculate DaysInStock average
+        int totaldayinstock = calculateTotalDaysInStock(data);
+        String daysInStockFormatted = formatNumberStringWithComma(totaldayinstock.toString());
+
+        // Count stock statuses
+        Map<String, int> statusCounts = {
+          'Understock': 0,
+          'Overstock': 0,
+          'Balanced': 0,
+        };
+
+        int zeroInStockRateCount = 0; // NEW variable to count SKUs with 0 InStock_Rate_Percent
+
+        for (var item in data) {
+          final status = item['Stock_Status']?.toString();
+          if (status != null && statusCounts.containsKey(status)) {
+            statusCounts[status] = statusCounts[status]! + 1;
+          }
+
+          // Check if InStock_Rate_Percent == 0 and count it
+          final rateStr = item['InStock_Rate_Percent']?.toString() ?? '0';
+          final rate = double.tryParse(rateStr) ?? 0;
+          if (rate == 0) {
+            zeroInStockRateCount++;
+          }
+        }
+
+        setState(() {
+          inventoryList = data;
+          DaysInStock = daysInStockFormatted;
+
+          understockCount = statusCounts['Understock'] ?? 0;
+          overstockCount = statusCounts['Overstock'] ?? 0;
+          balancedCount = statusCounts['Balanced'] ?? 0;
+
+          zeroInStockRateSkuCount = zeroInStockRateCount; // Update new variable here
+
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          error = 'Error: ${response.statusMessage}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        error = 'Exception: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+
+
+  // Future<void> fetchExecutiveData() async {
+  //   try {
+  //     var dio = Dio();
+  //     var response = await dio.get('${ApiConfig.baseUrl}/inventory');
+  //     //var response = await dio.get(ApiConfig.ukInventory);
+  //
+  //     if (response.statusCode == 200) {
+  //       setState(() {
+  //         inventoryList = response.data;
+  //
+  //         double totaldayinstock = calculateTotalDaysInStock(inventoryList);
+  //         DaysInStock= formatNumberStringWithComma(totaldayinstock.toString());
+  //
+  //
+  //         isLoading = false;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         error = 'Error: ${response.statusMessage}';
+  //         isLoading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       error = 'Exception: $e';
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
+
+
 
   String formatFilterType(String filter) {
     switch (filter) {
@@ -459,71 +687,148 @@ class _DashboardState extends State<Dashboard>{
 
 
 
-  void _showDateRangePicker(BuildContext context) async {
-    showDialog(
+  Future<void> _showMonthYearRangePicker(BuildContext context) async {
+    final now = DateTime.now();
+    DateTime tempStartDate = startDate ?? DateTime(now.year, now.month);
+    DateTime tempEndDate = endDate ?? DateTime(now.year, now.month);
+
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
-        PickerDateRange? selectedRange; // Store the selected range
-
         return StatefulBuilder(
-          // Use StatefulBuilder for state within the dialog
-          builder: (BuildContext context, StateSetter setState) {
+          builder: (context, setState) {
+            // Helper to get months based on selected year (disable future months)
+            List<DropdownMenuItem<int>> buildMonthItems(int selectedYear) {
+              int maxMonth = (selectedYear == now.year) ? now.month : 12;
+              return List.generate(maxMonth, (i) {
+                int month = i + 1;
+                return DropdownMenuItem(
+                  value: month,
+                  child: Text(month.toString().padLeft(2, '0')),
+                );
+              });
+            }
+
             return AlertDialog(
               backgroundColor: AppColors.beige,
-              title: Text('Select Date Range'),
-              content: Container(
-                width: 300,
-                height: 350,
-                child: SfDateRangePicker(
-                  backgroundColor: AppColors.white,
-                  selectionColor: AppColors.gold,
-                  todayHighlightColor: AppColors.gold,
-                  rangeSelectionColor: AppColors.gold,
-                  endRangeSelectionColor: AppColors.gradientStart,
-                  startRangeSelectionColor: AppColors.gradientStart,
-                  selectionMode: DateRangePickerSelectionMode.range,
-                  navigationMode: DateRangePickerNavigationMode.scroll,
-                  onSelectionChanged:
-                      (DateRangePickerSelectionChangedArgs args) {
-                    if (args.value is PickerDateRange) {
-                      print(
-                          "Selected Range: ${args.value.startDate} to ${args.value.endDate}");
-                      selectedRange = args.value;
-                      setState(() {
-                        startDate = args.value?.startDate;
-                        endDate = args.value?.endDate;
-                      });
-                    }
-                  },
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: AppColors.gold),
+              title: Text('Select Month & Year Range'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Start"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempStartDate.month,
+                          items: buildMonthItems(tempStartDate.year),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                tempStartDate = DateTime(tempStartDate.year, val);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempEndDate = tempStartDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempStartDate.year,
+                          items: List.generate(10, (i) {
+                            int year = now.year - 9 + i;
+                            if (year > now.year) return null;
+                            return DropdownMenuItem(
+                              value: year,
+                              child: Text(year.toString()),
+                            );
+                          }).whereType<DropdownMenuItem<int>>().toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              int newMonth = tempStartDate.month;
+                              if (val == now.year && newMonth > now.month) {
+                                newMonth = now.month;
+                              }
+                              setState(() {
+                                tempStartDate = DateTime(val, newMonth);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempEndDate = tempStartDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  onPressed: () {
-                    // _selectedTime = 'Last 12 months';
-                    // String range =
-                    //               DateUtilsHelper.getDateRange(_selectedTime);
-                    //           _fetchData(range);
-                    Navigator.of(context).pop();
-                  },
+                  SizedBox(height: 20),
+                  Text("End"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempEndDate.month,
+                          items: buildMonthItems(tempEndDate.year),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                tempEndDate = DateTime(tempEndDate.year, val);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempStartDate = tempEndDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempEndDate.year,
+                          items: List.generate(10, (i) {
+                            int year = now.year - 9 + i;
+                            if (year > now.year) return null;
+                            return DropdownMenuItem(
+                              value: year,
+                              child: Text(year.toString()),
+                            );
+                          }).whereType<DropdownMenuItem<int>>().toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              int newMonth = tempEndDate.month;
+                              if (val == now.year && newMonth > now.month) {
+                                newMonth = now.month;
+                              }
+                              setState(() {
+                                tempEndDate = DateTime(val, newMonth);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempStartDate = tempEndDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: Text('Cancel', style: TextStyle(color: AppColors.gold)),
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
                 TextButton(
                   child: Text('Apply', style: TextStyle(color: AppColors.gold)),
                   onPressed: () {
-                    if (selectedRange != null) {
-                      // setState(() {
-                      // String range =
-                      //           DateUtilsHelper.getDateRangeFromDates(selectedRange?.startDate, selectedRange?.endDate);
-                      // _fetchData(range);
-                      fetchFilteredData();
-                      fetchAdData();
-                      // });
-                      Navigator.of(context).pop();
-                    }
+                    startDate = tempStartDate;
+                    endDate = tempEndDate;
+                    fetchFilteredData();
+                    fetchAdData();
+                    Navigator.of(context).pop();
                   },
                 ),
               ],
@@ -534,8 +839,86 @@ class _DashboardState extends State<Dashboard>{
     );
   }
 
+
+//old date picker days wise
+  // void _showDateRangePicker(BuildContext context) async {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       PickerDateRange? selectedRange; // Store the selected range
+  //
+  //       return StatefulBuilder(
+  //         // Use StatefulBuilder for state within the dialog
+  //         builder: (BuildContext context, StateSetter setState) {
+  //           return AlertDialog(
+  //             backgroundColor: AppColors.beige,
+  //             title: Text('Select Date Range'),
+  //             content: Container(
+  //               width: 300,
+  //               height: 350,
+  //               child: SfDateRangePicker(
+  //                 backgroundColor: AppColors.white,
+  //                 selectionColor: AppColors.gold,
+  //                 todayHighlightColor: AppColors.gold,
+  //                 rangeSelectionColor: AppColors.gold,
+  //                 endRangeSelectionColor: AppColors.gradientStart,
+  //                 startRangeSelectionColor: AppColors.gradientStart,
+  //                 selectionMode: DateRangePickerSelectionMode.range,
+  //                 navigationMode: DateRangePickerNavigationMode.scroll,
+  //                 onSelectionChanged:
+  //                     (DateRangePickerSelectionChangedArgs args) {
+  //                   if (args.value is PickerDateRange) {
+  //                     print(
+  //                         "Selected Range: ${args.value.startDate} to ${args.value.endDate}");
+  //                     selectedRange = args.value;
+  //                     setState(() {
+  //                       startDate = args.value?.startDate;
+  //                       endDate = args.value?.endDate;
+  //                     });
+  //                   }
+  //                 },
+  //               ),
+  //             ),
+  //             actions: <Widget>[
+  //               TextButton(
+  //                 child: Text(
+  //                   'Cancel',
+  //                   style: TextStyle(color: AppColors.gold),
+  //                 ),
+  //                 onPressed: () {
+  //                   // _selectedTime = 'Last 12 months';
+  //                   // String range =
+  //                   //               DateUtilsHelper.getDateRange(_selectedTime);
+  //                   //           _fetchData(range);
+  //                   Navigator.of(context).pop();
+  //                 },
+  //               ),
+  //               TextButton(
+  //                 child: Text('Apply', style: TextStyle(color: AppColors.gold)),
+  //                 onPressed: () {
+  //                   if (selectedRange != null) {
+  //                     // setState(() {
+  //                     // String range =
+  //                     //           DateUtilsHelper.getDateRangeFromDates(selectedRange?.startDate, selectedRange?.endDate);
+  //                     // _fetchData(range);
+  //                     fetchFilteredData();
+  //                     fetchAdData();
+  //                     // });
+  //                     Navigator.of(context).pop();
+  //                   }
+  //                 },
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
+   // final stockCounts = countStockStatus(data);
     return Scaffold(
 
       body:     Padding(
@@ -586,20 +969,29 @@ class _DashboardState extends State<Dashboard>{
                   ),
 
                   if (selectedFilterType == 'custom')
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: ElevatedButton.icon(
-                        onPressed: () => _showDateRangePicker(context),
-                        // onPressed: () => selectDateRange(context),
+                    ElevatedButton.icon(
+                      onPressed: () => _showMonthYearRangePicker(context),
 
-                        icon: Icon(Icons.date_range),
-                        label: Text(
-                          startDate != null && endDate != null
-                              ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
-                              : "Select Date Range",
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                      //onPressed: () => _showDateRangePicker(context),
+
+
+
+                      icon: Icon(Icons.date_range),
+
+
+                      label: Text(
+                        startDate != null && endDate != null
+                            ? "${startDate!.year}-${startDate!.month.toString().padLeft(2, '0')}/ ${endDate!.year}-${endDate!.month.toString().padLeft(2, '0')}"
+                            : "Select Date Range",
+                        overflow: TextOverflow.ellipsis,
                       ),
+
+                      // label: Text(
+                      //   startDate != null && endDate != null
+                      //       ? "${formatDate(startDate!)}-${formatDate(endDate!)}"
+                      //       : "Select Date Range",
+                      //   overflow: TextOverflow.ellipsis,
+                      // ),
                     ),
 
                 ],
@@ -624,7 +1016,7 @@ class _DashboardState extends State<Dashboard>{
                       alignment: Alignment.center,
                       child: Text(
                         "Sales",
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
                       ),
                     ),
 
@@ -693,10 +1085,10 @@ class _DashboardState extends State<Dashboard>{
 
                     SizedBox(height: 8,),
                     Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.center,
                       child: Text(
                         "Ads",
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
                       ),
                     ),
                     Container(
@@ -761,13 +1153,28 @@ class _DashboardState extends State<Dashboard>{
 
 
                     SizedBox(height: 8,),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Inventory",
-                        style: TextStyle(fontSize: 18),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Inventory ',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'as of today',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
+                      textAlign: TextAlign.center,
                     ),
+
                     Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -778,20 +1185,37 @@ class _DashboardState extends State<Dashboard>{
                           padding: const EdgeInsets.all(8.0),
                           child: Column(children: [
 
+                            // Column(
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   children: [
+                            //     Text('Days in Stock: $DaysInStock'),
+                            //     Text('Understock: $understockCount'),
+                            //     Text('Overstock: $overstockCount'),
+                            //     Text('Balanced: $balancedCount'),
+                            //     Text('SKUs with InStock Rate 0: $zeroInStockRateSkuCount'),
+                            //
+                            //   ],
+                            // ),
+
+
                             Row(
                               children: [
                                 Expanded(
-                                  child: MetricCardcm(
+                                  child: MetricCardinvetory(
                                     title: "InStock Rate",
-                                    value: "123",
+                                    value: "${DaysInStock} %",
+                                    compared: "",
                                   ),
                                 ),
 
                                 const SizedBox(width: 8),
                                 Expanded(
-                                  child: MetricCardcm(
-                                    title: "ROAS",
-                                    value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                                  child: MetricCardinvetory(
+                                    title: "Active SKU OOS",
+                                   value: '$zeroInStockRateSkuCount',
+                                   compared: "SKU Counts",
+
+                                   // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
 
                                   ),
                                 ),
@@ -801,17 +1225,21 @@ class _DashboardState extends State<Dashboard>{
                             Row(
                               children: [
                                 Expanded(
-                                  child: MetricCardcm(
-                                    title: "Organic Sales",
-                                    value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
+                                  child: MetricCardinvetory(
+                                    title: "Over Stock",
+                                   value:"$overstockCount",
+                                   compared: "SKU Counts",
+                                   // value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
                                   ),
                                 ),
 
                                 const SizedBox(width: 8),
                                 Expanded(
-                                  child: MetricCardcm(
-                                    title: "ROAS",
-                                    value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                                  child: MetricCardinvetory(
+                                    title: "Under Stock",
+                                   value: "$understockCount",
+                                   compared: "SKU Counts",
+                                   // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
 
                                   ),
                                 ),
@@ -831,127 +1259,158 @@ class _DashboardState extends State<Dashboard>{
               ),
 
               /// 🔽 Fixed bottom section (not scrollable)
-              const SizedBox(height: 16),
-              Column(
-                mainAxisSize: MainAxisSize.min,
+              // const SizedBox(height: 16),
+              // Column(
+              //   mainAxisSize: MainAxisSize.min,
+              //   children: [
+              //     Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //       children: [
+              //         Expanded(
+              //             child: InkWell(
+              //                 onTap: () {
+              //                   print("CM1 Clicked");
+              //                   showDialog(
+              //                     context: context,
+              //                     builder: (_) => AlertDialog(
+              //                       title: Text('CM1 '),
+              //                       content: Text('This is a popup message'),
+              //                       actions: [
+              //                         TextButton(
+              //                           onPressed: () => Navigator.pop(context),
+              //                           child: Text('OK'),
+              //                         )
+              //                       ],
+              //                     ),
+              //                   );
+              //                 },
+              //             child: MetricCardcm(title: "CM ₁", value: "00.0")),
+              //         ),
+              //         const SizedBox(width: 8),
+              //         Expanded(
+              //
+              //           child: InkWell(
+              //               onTap: () {
+              //                 print("CM2 Clicked");
+              //                 showDialog(
+              //                   context: context,
+              //                   builder: (_) => AlertDialog(
+              //                     title: Text('CM2 '),
+              //                     content: Text('This is a popup message'),
+              //                     actions: [
+              //                       TextButton(
+              //                         onPressed: () => Navigator.pop(context),
+              //                         child: Text('OK'),
+              //                       )
+              //                     ],
+              //                   ),
+              //                 );
+              //               },
+              //               child: MetricCardcm(title: "CM ₂", value: "00.0")),
+              //         ),
+              //         const SizedBox(width: 8),
+              //         Expanded(
+              //           child: InkWell(
+              //               onTap: () {
+              //                 print("CM3 Clicked");
+              //                 showDialog(
+              //                   context: context,
+              //                   builder: (_) => AlertDialog(
+              //                     title: Text('CM3 '),
+              //                     content: Text('This is a popup message'),
+              //                     actions: [
+              //                       TextButton(
+              //                         onPressed: () => Navigator.pop(context),
+              //                         child: Text('OK'),
+              //                       )
+              //                     ],
+              //                   ),
+              //                 );
+              //               },
+              //               child: MetricCardcm(title: "CM ₃", value: "00.0")),
+              //         ),
+              //         const SizedBox(width: 8),
+              //         Expanded(
+              //           child: InkWell(
+              //               onTap: () {
+              //                 print(" View full P&L Clicked");
+              //                 Navigator.push(
+              //                   context,
+              //                   MaterialPageRoute(
+              //                     builder: (context) => kIsWeb ? FinanceExecutiveWebScreen() :
+              //                     //CMReportScreen(),
+              //                    FinanceExecutiveScreen(),
+              //                   ),
+              //                 );
+              //               },
+              //               child: MetricCardcm(title: "View",value: "P&L",)),
+              //         ),
+              //       ],
+              //     ),
+              //
+              //
+              //     const SizedBox(height: 10),
+              //     const SizedBox(height: 10),
+              //
+              //     //Divider(color: AppColors.gold, thickness: 0.5),
+              //
+              //
+              //     // if (!isLoading)
+              //     //   TextButton(
+              //     //     onPressed: () {
+              //     //       Navigator.push(
+              //     //         context,
+              //     //         MaterialPageRoute(
+              //     //           builder: (context) => FinanceExecutiveScreen(),
+              //     //         ),
+              //     //       );
+              //     //     },
+              //     //     child: Row(
+              //     //       mainAxisAlignment: MainAxisAlignment.center,
+              //     //       children: [
+              //     //         Text(
+              //     //           'View full P&L',
+              //     //           style: TextStyle(
+              //     //             fontWeight: FontWeight.bold,
+              //     //             color: AppColors.gold,
+              //     //           ),
+              //     //         ),
+              //     //         const SizedBox(width: 8),
+              //     //         Icon(Icons.arrow_forward, color: AppColors.gold),
+              //     //       ],
+              //     //     ),
+              //     //   ),
+              //     // Divider(color: AppColors.gold, thickness: 0.5),
+              //   ],
+              // ),
+
+              Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                          child: InkWell(
-                              onTap: () {
-                                print("CM1 Clicked");
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    title: Text('CM1 '),
-                                    content: Text('This is a popup message'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text('OK'),
-                                      )
-                                    ],
-                                  ),
-                                );
-                              },
-                          child: MetricCardcm(title: "CM ₁", value: "00.0")),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-
-                        child: InkWell(
-                            onTap: () {
-                              print("CM2 Clicked");
-                              showDialog(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: Text('CM2 '),
-                                  content: Text('This is a popup message'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('OK'),
-                                    )
-                                  ],
-                                ),
-                              );
-                            },
-                            child: MetricCardcm(title: "CM ₂", value: "00.0")),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: InkWell(
-                            onTap: () {
-                              print("CM3 Clicked");
-                              showDialog(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: Text('CM3 '),
-                                  content: Text('This is a popup message'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('OK'),
-                                    )
-                                  ],
-                                ),
-                              );
-                            },
-                            child: MetricCardcm(title: "CM ₃", value: "00.0")),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: InkWell(
-                            onTap: () {
-                              print(" View full P&L Clicked");
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => kIsWeb ? FinanceExecutiveWebScreen() :
-                                  FinanceExecutiveScreen(),
-                                ),
-                              );
-                            },
-                            child: MetricCardcm(title: "View",value: "P&L",)),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const SizedBox(height: 10),
-
-                  Divider(color: AppColors.gold, thickness: 0.5),
-
-
-                  // if (!isLoading)
-                  //   TextButton(
-                  //     onPressed: () {
-                  //       Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //           builder: (context) => FinanceExecutiveScreen(),
-                  //         ),
-                  //       );
-                  //     },
-                  //     child: Row(
-                  //       mainAxisAlignment: MainAxisAlignment.center,
-                  //       children: [
-                  //         Text(
-                  //           'View full P&L',
-                  //           style: TextStyle(
-                  //             fontWeight: FontWeight.bold,
-                  //             color: AppColors.gold,
-                  //           ),
-                  //         ),
-                  //         const SizedBox(width: 8),
-                  //         Icon(Icons.arrow_forward, color: AppColors.gold),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // Divider(color: AppColors.gold, thickness: 0.5),
+                  SizedBox(
+                      height: 150,
+                      width: 324,
+                      child:PnLSummaryScreen(
+                        startDate: "2025-2",
+                        endDate: "2025-4",
+                      ),),
+                  InkWell(
+                      onTap: () {
+                        print(" View full P&L Clicked");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => kIsWeb ? FinanceExecutiveWebScreen() :
+                            //CMReportScreen(),
+                            FinanceExecutiveScreen(),
+                          ),
+                        );
+                      },
+                      child: MetricCardcm(title: "View",value: "P&L",)),
                 ],
               ),
+              Divider(color: AppColors.gold, thickness: 0.5),
+
+
             ],
           )),
     );
@@ -1060,6 +1519,77 @@ class MetricCardcm extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
             // textAlign: TextAlign.left
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MetricCardinvetory extends StatelessWidget {
+  final String title;
+  final String value;
+  final String compared;
+
+  const MetricCardinvetory(
+      {super.key,
+        required this.title,
+        required this.value,
+        required this.compared});
+
+  @override
+  Widget build(BuildContext context) {
+  //  print(compared);
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: AppColors.beige,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title, style: const TextStyle(fontSize: 16),
+            // textAlign: TextAlign.left
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon(
+                //   compared.contains('Profit')
+                //       ? Icons.arrow_upward
+                //       : Icons.arrow_downward,
+                //   size: 14,
+                //   color:
+                //   compared.contains('Profit') ? Colors.green : Colors.red,
+                // ),
+                const SizedBox(width: 4),
+                Text(
+                  compared, // e.g., "219.93%"
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                  //  color: compared.contains('Profit') ? Colors.green : Colors.red,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

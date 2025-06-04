@@ -54,7 +54,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
   @override
   void initState() {
     super.initState();
-    selectedFilterType = 'monthtodate'; // Set default to "6months"
+    selectedFilterType = 'lastmonth'; // Set default to "6months"
     fetchDropdownData();
     fetchFilteredData(); // Automatically fetch data for 6 months on screen load
   }
@@ -566,7 +566,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen> {
                                       child: MetricCardcm(
                                         title: "ROAS",
                                         value:
-                                            "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                                        "${(((adssales?['totalAdSpend'] ?? 0) / (salesData?['totalSales'] ?? 1))).toStringAsFixed(2)} ",
                                       ),
                                     ),
                                   ],

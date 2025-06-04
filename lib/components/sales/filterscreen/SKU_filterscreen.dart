@@ -51,7 +51,7 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
   @override
   void initState() {
     super.initState();
-    selectedFilterType = 'monthtodate'; // Set default to "6months"
+    selectedFilterType = '6months'; // Set default to "6months"
     fetchDropdownData();
     fetchSalesData(); // Automatically fetch data for 6 months on screen load
   }

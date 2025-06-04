@@ -74,7 +74,7 @@ class _Filter_SalesRereginwiseScreenState
   void initState() {
     super.initState();
     print("Hello Filter_SalesRereginwiseScreen initState called");
-    selectedFilterType = 'monthtodate'; // Set default to "6months"
+    selectedFilterType = 'lastmonth'; // Set default to "6months"
     fetchDropdownData();
     fetchFilteredData(); // Automatically fetch data for 6 months on screen load
   }
@@ -502,34 +502,34 @@ class _Filter_SalesRereginwiseScreenState
                     ),
                   ),
 
-                  SizedBox(width: 8),
-                  SizedBox(
-                    width: 150,
-                    height: 50,
-                    child: DropdownSearch<String>(
-                      items: cities,
-                      selectedItem: selectedCity,
-                      popupProps: PopupProps.menu(
-                        showSearchBox: true,
-                        searchFieldProps: TextFieldProps(
-                          decoration: InputDecoration(
-                            hintText: "Search City",
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                      dropdownDecoratorProps: DropDownDecoratorProps(
-                        // dropdownSearchDecoration: InputDecoration(
-                        //   labelText: "City",
-                        //   border: OutlineInputBorder(),
-                        // ),
-                        dropdownSearchDecoration:
-                            customInputDecoration(labelText: "City"),
-                      ),
-                      clearButtonProps: ClearButtonProps(isVisible: true),
-                      onChanged: (val) => onDropdownChanged(val, 'city'),
-                    ),
-                  ),
+                  // SizedBox(width: 8),
+                  // SizedBox(
+                  //   width: 150,
+                  //   height: 50,
+                  //   child: DropdownSearch<String>(
+                  //     items: cities,
+                  //     selectedItem: selectedCity,
+                  //     popupProps: PopupProps.menu(
+                  //       showSearchBox: true,
+                  //       searchFieldProps: TextFieldProps(
+                  //         decoration: InputDecoration(
+                  //           hintText: "Search City",
+                  //           border: OutlineInputBorder(),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     dropdownDecoratorProps: DropDownDecoratorProps(
+                  //       // dropdownSearchDecoration: InputDecoration(
+                  //       //   labelText: "City",
+                  //       //   border: OutlineInputBorder(),
+                  //       // ),
+                  //       dropdownSearchDecoration:
+                  //           customInputDecoration(labelText: "City"),
+                  //     ),
+                  //     clearButtonProps: ClearButtonProps(isVisible: true),
+                  //     onChanged: (val) => onDropdownChanged(val, 'city'),
+                  //   ),
+                  // ),
 
                   SizedBox(width: 8),
                   SizedBox(
@@ -737,9 +737,9 @@ class _Filter_SalesRereginwiseScreenState
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: MetricCardcm(
-                                        title: "", //DOS
-                                        value: "",
-                                        // value: (adssales!['totalAdSales'] / (double.tryParse(salesData!['totalSales'].toString()) ?? 1)*100).toStringAsFixed(2),
+                                        title: "ROAS",
+                                        value:
+                                        "${(((adssales?['totalAdSpend'] ?? 0) / (salesData?['totalSales'] ?? 1))).toStringAsFixed(2)} ",
                                       ),
                                     ),
                                   ],

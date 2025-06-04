@@ -17,6 +17,7 @@ String error = '';
 String Amazoninventorysum = '00';
 String LTSFsum = '00';
 String Storagecostsum = '00';
+String DaysInStock = '00';
 String DOSsum = '00';
 
 class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
@@ -35,7 +36,19 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
           0.0;
       totalCost += cost;
     }
+    // Round to nearest whole number
+    return totalCost.roundToDouble();
+  }
 
+  double calculateTotalDaysInStock(List<dynamic> data) {
+    double totalCost = 0.0;
+
+    for (var item in data) {
+      final cost = double.tryParse(
+          item['Days_In_Stock'].toString()) ??
+          0.0;
+      totalCost += cost;
+    }
     // Round to nearest whole number
     return totalCost.roundToDouble();
   }
@@ -76,9 +89,11 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
           double totalEstimatedStorageCost = calculateTotalEstimatedStorageCost(inventoryList);
           print("Total Estimated Storage Cost: £${totalEstimatedStorageCost.toStringAsFixed(2)}");
           double totalAisCost = calculateTotalEstimatedAisCost(inventoryList);
-          print(
-              "Total estimated AIS cost: £${totalAisCost.toStringAsFixed(2)}");
+          double totaldayinstock = calculateTotalDaysInStock(inventoryList);
+          print("Total estimated AIS cost: £${totalAisCost.toStringAsFixed(2)}");
           LTSFsum= formatNumberStringWithComma(totalAisCost.toString());
+          DaysInStock= formatNumberStringWithComma(totaldayinstock.toString());
+         // DaysInStock= formatNumberStringWithComma(Days_In_Stock.toString());
 
           // int StorageCost = getStorageCostQuantity(inventoryList);
           // print("Storage cost sum: $StorageCost");
@@ -179,6 +194,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                   description: 'For all SKU Average basis',
                 ),
               ),
+
+
             ],
           ),
         ],
