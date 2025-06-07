@@ -13,7 +13,9 @@ import '../utils/colors.dart';
 import 'package:http/http.dart' as http;
 
 class NewFinanceSkuScreen extends StatefulWidget {
-  const NewFinanceSkuScreen({super.key});
+  final String financeval;
+
+  const NewFinanceSkuScreen({super.key, required this.financeval } );
 
   @override
   State<NewFinanceSkuScreen> createState() => _SalesSkuPageState();
@@ -352,7 +354,10 @@ class _SalesSkuPageState extends State<NewFinanceSkuScreen> {
     return Scaffold(
       // appBar: AppBar(title: const Text('Sales SKU Data')),
 
-      appBar: AppBar(
+      appBar:
+      widget.financeval == "1"
+          ?
+      AppBar(
         // title: Image.asset('assets/logo.png'),
         title: const Text(
           'Finance SKU',
@@ -365,7 +370,7 @@ class _SalesSkuPageState extends State<NewFinanceSkuScreen> {
         centerTitle: true,
         backgroundColor: AppColors.primaryBlue,
         iconTheme: IconThemeData(color: Colors.white),
-      ),
+      ):null,
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

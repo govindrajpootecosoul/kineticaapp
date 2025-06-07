@@ -32,10 +32,10 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
   List<String> skus = [];
 
   List<String> filterTypes = [
-    "today",
-    "last30days",
+   // "today",
+   // "last30days",
     "monthtodate",
-    '6months',
+   // '6months',
     "yeartodate",
     "custom",
   ];
@@ -43,7 +43,7 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
   String? selectedState;
   String? selectedCity;
   String? selectedSku;
-  String? selectedFilterType = '6months';
+  String? selectedFilterType = 'monthtodate';
 
   DateTime? startDate;
   DateTime? endDate;
@@ -51,23 +51,23 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
   @override
   void initState() {
     super.initState();
-    selectedFilterType = '6months'; // Set default to "6months"
+    selectedFilterType = 'monthtodate'; // Set default to "6months"
     fetchDropdownData();
     fetchSalesData(); // Automatically fetch data for 6 months on screen load
   }
 
   String formatFilterType(String filter) {
     switch (filter) {
-      case 'today':
-        return 'Today';
-      case 'last30days':
-        return 'Last 30 Days';
+      // case 'today':
+      //   return 'Today';
+      // case 'last30days':
+      //   return 'Last 30 Days';
       case 'monthtodate':
-        return 'Month to Date';
-      case '6months':
-        return 'Last 6 Months';
+        return 'Current Month';
+      // case '6months':
+      //   return 'Last 6 Months';
       case 'yeartodate':
-        return 'Year to Date';
+        return 'Current Year';
       case 'custom':
         return 'Custom Range';
       default:

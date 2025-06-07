@@ -15,6 +15,7 @@ import '../../../utils/colors.dart';
 import '../financescreens/Finance_Executive_Screen.dart';
 import '../graph/commanbarchar_file.dart';
 import '../utils/ApiConfig.dart';
+import '../utils/chart_config.dart';
 import 'Dashboard.dart'; // Import the package
 
 class NewHomeScreen extends StatefulWidget {
@@ -32,17 +33,37 @@ class _NewHomeScreenState extends State<NewHomeScreen>
 
   final List<Tab> myTabs = const [
     Tab(text: 'Account Level'),
-    Tab(text: 'ASINs'),
+    //Tab(text: 'ASINs'),
   ];
 
+
   List<String> filterTypes = [
+    // "today",
+    //"week",
+    //"last30days",
+    "lastmonth",
+    "monthtodate",
+    "previousyear",
+    // "currentyear",
+    "yeartodate",
+    "custom"
+    // "monthtodate",
+    // "lastmonth",
+    //'6months',
+    //"yeartodate",
+    // "custom",
+  ];
+
+
+
+/*  List<String> filterTypes = [
 
     "monthtodate",
     "lastmonth",
     //'6months',
     //"yeartodate",
     "custom",
-  ];
+  ];*/
 
   String? selectedState;
   String? selectedCity;
@@ -688,6 +709,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final config = getChartConfig('monthtodate');
     return Scaffold(
 
       appBar: AppBar(
@@ -713,252 +735,254 @@ class _NewHomeScreenState extends State<NewHomeScreen>
         controller: _tabController,
         children: [
           Dashboard(),
-          Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: ListView(
-                // mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomDropdown(
-                        value: selectedFilterType,
-                        items: filterTypes,
-                        hintText: "Select Filter Type",
-                        onChanged: (val) => onDropdownChanged(val, 'filter'),
-                      ),
-                      if (selectedFilterType == 'custom')
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: ElevatedButton.icon(
-                            onPressed: () => _showDateRangePicker(context),
-                            // onPressed: () => selectDateRange(context),
 
-                            icon: Icon(Icons.date_range),
-                            label: Text(
-                              startDate != null && endDate != null
-                                  ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
-                                  : "Select Date Range",
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  // 🔼 Your dropdown and filter widgets here...
-
-                  //   const SizedBox(height: 20),
-
-                  BarChartSample(values: values, labels: labels, isWeb: isWeb),
-
-                  /// This is your scrollable main content
-                  isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : errorMessage.isNotEmpty
-                          ? Center(child: Text(errorMessage))
-                          : SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                          child: MetricCard(
-                                        title: "Overall Sales",
-                                        value:
-                                            '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
-                                        compared:
-                                            "${salesData?['comparison']['salesChangePercent'] ?? "0"}",
-                                      )),
-                                      // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
-                                      SizedBox(width: 8),
-                                      Expanded(
-                                        child: MetricCard(
-                                          title: "Units Ordered",
-                                          value:
-                                              "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
-                                          compared:
-                                              "${salesData?['comparison']['quantityChangePercent']}",
-                                          //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      if (selectedFilterType != "last30days")
-                                        Expanded(
-                                          child: MetricCardcm(
-                                            title: "AOV",
-                                            //value: "",
-                                            value:
-                                                "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toInt())}",
-                                            //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
-                                            //  totalOrders
-                                          ),
-                                        ),
-                                      if (selectedFilterType == "last30days")
-                                        Expanded(
-                                          child: MetricCardcm(
-                                            title: "AOV",
-                                            //value: "",
-                                            value: "£ 00",
-                                            //  totalOrders
-                                          ),
-                                        ),
-                                      const SizedBox(width: 8),
-                                      if (selectedFilterType != "last30days")
-                                        Expanded(
-                                          child: MetricCardcm(
-                                            title: "Organic Sales",
-                                            value:
-                                                "£ ${NumberFormat('#,###').format(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round())}",
-                                            //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
-                                          ),
-                                        ),
-                                      if (selectedFilterType == "last30days")
-                                        Expanded(
-                                          child: MetricCardcm(
-                                            title: "Organic Sales",
-                                            value: "£ 00",
-                                            //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "Ad Spend",
-                                          value:
-                                              "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
-                                          // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "Ad Sales",
-                                          value:
-                                              "£ ${NumberFormat('#,###').format((adssales?['totalAdSales'] ?? 0).toDouble().round())}",
-                                          //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      if (selectedFilterType != "last30days")
-                                        Expanded(
-                                          child: MetricCardcm(
-                                            title: "ACOS",
-                                            value:
-                                                "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
-                                          ),
-                                        ),
-                                      if (selectedFilterType == "last30days")
-                                        Expanded(
-                                          child: MetricCardcm(
-                                            title: "ACOS",
-                                            value: "0.00 %",
-                                          ),
-                                        ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "TACOS",
-                                          value:
-                                              "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 0) * 100).toStringAsFixed(2)} %",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                  Row(
-                                    children: [
-                                      if (selectedFilterType != "last30days")
-                                        Expanded(
-                                          child: MetricCardcm(
-                                            title: "Organic Sales",
-                                            value:
-                                                "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)) / (salesData?['totalSales'] ?? 0.0) * 100).toStringAsFixed(2)} %",
-                                          ),
-                                        ),
-                                      if (selectedFilterType == "last30days")
-                                        Expanded(
-                                          child: MetricCardcm(
-                                            title: "Organic Sales",
-                                            value: "0.00 %",
-                                          ),
-                                        ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "ROAS",
-                                          value:
-                                              "${(((adssales?['totalAdSpend'] ?? 0) / (salesData?['totalSales'] ?? 1))).toStringAsFixed(2)} ",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-
-
-                            ),
-
-                  /// 🔽 Fixed bottom section (not scrollable)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 10),
-                      const SizedBox(height: 10),
-                      if (!isLoading)
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => kIsWeb
-                                    ? FinanceExecutiveWebScreen()
-                                    : FinanceExecutiveScreen(),
-                              ),
-                            );
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'View full P&L',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.gold,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Icon(Icons.arrow_forward, color: AppColors.gold),
-                            ],
-                          ),
-                        ),
-                      Divider(color: AppColors.gold, thickness: 0.5),
-                    ],
-                  ),
-                ],
-              )),
+          // Padding(
+          //     padding: const EdgeInsets.all(10.0),
+          //     child: ListView(
+          //       // mainAxisAlignment: MainAxisAlignment.end,
+          //       children: [
+          //         Row(
+          //           mainAxisAlignment: MainAxisAlignment.end,
+          //           children: [
+          //             CustomDropdown(
+          //               value: selectedFilterType,
+          //               items: filterTypes,
+          //               hintText: "Select Filter Type",
+          //               onChanged: (val) => onDropdownChanged(val, 'filter'),
+          //             ),
+          //             if (selectedFilterType == 'custom')
+          //               Padding(
+          //                 padding: const EdgeInsets.only(left: 8.0),
+          //                 child: ElevatedButton.icon(
+          //                   onPressed: () => _showDateRangePicker(context),
+          //                   // onPressed: () => selectDateRange(context),
+          //
+          //                   icon: Icon(Icons.date_range),
+          //                   label: Text(
+          //                     startDate != null && endDate != null
+          //                         ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
+          //                         : "Select Date Range",
+          //                     overflow: TextOverflow.ellipsis,
+          //                   ),
+          //                 ),
+          //               ),
+          //           ],
+          //         ),
+          //         // 🔼 Your dropdown and filter widgets here...
+          //
+          //         //   const SizedBox(height: 20),
+          //
+          //        // BarChartSample(values: values, labels: labels, isWeb: isWeb),
+          //         BarChartSample(values: values, labels: labels, isWeb: isWeb, activeCount: config['activeCount'],),
+          //
+          //         /// This is your scrollable main content
+          //         isLoading
+          //             ? Center(child: CircularProgressIndicator())
+          //             : errorMessage.isNotEmpty
+          //                 ? Center(child: Text(errorMessage))
+          //                 : SingleChildScrollView(
+          //                     child: Column(
+          //                       children: [
+          //                         Row(
+          //                           children: [
+          //                             Expanded(
+          //                                 child: MetricCard(
+          //                               title: "Overall Sales",
+          //                               value:
+          //                                   '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
+          //                               compared:
+          //                                   "${salesData?['comparison']['salesChangePercent'] ?? "0"}",
+          //                             )),
+          //                             // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
+          //                             SizedBox(width: 8),
+          //                             Expanded(
+          //                               child: MetricCard(
+          //                                 title: "Units Ordered",
+          //                                 value:
+          //                                     "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
+          //                                 compared:
+          //                                     "${salesData?['comparison']['quantityChangePercent']}",
+          //                                 //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
+          //                               ),
+          //                             ),
+          //                           ],
+          //                         ),
+          //                         SizedBox(
+          //                           height: 8,
+          //                         ),
+          //                         SizedBox(
+          //                           height: 10,
+          //                         ),
+          //                         Row(
+          //                           children: [
+          //                             if (selectedFilterType != "last30days")
+          //                               Expanded(
+          //                                 child: MetricCardcm(
+          //                                   title: "AOV",
+          //                                   //value: "",
+          //                                   value:
+          //                                       "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toInt())}",
+          //                                   //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+          //                                   //  totalOrders
+          //                                 ),
+          //                               ),
+          //                             if (selectedFilterType == "last30days")
+          //                               Expanded(
+          //                                 child: MetricCardcm(
+          //                                   title: "AOV",
+          //                                   //value: "",
+          //                                   value: "£ 00",
+          //                                   //  totalOrders
+          //                                 ),
+          //                               ),
+          //                             const SizedBox(width: 8),
+          //                             if (selectedFilterType != "last30days")
+          //                               Expanded(
+          //                                 child: MetricCardcm(
+          //                                   title: "Organic Sales",
+          //                                   value:
+          //                                       "£ ${NumberFormat('#,###').format(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round())}",
+          //                                   //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+          //                                 ),
+          //                               ),
+          //                             if (selectedFilterType == "last30days")
+          //                               Expanded(
+          //                                 child: MetricCardcm(
+          //                                   title: "Organic Sales",
+          //                                   value: "£ 00",
+          //                                   //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+          //                                 ),
+          //                               ),
+          //                           ],
+          //                         ),
+          //                         SizedBox(
+          //                           height: 10,
+          //                         ),
+          //                         Row(
+          //                           children: [
+          //                             Expanded(
+          //                               child: MetricCardcm(
+          //                                 title: "Ad Spend",
+          //                                 value:
+          //                                     "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
+          //                                 // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
+          //                               ),
+          //                             ),
+          //                             const SizedBox(width: 8),
+          //                             Expanded(
+          //                               child: MetricCardcm(
+          //                                 title: "Ad Sales",
+          //                                 value:
+          //                                     "£ ${NumberFormat('#,###').format((adssales?['totalAdSales'] ?? 0).toDouble().round())}",
+          //                                 //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+          //                               ),
+          //                             ),
+          //                           ],
+          //                         ),
+          //                         SizedBox(
+          //                           height: 10,
+          //                         ),
+          //                         Row(
+          //                           children: [
+          //                             if (selectedFilterType != "last30days")
+          //                               Expanded(
+          //                                 child: MetricCardcm(
+          //                                   title: "ACOS",
+          //                                   value:
+          //                                       "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
+          //                                 ),
+          //                               ),
+          //                             if (selectedFilterType == "last30days")
+          //                               Expanded(
+          //                                 child: MetricCardcm(
+          //                                   title: "ACOS",
+          //                                   value: "0.00 %",
+          //                                 ),
+          //                               ),
+          //                             const SizedBox(width: 8),
+          //                             Expanded(
+          //                               child: MetricCardcm(
+          //                                 title: "TACOS",
+          //                                 value:
+          //                                     "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 0) * 100).toStringAsFixed(2)} %",
+          //                               ),
+          //                             ),
+          //                           ],
+          //                         ),
+          //                         SizedBox(
+          //                           height: 8,
+          //                         ),
+          //                         Row(
+          //                           children: [
+          //                             if (selectedFilterType != "last30days")
+          //                               Expanded(
+          //                                 child: MetricCardcm(
+          //                                   title: "Organic Sales",
+          //                                   value:
+          //                                       "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)) / (salesData?['totalSales'] ?? 0.0) * 100).toStringAsFixed(2)} %",
+          //                                 ),
+          //                               ),
+          //                             if (selectedFilterType == "last30days")
+          //                               Expanded(
+          //                                 child: MetricCardcm(
+          //                                   title: "Organic Sales",
+          //                                   value: "0.00 %",
+          //                                 ),
+          //                               ),
+          //                             const SizedBox(width: 8),
+          //                             Expanded(
+          //                               child: MetricCardcm(
+          //                                 title: "ROAS",
+          //                                 value:
+          //                                     "${(((adssales?['totalAdSpend'] ?? 0) / (salesData?['totalSales'] ?? 1))).toStringAsFixed(2)} ",
+          //                               ),
+          //                             ),
+          //                           ],
+          //                         ),
+          //                       ],
+          //                     ),
+          //
+          //
+          //                   ),
+          //
+          //         /// 🔽 Fixed bottom section (not scrollable)
+          //         Column(
+          //           mainAxisSize: MainAxisSize.min,
+          //           children: [
+          //             const SizedBox(height: 10),
+          //             const SizedBox(height: 10),
+          //             if (!isLoading)
+          //               TextButton(
+          //                 onPressed: () {
+          //                   Navigator.push(
+          //                     context,
+          //                     MaterialPageRoute(
+          //                       builder: (context) => kIsWeb
+          //                           ? FinanceExecutiveWebScreen()
+          //                           : FinanceExecutiveScreen(),
+          //                     ),
+          //                   );
+          //                 },
+          //                 child: Row(
+          //                   mainAxisAlignment: MainAxisAlignment.center,
+          //                   children: [
+          //                     Text(
+          //                       'View full P&L',
+          //                       style: TextStyle(
+          //                         fontWeight: FontWeight.bold,
+          //                         color: AppColors.gold,
+          //                       ),
+          //                     ),
+          //                     const SizedBox(width: 8),
+          //                     Icon(Icons.arrow_forward, color: AppColors.gold),
+          //                   ],
+          //                 ),
+          //               ),
+          //             Divider(color: AppColors.gold, thickness: 0.5),
+          //           ],
+          //         ),
+          //       ],
+          //     )),
 
 
         ],

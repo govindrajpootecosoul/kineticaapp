@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
+import '../components/inventory/inventory_graph/inventory_graph.dart';
 
 class InventorySkuCardScreen extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -46,6 +47,11 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
+          // SizedBox(height: 400,
+          // child: InventoryGraph(),
+          // ),
+
           Text(label,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           const SizedBox(height: 8),
@@ -116,8 +122,8 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildLabelValue("ASIN", product['ASIN'] ?? "N/A"),
-                        buildLabelValue("DOS", product['days_of_supply'] ?? '00'),
+                        buildLabelValue("Product Name", product['Product_Name'] ?? "N/A"),
+                        buildLabelValue("Product Category", product['Product_Category'] ?? '00'),
                         buildLabelValue("LTSF Cost", "£ ${product['estimated_storage_cost_next_month'] ?? '00'}"),
                       ],
                     ),
@@ -153,8 +159,7 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     buildLabelValueExpend("FC Transfer", product['FC_Transfer'] ?? "00"),
                     buildLabelValueExpend("FC Processing", product['FC_Processing'] ?? "00"),
 
-
-                    buildLabelValueExpend("MTQ", product['MTQ'] ?? "00"),
+                    buildLabelValueExpend("DOS", product['days_of_supply'] ?? "00"),
                     buildLabelValueExpend("Instock Rate", "${product['InStock_Rate_Percent']} %" ?? "00"),
                     buildLabelValueExpend("Days In Stock", "${product['Days_In_Stock']}/${product['Total_Days']}" ?? "00"),
                   ],

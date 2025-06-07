@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../../comman_Screens/productcard.dart';
 import '../../../graph/commanbarchar_file.dart';
 import '../../../utils/ApiConfig.dart';
+import '../../../utils/chart_config.dart';
 import '../../../utils/colors.dart'; // Import the package
 
 class Filter_SalesRereginwiseScreen extends StatefulWidget {
@@ -81,21 +82,21 @@ class _Filter_SalesRereginwiseScreenState
 
   String formatFilterType(String filter) {
     switch (filter) {
-      case 'today':
-        return 'Today';
-      case '6months':
-        return 'Last 6 Months';
-      case 'last30days':
-        return 'Last 30 Days';
+      // case 'today':
+      //   return 'Today';
+      // case '6months':
+      //   return 'Last 6 Months';
+      // case 'last30days':
+      //   return 'Last 30 Days';
       case 'yeartodate':
-        return 'Year to Date';
+        return 'Current Year';
       case 'monthtodate':
         return 'Current Month';
 
       // case 'year':
       //   return 'This Year';
       case 'lastmonth':
-        return 'Last Month';
+        return 'Previous Month';
       case 'custom':
         return 'Custom Range';
       default:
@@ -423,6 +424,7 @@ class _Filter_SalesRereginwiseScreenState
 
   @override
   Widget build(BuildContext context) {
+    final config = getChartConfig('monthtodate');
     return Scaffold(
       // appBar: AppBar(title: const Text("Sales Data Viewer")),
       body: Padding(
@@ -564,7 +566,9 @@ class _Filter_SalesRereginwiseScreenState
             ),
 
             const SizedBox(height: 20),
+
             BarChartSample(values: values, labels: labels),
+           // BarChartSample(values: values, labels: labels,activeCount: config['activeCount'],),
             // const SizedBox(height: 20),
 
             Expanded(
@@ -577,173 +581,204 @@ class _Filter_SalesRereginwiseScreenState
                             padding: const EdgeInsets.all(1.0),
                             child: Column(
                               children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: MetricCard(
-                                      title: "Overall Sales",
-                                      value:
-                                          '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? "0").round())}',
-                                      compared:
-                                          "${salesData?['comparison']['salesChangePercent'] ?? "0"}",
-                                    )),
-                                    // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
-                                    SizedBox(width: 8),
-                                    Expanded(
-                                      child: MetricCard(
-                                        title: "Units Ordered",
-                                        value:
-                                            "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
-                                        compared:
-                                            "${salesData?['comparison']['quantityChangePercent']}",
-                                        //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
-                                      ),
+                                Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.grey),
                                     ),
-                                  ],
+                                    child:Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(children: [
+
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                                child: MetricCard(
+                                                  title: "Overall Sales",
+                                                  value:
+                                                  '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? "0").round())}',
+                                                  compared:
+                                                  "${salesData?['comparison']['salesChangePercent'] ?? "0"}",
+                                                )),
+                                            // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
+                                            SizedBox(width: 8),
+                                            Expanded(
+                                              child: MetricCard(
+                                                title: "Units Ordered",
+                                                value:
+                                                "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
+                                                compared:
+                                                "${salesData?['comparison']['quantityChangePercent']}",
+                                                //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        SizedBox(height:8,),
+                                        Row(
+                                          children: [
+                                            if (selectedFilterType != "last30days")
+                                              Expanded(
+                                                child: MetricCardcm(
+                                                  title: "AOV",
+                                                  //value: "",
+                                                  value:
+                                                  "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toInt())}",
+                                                  //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+                                                  //  totalOrders
+                                                ),
+                                              ),
+                                            if (selectedFilterType == "last30days")
+                                              Expanded(
+                                                child: MetricCardcm(
+                                                  title: "AOV",
+                                                  //value: "",
+                                                  value: "£ 00",
+                                                  //  totalOrders
+                                                ),
+                                              ),
+                                            const SizedBox(width: 8),
+                                            if (selectedFilterType != "last30days")
+                                              Expanded(
+                                                child: MetricCardcm(
+                                                  title: "Organic Sale",
+                                                  value:
+                                                  "£ ${NumberFormat('#,###').format(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round())}",
+                                                  //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+                                                ),
+                                              ),
+                                            if (selectedFilterType == "last30days")
+                                              Expanded(
+                                                child: MetricCardcm(
+                                                  title: "Organic Sales",
+                                                  value: "£ 00",
+                                                  //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+
+                                      ],),
+                                    )
                                 ),
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                // Row(children: [
-                                //   Expanded(
-                                //       child: MetricCard(
-                                //         title: "Organic Sales", value: '\$${salesData!['totalSales'].toStringAsFixed(2)}', compared: "${salesData!['comparison']['salesChangePercent']}",)),
-                                //   const SizedBox(width: 8),
-                                //   Expanded(
-                                //     child: MetricCard(
-                                //       title: "Units Orders", value:"${salesData!['totalQuantity']}", compared: "${salesData!['comparison']['quantityChangePercent']}",),),
-                                //
-                                // ],),
+
 
                                 SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    if (selectedFilterType != "last30days")
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "AOV",
-                                          //value: "",
-                                          value:
-                                              "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toInt())}",
-                                          //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
-                                          //  totalOrders
-                                        ),
-                                      ),
-                                    if (selectedFilterType == "last30days")
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "AOV",
-                                          //value: "",
-                                          value: "£ 00",
-                                          //  totalOrders
-                                        ),
-                                      ),
-                                    const SizedBox(width: 8),
-                                    if (selectedFilterType != "last30days")
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "Organic Sale",
-                                          value:
-                                              "£ ${NumberFormat('#,###').format(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round())}",
-                                          //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
-                                        ),
-                                      ),
-                                    if (selectedFilterType == "last30days")
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "Organic Sales",
-                                          value: "£ 00",
-                                          //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: MetricCardcm(
-                                        title: "Ad Spend",
-                                        value:
-                                            "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
-                                        // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: MetricCardcm(
-                                        title: "Ad Sales",
-                                        value:
-                                            "£ ${NumberFormat('#,###').format((adssales?['totalAdSales'] ?? 0).toDouble().round())}",
-                                        //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    if (selectedFilterType != "last30days")
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "ACOS",
-                                          value:
-                                              "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
-                                        ),
-                                      ),
-                                    if (selectedFilterType == "last30days")
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "ACOS",
-                                          value: "0.00 %",
-                                        ),
-                                      ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: MetricCardcm(
-                                        title: "TACOS",
-                                        value:
-                                            "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 1) * 100).toStringAsFixed(2)} %",
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
                                   height: 8,
                                 ),
-                                Row(
-                                  children: [
-                                    if (selectedFilterType != "last30days")
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "Organic Sales",
-                                          value:
-                                              "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)) / (salesData?['totalSales'] ?? 0.0) * 100).toStringAsFixed(2)} %",
-                                        ),
-                                      ),
-                                    if (selectedFilterType == "last30days")
-                                      Expanded(
-                                        child: MetricCardcm(
-                                          title: "Organic Sales",
-                                          value: "0.00 %",
-                                        ),
-                                      ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: MetricCardcm(
-                                        title: "ROAS",
-                                        value:
-                                        "${(((adssales?['totalAdSpend'] ?? 0) / (salesData?['totalSales'] ?? 1))).toStringAsFixed(2)} ",
-                                      ),
+
+                                Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.grey),
                                     ),
-                                  ],
+                                    child:Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(children: [
+
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: MetricCardcm(
+                                                title: "Ad Spend",
+                                                value:
+                                                "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
+                                                // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: MetricCardcm(
+                                                title: "Ad Sales",
+                                                value:
+                                                "£ ${NumberFormat('#,###').format((adssales?['totalAdSales'] ?? 0).toDouble().round())}",
+                                                //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height:8,),
+                                        Row(
+                                          children: [
+                                            if (selectedFilterType != "last30days")
+                                              Expanded(
+                                                child: MetricCardcm(
+                                                  title: "ACOS",
+                                                  value:
+                                                  "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                                                ),
+                                              ),
+                                            if (selectedFilterType == "last30days")
+                                              Expanded(
+                                                child: MetricCardcm(
+                                                  title: "ACOS",
+                                                  value: "0.00 %",
+                                                ),
+                                              ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: MetricCardcm(
+                                                title: "TACOS",
+                                                value:
+                                                "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 1) * 100).toStringAsFixed(2)} %",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                      ],),
+                                    )
                                 ),
+
+                                SizedBox(height: 8,),
+
+                                Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.grey),
+                                    ),
+                                    child:Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(children: [
+
+                                        Row(
+                                          children: [
+                                            if (selectedFilterType != "last30days")
+                                              Expanded(
+                                                child: MetricCardcm(
+                                                  title: "Organic Sales",
+                                                  value:
+                                                  "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)) / (salesData?['totalSales'] ?? 0.0) * 100).toStringAsFixed(2)} %",
+                                                ),
+                                              ),
+                                            if (selectedFilterType == "last30days")
+                                              Expanded(
+                                                child: MetricCardcm(
+                                                  title: "Organic Sales",
+                                                  value: "0.00 %",
+                                                ),
+                                              ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: MetricCardcm(
+                                                title: "ROAS",
+                                                value:
+                                                "${(((adssales?['totalAdSpend'] ?? 0) / (salesData?['totalSales'] ?? 1))).toStringAsFixed(2)} ",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+
+                                      ],),
+                                    )
+                                ),
+
+
                               ],
                             ),
 

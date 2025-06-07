@@ -465,16 +465,20 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   ];
 
   final Map<String, String> fieldMapping = {
-    "Warehouse Inventory": "afn-warehouse-quantity",
-    "Total Sellable": "afn_fulfillable_quantity",
+    "Warehouse Inventory": "afn-warehouse-quantity",//
+    "Total Sellable": "afn_fulfillable_quantity",//
     "Amazon Reserved": "Amazon Reserved",
-    "Inventory Age": "inv_age_181_to_270_days"+"FC_Transfer",
-    "Customer Reserved": "Customer_reserved",
-    "FC Transfer": "FC_Transfer",
-    "FC Processing": "FC_Processing",
+    "Inventory Age": "inv_age_181_to_270_days"+"FC_Transfer",//
+    "Customer Reserved": "Customer_reserved",//
+    "FC Transfer": "FC_Transfer",//
+    "FC Processing": "FC_Processing",//
     "Unfulfilled": "afn_unsellable_quantity",
     "Inbound Recieving": "afn_inbound_receiving_quantity",
   };
+
+
+
+
 
   List<dynamic> inventoryList = [];
   bool isLoading = true;
@@ -778,29 +782,31 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
                               SizedBox(
                                 width: 200,
                                 child: Text(
-                                  "${item['SKU'].toString()}",
+                                  "${item['Product_Name'].toString()}",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       color: Colors.brown),
-                                  overflow: TextOverflow.ellipsis,
+                                 // overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               const SizedBox(height: 10),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Column(
+                                  Row(
                                     crossAxisAlignment:
                                     CrossAxisAlignment.start,
                                     children: [
-                                      Text("SKU",
+                                      Text("SKU ",
                                           style: TextStyle(
                                               fontSize: 14,
                                               fontWeight:
                                               FontWeight.bold,
                                               color: AppColors.gold)),
                                       SizedBox(
-                                        width: 100,
+                                       // width: 100,
                                         child: Text(
                                           item['SKU'].toString(),
                                           style: TextStyle(

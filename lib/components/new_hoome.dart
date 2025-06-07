@@ -844,9 +844,8 @@ class _New_HomePageState extends State<New_HomePage> {
 
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => FinanceExecutiveScreen()),
+                                  MaterialPageRoute(builder: (context) => FinanceExecutiveScreen(productval:"1")),
                                 );
-
                               },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment

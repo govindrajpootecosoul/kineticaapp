@@ -16,8 +16,11 @@ import '../cm1.dart';
 import '../financescreens/Finance_Executive_Screen.dart';
 import '../graph/commanbarchar_file.dart';
 import '../utils/ApiConfig.dart';
+import '../utils/chart_config.dart';
 import '../utils/formatNumberStringWithComma.dart';
 import 'inventory/inventory_executive.dart'; // Import the package
+
+int zeroInStockRateSkuCount = 0;
 
 class Dashboard extends StatefulWidget {
   ///final List<dynamic> data;
@@ -45,7 +48,7 @@ class _DashboardState extends State<Dashboard>{
   int understockCount = 0;
   int overstockCount = 0;
   int balancedCount = 0;
-  int zeroInStockRateSkuCount = 0;
+  //int zeroInStockRateSkuCount = 0;
 
   //final Map<String, int> stockCounts = countStockStatus();
 
@@ -74,12 +77,62 @@ class _DashboardState extends State<Dashboard>{
     // "today",
     //"week",
     //"last30days",
+    "lastmonth",
+    "monthtodate",
+    //"previousyear",
+    // "currentyear",
+    "yeartodate",
+    "custom"
+    // "monthtodate",
+    // "lastmonth",
+    //'6months',
+    //"yeartodate",
+    // "custom",
+  ];
+
+
+  String formatFilterType(String filter) {
+    switch (filter) {
+    // case 'today':
+    //   return 'Today';
+    //   case 'week':
+    //   return 'Week';
+    // case '6months':
+    //   return 'Last 6 Months';
+    // case 'last30days':
+    //   return 'Last 30 Days';
+    // case 'yeartodate':
+    //   return 'Year to Date';
+      case 'lastmonth':
+        return 'Previous Month';
+      case 'monthtodate':
+        return 'Current Month';
+
+    // case 'year':
+    //   return 'This Year';
+    //   case 'previousyear':
+    //     return 'Previous Year';
+    // case 'currentyear':
+      case 'yeartodate':
+        return 'Current Year';
+      case 'custom':
+        return 'Custom Range';
+      default:
+        return filter;
+    }
+  }
+
+
+/*  List<String> filterTypes = [
+    // "today",
+    //"week",
+    //"last30days",
     "monthtodate",
     "lastmonth",
     //'6months',
     //"yeartodate",
     "custom",
-  ];
+  ];*/
 
   String? selectedState;
   String? selectedCity;
@@ -328,31 +381,31 @@ class _DashboardState extends State<Dashboard>{
 
 
 
-  String formatFilterType(String filter) {
-    switch (filter) {
-    // case 'today':
-    //   return 'Today';
-    //   case 'week':
-    //   return 'Week';
-    // case '6months':
-    //   return 'Last 6 Months';
-    // case 'last30days':
-    //   return 'Last 30 Days';
-    // case 'yeartodate':
-    //   return 'Year to Date';
-      case 'monthtodate':
-        return 'Current Month';
-
-    // case 'year':
-    //   return 'This Year';
-      case 'lastmonth':
-        return 'Last Month';
-      case 'custom':
-        return 'Custom Range';
-      default:
-        return filter;
-    }
-  }
+  // String formatFilterType(String filter) {
+  //   switch (filter) {
+  //   // case 'today':
+  //   //   return 'Today';
+  //   //   case 'week':
+  //   //   return 'Week';
+  //   // case '6months':
+  //   //   return 'Last 6 Months';
+  //   // case 'last30days':
+  //   //   return 'Last 30 Days';
+  //   // case 'yeartodate':
+  //   //   return 'Year to Date';
+  //     case 'monthtodate':
+  //       return 'Current Month';
+  //
+  //   // case 'year':
+  //   //   return 'This Year';
+  //     case 'lastmonth':
+  //       return 'Last Month';
+  //     case 'custom':
+  //       return 'Custom Range';
+  //     default:
+  //       return filter;
+  //   }
+  // }
 
   Future<void> fetchDropdownData() async {
     try {
@@ -374,6 +427,11 @@ class _DashboardState extends State<Dashboard>{
     }
   }
 
+  String formatDateads_api(DateTime date) {
+    return '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}';
+  }
+
+
   String formatDate(DateTime date) =>
       "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
@@ -393,9 +451,10 @@ class _DashboardState extends State<Dashboard>{
       final to = formatDate(endDate!);
 
       url =
-      '${ApiConfig.baseUrl}/sales/resion?filterType=custom&fromDate=$from&toDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      '${ApiConfig.baseUrl}/sales/resion?filterType=custom&fromDate=$from&toDate=$to}';
     } else {
       url =
+         // 'http://192.168.18.131:3000/api/sales/resion?filterType=lastmonth';
       '${ApiConfig.baseUrl}/sales/resion?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     }
     //var request = http.Request('GET', url);
@@ -405,14 +464,15 @@ class _DashboardState extends State<Dashboard>{
     try {
       http.StreamedResponse response = await request.send();
 
-      // if (response.statusCode == 200) {
-      //   final data = await response.stream.bytesToString();
-      //
-      //   setState(() {
-      //     salesData = json.decode(data);
-      //     isLoading = false;
-      //   });
-      // }
+//       if (response.statusCode == 200) {
+//         final data = await response.stream.bytesToString();
+// print("qwertyuio:::  ${json.decode(data)}");
+//
+//         setState(() {
+//           salesData = json.decode(data);
+//           isLoading = false;
+//         });
+//       }
 
 
       if (response.statusCode == 200) {
@@ -434,21 +494,24 @@ class _DashboardState extends State<Dashboard>{
           if(selectedFilterType== "last30days")
           {
             print("last30days");
-            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
-            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+            values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            labels = breakdown.map<String>((item) => item['date'].toString()).toList();
 
-            values = breakdown
-                .map<double>((item) => (item['totalSales'] as num).roundToDouble())
-                .toList();
-
-            labels = breakdown
-                .map<String>((item) {
-              final date = DateTime.parse(item['date']);
-              return '${date.month.toString().padLeft(1, '0')}-${date.day.toString().padLeft(1, '0')}';
-            })
-                .toList();
+            // values = breakdown
+            //     .map<double>((item) => (item['totalSales'] as num).roundToDouble())
+            //     .toList();
+            //
+            // labels = breakdown
+            //     .map<String>((item) {
+            //   final date = DateTime.parse(item['date']);
+            //   return '${date.month.toString().padLeft(1, '0')}-${date.day.toString().padLeft(1, '0')}';
+            // })
+            //     .toList();
 
           }
+
+
+
           if(selectedFilterType== "monthtodate")
           {
             print("monthtodate");
@@ -471,43 +534,26 @@ class _DashboardState extends State<Dashboard>{
 
           }
 
-          if(selectedFilterType== "lastmonth")
-          {
+
+
+          if (selectedFilterType == "lastmonth") {
             print("6666666 months");
-            // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
-            // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+            //   values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            //   labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+            values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
 
+            // Only show day (1, 2, 3...) as label
+            labels = breakdown.map<String>((item) {
+              DateTime date = DateTime.parse(item['date'].toString());
+              return date.day.toString();
+            }).toList();
 
-
-            Map<String, double> monthlyTotals = {};
-
-            for (var item in breakdown) {
-              final fullDate = item['date'].toString(); // e.g., "January 2025"
-
-              DateTime? date;
-              try {
-                // Use DateFormat to parse "January 2025"
-                date = DateFormat('MMMM yyyy').parseStrict(fullDate);
-              } catch (e) {
-                continue; // skip invalid date
-              }
-
-              final month = DateFormat('MMM').format(date); // "Jan"
-              final year = date.year.toString().substring(2); // "25"
-              final label = '$month $year'; // e.g., "Jan 25"
-
-              final sale = (item['totalSales'] as num).toInt().toDouble();
-              monthlyTotals[label] = (monthlyTotals[label] ?? 0) + sale;
-            }
-
-// Step 2: Convert to chart-friendly lists
-            labels = monthlyTotals.keys.toList();
-            values = monthlyTotals.values.toList();
-
-            print("6 month${labels}");
-            print("6 month${values}");
-
+            print(values);
+            print(labels);
+            print("6666666 months");
           }
+
+
 
           if(selectedFilterType== "yeartodate")
           {
@@ -536,44 +582,47 @@ class _DashboardState extends State<Dashboard>{
 
 
           }
-          if(selectedFilterType== "custom")
-          {
+          if(selectedFilterType == "custom") {
             print("custom");
-            Map<String, double> monthlyTotals = {};
 
-            for (var item in breakdown) {
-              final fullDate = item['date'].toString(); // e.g., "January 2025"
+            values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            labels = breakdown.map<String>((item) => item['date'].toString()).toList();
 
-              DateTime? date;
-              try {
-                // Use DateFormat to parse "January 2025"
-                date = DateFormat('MMMM yyyy').parseStrict(fullDate);
-              } catch (e) {
-                continue; // skip invalid date
+            Map<String, double> monthWiseSum = {};
+            String getMonthKey(String date) => date.substring(0, 7);
+
+            for (int i = 0; i < labels.length; i++) {
+              String monthKey = getMonthKey(labels[i]);
+              double saleValue = values[i];
+
+              if (monthWiseSum.containsKey(monthKey)) {
+                monthWiseSum[monthKey] = monthWiseSum[monthKey]! + saleValue;
+              } else {
+                monthWiseSum[monthKey] = saleValue;
               }
-
-              final month = DateFormat('MMM').format(date); // "Jan"
-              final year = date.year.toString().substring(2); // "25"
-              final label = '$month $year'; // e.g., "Jan 25"
-
-              final sale = (item['totalSales'] as num).toInt().toDouble();
-              monthlyTotals[label] = (monthlyTotals[label] ?? 0) + sale;
             }
 
-// Step 2: Convert to chart-friendly lists
-            labels = monthlyTotals.keys.toList();
-            values = monthlyTotals.values.toList();
+            String formatMonthLabel(String monthKey) {
+              final year = monthKey.substring(2, 4);
+              final month = int.parse(monthKey.substring(5, 7));
+              return "$year-$month";
+            }
+
+            labels = monthWiseSum.keys.map((key) => formatMonthLabel(key)).toList();
+            values = monthWiseSum.values.toList();
+
+            print("📅 Month Labels: $labels");
+            print("📊 Month Values: $values");
           }
 
-          print("📊 values: $values");
-          print("📅 labels: $labels");
+
+          // print("📊 values: $values");
+          // print("📅 labels: $labels");
 
           fetchAdData();
           isLoading = false;
         });
       }
-
-
 
       else {
         setState(() {
@@ -591,6 +640,16 @@ class _DashboardState extends State<Dashboard>{
     }
   }
 
+  String formatShortYearMonth(String date) {
+    DateTime parsedDate = DateTime.parse(date);
+    String shortYear = parsedDate.year.toString().substring(2); // "25"
+    String month = parsedDate.month.toString().padLeft(2, '0'); // "04"
+    return '$shortYear-$month';
+  }
+
+
+
+
   Future<void> fetchAdData() async {
     if (selectedFilterType == null) return;
 
@@ -604,11 +663,12 @@ class _DashboardState extends State<Dashboard>{
         return;
       }
 
-      final from = formatDate(startDate!);
-      final to = formatDate(endDate!);
+      final from = formatDateads_api(startDate!);
+      final to = formatDateads_api(endDate!);
 
-      url =
-      '${ApiConfig.baseUrl}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      url = '${ApiConfig.baseUrl}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+
+    print("print url custom ads data ${url}");
     } else {
       url =
       '${ApiConfig.baseUrl}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
@@ -915,10 +975,18 @@ class _DashboardState extends State<Dashboard>{
   //     },
   //   );
   // }
+  String formatDatepnl(DateTime date) {
+    return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}";
+  }
+
 
   @override
   Widget build(BuildContext context) {
    // final stockCounts = countStockStatus(data);
+    final config = getChartConfig('monthtodate');
+    // print("custom datre value ${formatDate(startDate!)}");
+    // print("custom datre value ${formatDate(endDate!)}");
+
     return Scaffold(
 
       body:     Padding(
@@ -1002,6 +1070,8 @@ class _DashboardState extends State<Dashboard>{
 
               BarChartSample(values: values, labels: labels, isWeb: isWeb),
 
+              //BarChartSample(values: values, labels: labels, isWeb: isWeb, activeCount: config['activeCount'],),
+
               /// This is your scrollable main content
               isLoading
                   ? Center(child: CircularProgressIndicator())
@@ -1012,12 +1082,48 @@ class _DashboardState extends State<Dashboard>{
 
                 Column(
                   children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Sales",
-                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
+                    // Align(
+                    //   alignment: Alignment.center,
+                    //   child: Text(
+                    //     "Sales",
+                    //     style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
+                    //   ),
+                    // ),
+
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Sales ',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          TextSpan(
+                            text: (salesData != null &&
+                                salesData!['comparison']?['previousPeriod']?['startDate'] != null &&
+                                salesData!['comparison']?['previousPeriod']?['endDate'] != null)
+                                ? 'Compared with ${formatShortYearMonth(salesData!['comparison']['previousPeriod']['startDate'])} To ${formatShortYearMonth(salesData!['comparison']['previousPeriod']['endDate'])}'
+                                : 'Comparison data unavailable',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          )
+
+
+
+                          // TextSpan(
+                          //   text: 'as of ${salesData?['comparison']['previousPeriod']['startDate']}/${salesData?['comparison']['previousPeriod']['endDate']}',
+                          //   style: TextStyle(
+                          //     fontSize: 14,
+                          //     fontWeight: FontWeight.w400,
+                          //   ),
+                          // ),
+                        ],
                       ),
+                      textAlign: TextAlign.center,
                     ),
 
                     Container(
@@ -1051,27 +1157,44 @@ class _DashboardState extends State<Dashboard>{
                           Row(
                             children: [
                         
+                              // Expanded(
+                              //   child: MetricCardcm(
+                              //     title: "AOV",
+                              //     //value: "",
+                              //     value: "£ ${NumberFormat('#,###').format(
+                              //         (((salesData?['totalSales'] ?? 0.0) as num) /
+                              //             ((adssales?['totalOrders'] ?? 1) as num)).toInt()
+                              //     )}",
+                              //     //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+                              //     //  totalOrders
+                              //   ),
+                              // ),
+
+
+
                               Expanded(
-                                child: MetricCardcm(
+                                child: MetricCard(
                                   title: "AOV",
                                   //value: "",
                                   value: "£ ${NumberFormat('#,###').format(
-                                      (((salesData?['totalSales'] ?? 0.0) as num) /
-                                          ((adssales?['totalOrders'] ?? 1) as num)).toInt()
+                                      (((salesData?['totalSales'] ?? 0.0) as num) / (((adssales?['totalOrders'] == 0 ? 1 : adssales?['totalOrders']) ?? 1) as num)).toInt()
                                   )}",
-                                  //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+                                 compared: "${salesData?['comparison']['aovChangePercent']}",
+                                  //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalSales'] ?? 1) as num)).toStringAsFixed(0)}",
                                   //  totalOrders
                                 ),
                               ),
-                        
+
+
                               const SizedBox(width: 8),
                         
                               Expanded(
-                                child: MetricCardcm(
+                                child: MetricCard(
                                   title: "Organic Sales",
                                   value: "£ ${NumberFormat('#,###').format(
                                       ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
                                   )}",
+                                  compared: "${salesData?['comparison']['organicSalesChangePercent']}",
                                   //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
                         
                                 ),
@@ -1105,6 +1228,7 @@ class _DashboardState extends State<Dashboard>{
                                 Expanded(
                                   child: MetricCardcm(
                                     title: "Ad Spend",
+                                   // title: Salesvaluepnl.toString(),
                                     value: "£ ${NumberFormat('#,###').format(
                                         (adssales?['totalAdSpend'] ?? 0).toDouble().round()
                                     )}",
@@ -1142,7 +1266,7 @@ class _DashboardState extends State<Dashboard>{
                                 Expanded(
                                   child: MetricCardcm(
                                     title: "TACOS",
-                                    value: "${((adssales?['totalAdSales'] ?? 0) / (salesData?['totalSales'] ?? 0) * 100).toStringAsFixed(2)} %",
+                                    value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
                                   ),
                                 ),
                               ],
@@ -1254,160 +1378,74 @@ class _DashboardState extends State<Dashboard>{
 
 
 
+
                   ],
                 ),
               ),
 
-              /// 🔽 Fixed bottom section (not scrollable)
-              // const SizedBox(height: 16),
-              // Column(
-              //   mainAxisSize: MainAxisSize.min,
-              //   children: [
-              //     Row(
-              //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //       children: [
-              //         Expanded(
-              //             child: InkWell(
-              //                 onTap: () {
-              //                   print("CM1 Clicked");
-              //                   showDialog(
-              //                     context: context,
-              //                     builder: (_) => AlertDialog(
-              //                       title: Text('CM1 '),
-              //                       content: Text('This is a popup message'),
-              //                       actions: [
-              //                         TextButton(
-              //                           onPressed: () => Navigator.pop(context),
-              //                           child: Text('OK'),
-              //                         )
-              //                       ],
-              //                     ),
-              //                   );
-              //                 },
-              //             child: MetricCardcm(title: "CM ₁", value: "00.0")),
-              //         ),
-              //         const SizedBox(width: 8),
-              //         Expanded(
-              //
-              //           child: InkWell(
-              //               onTap: () {
-              //                 print("CM2 Clicked");
-              //                 showDialog(
-              //                   context: context,
-              //                   builder: (_) => AlertDialog(
-              //                     title: Text('CM2 '),
-              //                     content: Text('This is a popup message'),
-              //                     actions: [
-              //                       TextButton(
-              //                         onPressed: () => Navigator.pop(context),
-              //                         child: Text('OK'),
-              //                       )
-              //                     ],
-              //                   ),
-              //                 );
-              //               },
-              //               child: MetricCardcm(title: "CM ₂", value: "00.0")),
-              //         ),
-              //         const SizedBox(width: 8),
-              //         Expanded(
-              //           child: InkWell(
-              //               onTap: () {
-              //                 print("CM3 Clicked");
-              //                 showDialog(
-              //                   context: context,
-              //                   builder: (_) => AlertDialog(
-              //                     title: Text('CM3 '),
-              //                     content: Text('This is a popup message'),
-              //                     actions: [
-              //                       TextButton(
-              //                         onPressed: () => Navigator.pop(context),
-              //                         child: Text('OK'),
-              //                       )
-              //                     ],
-              //                   ),
-              //                 );
-              //               },
-              //               child: MetricCardcm(title: "CM ₃", value: "00.0")),
-              //         ),
-              //         const SizedBox(width: 8),
-              //         Expanded(
-              //           child: InkWell(
-              //               onTap: () {
-              //                 print(" View full P&L Clicked");
-              //                 Navigator.push(
-              //                   context,
-              //                   MaterialPageRoute(
-              //                     builder: (context) => kIsWeb ? FinanceExecutiveWebScreen() :
-              //                     //CMReportScreen(),
-              //                    FinanceExecutiveScreen(),
-              //                   ),
-              //                 );
-              //               },
-              //               child: MetricCardcm(title: "View",value: "P&L",)),
-              //         ),
-              //       ],
-              //     ),
-              //
-              //
-              //     const SizedBox(height: 10),
-              //     const SizedBox(height: 10),
-              //
-              //     //Divider(color: AppColors.gold, thickness: 0.5),
-              //
-              //
-              //     // if (!isLoading)
-              //     //   TextButton(
-              //     //     onPressed: () {
-              //     //       Navigator.push(
-              //     //         context,
-              //     //         MaterialPageRoute(
-              //     //           builder: (context) => FinanceExecutiveScreen(),
-              //     //         ),
-              //     //       );
-              //     //     },
-              //     //     child: Row(
-              //     //       mainAxisAlignment: MainAxisAlignment.center,
-              //     //       children: [
-              //     //         Text(
-              //     //           'View full P&L',
-              //     //           style: TextStyle(
-              //     //             fontWeight: FontWeight.bold,
-              //     //             color: AppColors.gold,
-              //     //           ),
-              //     //         ),
-              //     //         const SizedBox(width: 8),
-              //     //         Icon(Icons.arrow_forward, color: AppColors.gold),
-              //     //       ],
-              //     //     ),
-              //     //   ),
-              //     // Divider(color: AppColors.gold, thickness: 0.5),
-              //   ],
-              // ),
 
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Finance ',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    // TextSpan(
+                    //   text: 'as of ${formatShortYearMonth(salesData?['comparison']['previousPeriod']['startDate'])} To ${formatShortYearMonth(salesData?['comparison']['previousPeriod']['endDate'])}',
+                    //   style: TextStyle(
+                    //     fontSize: 14,
+                    //     fontWeight: FontWeight.w400,
+                    //   ),
+                    // ),
+
+
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (selectedFilterType != 'custom')
               Row(
                 children: [
                   SizedBox(
-                      height: 150,
-                      width: 324,
-                      child:PnLSummaryScreen(
-                        startDate: "2025-2",
-                        endDate: "2025-4",
+
+                      height: 250,
+                    width: MediaQuery.of(context).size.width * 0.95,
+                      ///https://api.thrivebrands.ai/api/pnl-data-cmm?date=${widget.startDate}
+
+                      child:PnLSummaryScreen(startDate: "https://api.thrivebrands.ai/api/pnl-data-cmm?date=${selectedFilterType}",
+
+
+                      //'https://api.thrivebrands.ai/api/pnl-data-cmm?startDate=${widget.startDate}&endDate=${widget.endDate}',
                       ),),
-                  InkWell(
-                      onTap: () {
-                        print(" View full P&L Clicked");
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => kIsWeb ? FinanceExecutiveWebScreen() :
-                            //CMReportScreen(),
-                            FinanceExecutiveScreen(),
-                          ),
-                        );
-                      },
-                      child: MetricCardcm(title: "View",value: "P&L",)),
                 ],
               ),
+
+              if (selectedFilterType == 'custom')
+
+
+        if (startDate != null && endDate != null)
+
+
+    Row(
+      children: [
+        SizedBox(
+          height: 250,
+          width: MediaQuery.of(context).size.width * 0.95,
+          child: PnLSummaryScreen(
+            startDate: "https://api.thrivebrands.ai/api/pnl-data-cmm?startDate=${formatDatepnl(startDate!)}&endDate=${formatDatepnl(endDate!)}",
+          ),
+        ),
+      ],
+    )
+    else
+    const SizedBox(), // or a loader / error message
+
+
+
               Divider(color: AppColors.gold, thickness: 0.5),
 
 
@@ -1432,7 +1470,9 @@ class MetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print(compared);
-    return Container(
+    return
+
+      Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: AppColors.beige,

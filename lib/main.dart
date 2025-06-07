@@ -22,6 +22,7 @@ import 'components/inventory/newInventrory_main.dart';
 import 'components/new_hoome.dart';
 import 'components/profit_loss.dart';
 import 'financescreens/Finance_Executive_Screen.dart';
+import 'financescreens/Finance_tab_screen.dart';
 import 'financescreens/finance_sku.dart';
 
 // void main() {
@@ -88,7 +89,11 @@ class _MainLayoutState extends State<MainLayout> {
     InventoryTabScreen(),// Sales page body (Add this in `pages/sales_page.dart`)
    // InventoryMainPage(),
     //NewinventroryMain(),
-    MarketingMainPage(), // Placeholder for Menu
+
+
+    FinanceTabScreen(),
+
+    //MarketingMainPage(), // Placeholder for Menu
   ];
 
   Future<void> logout(BuildContext context) async {
@@ -282,7 +287,7 @@ class _MainLayoutState extends State<MainLayout> {
                         Navigator.push(
                           context,
                          // MaterialPageRoute(builder: (context) => ProfitLossPage()),
-                          MaterialPageRoute(builder: (context) => FinanceExecutiveScreen()),
+                          MaterialPageRoute(builder: (context) => FinanceExecutiveScreen(productval:"1")),
                             //ProfitLossPage
                         );
                         // Navigator.pop(context); // Close drawer
@@ -297,7 +302,7 @@ class _MainLayoutState extends State<MainLayout> {
                         // selectedSubItem = "SKU";
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => NewFinanceSkuScreen()),
+                          MaterialPageRoute(builder: (context) => NewFinanceSkuScreen(financeval:"1")),
                           //ProfitLossPage
                         );
                        // Navigator.pop(context); // Close drawer
@@ -439,8 +444,8 @@ class _MainLayoutState extends State<MainLayout> {
                   icon: Icon(Icons.bar_chart), label: 'Sales'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.inventory), label: 'Inventory'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.campaign_outlined), label: 'Marketing'),
+             // BottomNavigationBarItem(icon: Icon(Icons.campaign_outlined), label: 'Marketing'),
+              BottomNavigationBarItem(icon: Icon(Icons.campaign_outlined), label: 'Finance'),
             ],
             currentIndex: _selectedIndex,
             selectedItemColor: AppColors.primaryBlue,
