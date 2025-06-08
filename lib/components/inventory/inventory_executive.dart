@@ -606,7 +606,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                         children: [
                           Expanded(
                             child: MetriccardExecutive(
-                              title: "Warehouse Inventory",
+                              title: "Amazon Inventory",
                               value: "${WarehouseInventoryv} units",
                               compared: "WH Stock Value: £${Inventoryvaluev}",
                             ),

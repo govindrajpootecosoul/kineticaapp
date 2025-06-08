@@ -24,10 +24,12 @@ import 'components/profit_loss.dart';
 import 'financescreens/Finance_Executive_Screen.dart';
 import 'financescreens/Finance_tab_screen.dart';
 import 'financescreens/finance_sku.dart';
+import 'financescreens/newfinancescreen.dart';
 
 // void main() {
 //   runApp(MyApp());
 // }
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 void main() async {
 
@@ -54,6 +56,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      navigatorObservers: [routeObserver],
       debugShowCheckedModeBanner: false,
       home: FutureBuilder<bool>(
         future: _isUserLoggedIn(),

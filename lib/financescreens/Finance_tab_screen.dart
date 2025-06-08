@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/colors.dart';
 import 'Finance_Executive_Screen.dart';
 import 'finance_sku.dart';
+import 'newfinancescreen.dart';
 
 class FinanceTabScreen extends StatefulWidget {
   const FinanceTabScreen({super.key});
@@ -54,7 +55,7 @@ class _FinanceTabScreenState extends State<FinanceTabScreen> with SingleTickerPr
       body: TabBarView(
         controller: _tabController,
         children:  [
-
+          //PnlDataScreen(),
           FinanceExecutiveScreen(productval:"0",),
           NewFinanceSkuScreen(financeval:"0"),
 

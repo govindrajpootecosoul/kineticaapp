@@ -1039,13 +1039,9 @@ class _DashboardState extends State<Dashboard>{
                   if (selectedFilterType == 'custom')
                     ElevatedButton.icon(
                       onPressed: () => _showMonthYearRangePicker(context),
-
                       //onPressed: () => _showDateRangePicker(context),
 
-
-
                       icon: Icon(Icons.date_range),
-
 
                       label: Text(
                         startDate != null && endDate != null
@@ -1061,6 +1057,14 @@ class _DashboardState extends State<Dashboard>{
                       //   overflow: TextOverflow.ellipsis,
                       // ),
                     ),
+
+
+
+
+
+
+
+
 
                 ],
               ),
@@ -1138,7 +1142,7 @@ class _DashboardState extends State<Dashboard>{
                           Row(children: [
                             Expanded(
                                 child: MetricCard(
-                                  title: "Overall Sales",
+                                  title: "Revenue",
                                   value: '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
                                   compared: "${salesData?['comparison']['salesChangePercent']??"0"}",)
                             ),
@@ -1263,10 +1267,18 @@ class _DashboardState extends State<Dashboard>{
                                     ),
                                   ),
                                 const SizedBox(width: 8),
+                                Salesvaluepnl!=0
+                                    ?
                                 Expanded(
                                   child: MetricCardcm(
                                     title: "TACOS",
                                     value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+                                  ),
+                                ):
+                                Expanded(
+                                  child: MetricCardcm(
+                                    title: "TACOS",
+                                    value: "0 %",
                                   ),
                                 ),
                               ],
