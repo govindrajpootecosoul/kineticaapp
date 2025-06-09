@@ -40,7 +40,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
   // ];
 
   final Map<String, String> fieldMapping = {
-    "Warehouse Inventory": "afn-warehouse-quantity",
+    "Amazon Inventory": "afn-warehouse-quantity",
     "Total Sellable": "afn-fulfillable-quantity",
 
     "0-30 Days": "inv_age_0_to_30_days",
@@ -441,19 +441,19 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
                                     Column(
                                       children: [
                                         // Icon(Icons.icecream_outlined),
-                                        SizedBox(
-                                          width: 100,
-                                          child: Text(
-                                            '📦',
-                                            //Product: name
-                                            // "${item['SKU'].toString()}",
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 50,
-                                                color: Colors.brown),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
+                                        // SizedBox(
+                                        //   width: 100,
+                                        //   child: Text(
+                                        //     '📦',
+                                        //     //Product: name
+                                        //     // "${item['SKU'].toString()}",
+                                        //     style: const TextStyle(
+                                        //         fontWeight: FontWeight.bold,
+                                        //         fontSize: 50,
+                                        //         color: Colors.brown),
+                                        //     overflow: TextOverflow.ellipsis,
+                                        //   ),
+                                        // ),
                                         const SizedBox(height: 10),
                                         Row(
                                           children: [
@@ -513,7 +513,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    Text("ASIN",
+                                                    Text("Product Name",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
@@ -524,7 +524,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
                                                       width:
                                                           100, // tweak this value to achieve a wrap around 15 characters
                                                       child: Text(
-                                                        item['ASIN'].toString(),
+                                                        item['Product_Name'].toString(),
                                                         style: TextStyle(
                                                           fontSize: 14,
                                                           fontWeight:

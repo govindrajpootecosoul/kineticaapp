@@ -33,7 +33,7 @@ class _InventorySkuDetailsState extends State<InventorySkuDetails> {
   bool isTotalValuesLoading = false;
 
   Map<String, String> uiFields = {
-    "totalQuantity": "Warehouse Inventory",
+    "totalQuantity": "Amazon Inventory",
     "fulfillableQuantity": "Total Sellable",
     "dos": "Days of Sale",
     "reservedQuantity.totalReservedQuantity": "Customer Reserved",

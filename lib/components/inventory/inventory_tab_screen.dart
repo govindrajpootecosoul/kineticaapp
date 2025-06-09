@@ -8,6 +8,7 @@ import '../profit_loss.dart';
 import 'aging_screen.dart';
 import 'inventory_detail.dart';
 import 'inventory_executive.dart';
+import 'inventory_graph/product_category.dart';
 import 'newInventrory_main.dart';
 import 'new_inventory_details.dart';
 import 'new_shipment_deatils.dart';
@@ -69,7 +70,11 @@ class _InventoryTabScreenState extends State<InventoryTabScreen> with SingleTick
         children: [
           InventoryExecutivePage(),
           //Center(child: Text("Executive Content")),
-          NewInventoryMain(),
+
+
+           NewInventoryMain(),
+          //InventoryScreen(),
+
           //NewFinanceSkuScreen(),
           //Center(child: Text("Executive Content")),
           ///InventoryDetails(),

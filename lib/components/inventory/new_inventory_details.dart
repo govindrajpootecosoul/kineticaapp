@@ -14,13 +14,13 @@
 //
 // class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //   List<String> _selectedItems = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Amazon Reserved"
 //   ];
 //
 //   final List<String> _options = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Amazon Reserved",
 //     "Inventory Age",
@@ -35,7 +35,7 @@
 //
 //
 //   final Map<String, String> fieldMapping = {
-//     "Warehouse Inventory": "afn-warehouse-quantity",
+//     "Amazon Inventory": "afn-warehouse-quantity",
 //     "Total Sellable": "afn-fulfillable-quantity",
 //     "Amazon Reserved": "Amazon Reserved",
 //     "Inventory Age": "inv-age-181-to-270-days"+"FC_Transfer",
@@ -452,7 +452,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   List<String> _selectedItems = [];
 
   final List<String> _options = [
-    "Warehouse Inventory",
+    "Amazon Inventory",
     "Total Sellable",
     "Amazon Reserved",
     "Inventory Age",
@@ -465,16 +465,20 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   ];
 
   final Map<String, String> fieldMapping = {
-    "Warehouse Inventory": "afn-warehouse-quantity",
-    "Total Sellable": "afn_fulfillable_quantity",
+    "Amazon Inventory": "afn-warehouse-quantity",//
+    "Total Sellable": "afn_fulfillable_quantity",//
     "Amazon Reserved": "Amazon Reserved",
-    "Inventory Age": "inv_age_181_to_270_days"+"FC_Transfer",
-    "Customer Reserved": "Customer_reserved",
-    "FC Transfer": "FC_Transfer",
-    "FC Processing": "FC_Processing",
+    "Inventory Age": "inv_age_181_to_270_days"+"FC_Transfer",//
+    "Customer Reserved": "Customer_reserved",//
+    "FC Transfer": "FC_Transfer",//
+    "FC Processing": "FC_Processing",//
     "Unfulfilled": "afn_unsellable_quantity",
     "Inbound Recieving": "afn_inbound_receiving_quantity",
   };
+
+
+
+
 
   List<dynamic> inventoryList = [];
   bool isLoading = true;
@@ -494,7 +498,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   void initializeSelectedItems() {
   if (kIsWeb) {
     _selectedItems = [
-      "Warehouse Inventory",
+      "Amazon Inventory",
       "Total Sellable",
       "Amazon Reserved",
       "Inventory Age",
@@ -503,7 +507,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
     ]; // 6 items for Web
   } else {
     _selectedItems = [
-      "Warehouse Inventory",
+      "Amazon Inventory",
       "Total Sellable",
       "Amazon Reserved",
     ]; // 3 items for Mobile
@@ -778,29 +782,31 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
                               SizedBox(
                                 width: 200,
                                 child: Text(
-                                  "${item['SKU'].toString()}",
+                                  "${item['Product_Name'].toString()}",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       color: Colors.brown),
-                                  overflow: TextOverflow.ellipsis,
+                                 // overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               const SizedBox(height: 10),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Column(
+                                  Row(
                                     crossAxisAlignment:
                                     CrossAxisAlignment.start,
                                     children: [
-                                      Text("SKU",
+                                      Text("SKU ",
                                           style: TextStyle(
                                               fontSize: 14,
                                               fontWeight:
                                               FontWeight.bold,
                                               color: AppColors.gold)),
                                       SizedBox(
-                                        width: 100,
+                                       // width: 100,
                                         child: Text(
                                           item['SKU'].toString(),
                                           style: TextStyle(
@@ -923,13 +929,13 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //
 // class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //   List<String> _selectedItems = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Inventory Age"
 //   ];
 //
 //   final List<String> _options = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Inventory Age",
 //     "DOS",
@@ -941,7 +947,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //   ];
 //
 //   final Map<String, String> fieldMapping = {
-//     "Warehouse Inventory": "afn-warehouse-quantity",
+//     "Amazon Inventory": "afn-warehouse-quantity",
 //     "Total Sellable": "afn-fulfillable-quantity",
 //     "Inventory Age": "afn-inventory-age-0-to-30-days",
 //     "DOS": "afn-inbound-receiving-quantity",
