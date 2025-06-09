@@ -147,7 +147,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
                   ),
                 ),
               ),
-              Padding(
+/*              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   '£ ${formatNumberStringWithComma(value.round().toString())}',
@@ -158,7 +158,23 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
                   ),
                   textAlign: TextAlign.right,
                 ),
+              ),*/
+
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  '£ ${formatNumberStringWithComma(value.abs().round().toString())}',
+                  style: TextStyle(
+                    color: valueColor ?? Colors.black,
+                    fontWeight: isCM ? FontWeight.bold : FontWeight.w600,
+                    fontSize: isCM ? 16 : 14,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
               ),
+
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -341,7 +357,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               dataRow1("Gross Revenue:", selectedMonthData!['Total Sales with tax'], valueColor: selectedMonthData!['Total Sales with tax']! < 0 ? Colors.green : Colors.green),
-                              dataRow1("Return :", selectedMonthData!['Total Return with tax'], valueColor: selectedMonthData!['Total Return with tax']! < 0 ? Colors.red : Colors.red),
+                              dataRow1("Return Revenue:", selectedMonthData!['Total Return with tax'], valueColor: selectedMonthData!['Total Return with tax']! < 0 ? Colors.red : Colors.red),
 
                               //dataRow("Net Revenue with tax:", selectedMonthData!['Net Sales with tax'],selectedMonthData!['Net Sales with tax'/'Total Sales with tax'], valueColor: selectedMonthData!['Net Sales with tax']! < 0 ? Colors.red : Colors.green),
 

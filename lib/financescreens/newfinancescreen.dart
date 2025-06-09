@@ -8,10 +8,10 @@ class NewFinanceSkuScreen extends StatefulWidget {
   const NewFinanceSkuScreen({Key? key, required this.financeval}) : super(key: key);
 
   @override
-  State<NewFinanceSkuScreen> createState() => _PnlDataScreenState();
+  State<NewFinanceSkuScreen> createState() => _NewFinanceSkuScreenState();
 }
 
-class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
+class _NewFinanceSkuScreenState extends State<NewFinanceSkuScreen> {
   List<dynamic> pnlData = [];
   List<String> categories = [];
   List<String> skus = [];
@@ -19,94 +19,114 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
   String? selectedCategory;
   String? selectedSku;
   bool isLoading = false;
-  //
-  // final List<String> orderedKeys = [
-  //   'SKU',
-  //   'Product Name',
-  //   'Product Category',
-  //   'Channel',
-  //   'Year-Month',
-  //   'Total Units',
-  //   'Net Sales',
-  //   'Net Sales with tax',
-  //   'Total Sales',
-  //   'Total Sales with tax',
-  //   'Total_Return_Amount',
-  //   'Total Return with tax',
-  //   'Deal Fee',
-  //   'FBA Inventory Fee',
-  //   'fba fees',
-  //   'FBA Reimbursement',
-  //   'selling fees',
-  //   'promotional rebates',
-  //   'Storage Fee',
-  //   'Spend',
-  //   'Other marketing Expenses',
-  //   'Product CoGS',
-  //   'Cogs',
-  //   'CM1',
-  //   'heads_CM2',
-  //   'CM2',
-  //   'heads_CM3',
-  //   'CM3',
-  // ];
 
+  String? selectedFilterType;
 
-  final List<String> orderedKeys = [
-    'Product Name',
-    'Product Category',
-    'Total Sales with tax',
-    'Total Return with tax',
-    'Net Sales with tax',
-    'Cogs',
-    'CM1',
-    'Deal Fee',
-    'FBA Inventory Fee',
-    'FBA Reimbursement',
-    'Liquidations',
-    'Storage Fee',
-    'fba fees',
-    'CM2',
-    'Other marketing Expenses',
-    'promotional rebates',
-    'selling fees',
-    'Spend',
-    'CM3',
+  List<String> filterTypes = [
+    // "today",
+    //"week",
+    //"last30days",
+    "lastmonth",
+    "monthtodate",
+    //"previousyear",
+    // "currentyear",
+    "yeartodate",
+    "custom"
+    // "monthtodate",
+    // "lastmonth",
+    //'6months',
+    //"yeartodate",
+    // "custom",
   ];
 
 
+  String formatFilterType(String filter) {
+    switch (filter) {
+    // case 'today':
+    //   return 'Today';
+    //   case 'week':
+    //   return 'Week';
+    // case '6months':
+    //   return 'Last 6 Months';
+    // case 'last30days':
+    //   return 'Last 30 Days';
+    // case 'yeartodate':
+    //   return 'Year to Date';
+      case 'lastmonth':
+        return 'Previous Month';
+      case 'monthtodate':
+        return 'Current Month';
+
+    // case 'year':
+    //   return 'This Year';
+    //   case 'previousyear':
+    //     return 'Previous Year';
+    // case 'currentyear':
+      case 'yeartodate':
+        return 'Current Year';
+      case 'custom':
+        return 'Custom Range';
+      default:
+        return filter;
+    }
+  }
+
+
+
+  final Map<String, String> displayNames = {
+    'SKU': 'SKU',
+    'Product Name': 'Product Name ',
+    'Product Category': 'Product Category',
+    'Total Sales with tax': 'Gross Revenue',
+    'Total Return with tax': 'Return Revenue',
+    'Net Sales with tax': 'Net Revenue',
+    'Cogs': 'COGS ',
+    'CM1': 'CM1',
+    'Deal Fee': 'Deal Fee',
+    'FBA Inventory Fee': 'FBA Inventory Fee',
+    'FBA Reimbursement': 'FBA Reimbursement',
+    'Liquidations': 'Liquidations',
+    'Storage Fee': 'Storage Fee',
+    'fba fees': 'FBA Fees',
+    'CM2': 'CM2',
+    'Other marketing Expenses': 'Other Marketing Expenses',
+    'promotional rebates': 'Discounts',
+    'selling fees': 'Selling Fees',
+    'Spend': 'Ad Spend',
+    'CM3': 'CM3',
+  };
+
   final Map<String, Color> keyColors = {
     'SKU': Colors.green,
-    'Product Name': Colors.green,
-    'Product Category': Colors.green,
+    'Product Name': Colors.black,
+    'Product Category': Colors.black,
     'Channel': Colors.green,
     'Year-Month': Colors.green,
     'Total Units': Colors.green,
-    'Net Sales': Colors.green,
+    'Net Sales': Colors.red,
     'Net Sales with tax': Colors.green,
     'Total Sales': Colors.green,
     'Total Sales with tax': Colors.green,
     'Total_Return_Amount': Colors.green,
     'Total Return with tax': Colors.green,
-    'Deal Fee': Colors.green,
-    'FBA Inventory Fee': Colors.green,
-    'fba fees': Colors.green,
+    'Deal Fee': Colors.red,
+    'FBA Inventory Fee': Colors.red,
+    'fba fees': Colors.red,
     'FBA Reimbursement': Colors.green,
-    'selling fees': Colors.green,
-    'promotional rebates': Colors.green,
-    'Storage Fee': Colors.green,
-    'Spend': Colors.green,
-    'Other marketing Expenses': Colors.green,
-    'Product CoGS': Colors.green,
-    'Cogs': Colors.green,
-    'Liquidations': Colors.green,
+    'selling fees': Colors.red,
+    'promotional rebates': Colors.red,
+    'Storage Fee': Colors.red,
+    'Spend': Colors.red,
+    'Other marketing Expenses': Colors.red,
+    'Product CoGS': Colors.red,
+    'Cogs': Colors.red,
+    'Liquidations': Colors.red,
     'CM1': Colors.green,
     'heads_CM2': Colors.green,
     'CM2': Colors.green,
     'heads_CM3': Colors.green,
     'CM3': Colors.green,
   };
-
 
   bool _isCurrencyField(String key) {
     const currencyFields = {
@@ -130,7 +150,6 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
     };
     return currencyFields.contains(key);
   }
-
 
   @override
   void initState() {
@@ -159,6 +178,10 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
     setState(() => isLoading = true);
     final dio = Dio();
     try {
+
+      //http://localhost:3000/api/pnl-data?sku=6C-BUK7-5RZ2&category=Diet Protein&startMonth=2025-01&endMonth=2025-04
+      //https://api.thrivebrands.ai/api/pnl-data?sku=6C-BUK7-5RZ2&category=Diet Protein&startMonth=2025-01&endMonth=2025-04
+      //https://api.thrivebrands.ai/api/pnl-data?sku=&category=Diet Protein&startMonth=2025-01&endMonth=2025-04
       String url = 'https://api.thrivebrands.ai/api/pnl-data?range=$selectedRange';
       if (selectedCategory != null && selectedCategory!.isNotEmpty) {
         url += '&category=${Uri.encodeComponent(selectedCategory!)}';
@@ -181,49 +204,58 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
 
   Widget buildTable(Map<String, dynamic> data) {
     return Column(
-      children: orderedKeys.map((key) {
-        if (data.containsKey(key)) {
-          final color = keyColors[key] ?? Colors.black;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    key,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                     // color: color,
-                    ),
+      children: displayNames.entries.map((entry) {
+        final key = entry.key;
+        if (!data.containsKey(key)) return const SizedBox.shrink();
+
+        final color = keyColors[key] ?? Colors.black;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 4,
+                child: Text(
+                  displayNames[key] ?? key,  // <== Use display name here
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-        /*        Expanded(
-                  flex: 6,
-                  child: Text(
-                    data[key].toString(),
-                    style:  TextStyle(color: color),
-                  ),
-                ),*/
+              ),
+              Expanded(
+                flex: 6,
+                child: Builder(
+                  builder: (_) {
+                    final cmKeys = ['CM1', 'CM2', 'CM3'];
+                    final isCmField = cmKeys.contains(key);
 
-                Expanded(
-                  flex: 6,
-                  child: Text(
-                    _isCurrencyField(key) ? '£ ${data[key]}' : data[key].toString(),
-                    style: TextStyle(color: color),
-                  ),
+                    Color displayColor = color;
+                    var value = data[key];
+
+                    if (value is num) {
+                      if (value < 0) {
+                        value = value.abs();
+                        if (isCmField) {
+                          displayColor = Colors.red;
+                        }
+                      }
+                      value = value.round();
+                    }
+
+                    return Text(
+                      _isCurrencyField(key) ? '£ $value' : value.toString(),
+                      style: TextStyle(color: displayColor),
+                    );
+                  },
                 ),
-
-
-              ],
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
+              ),
+            ],
+          ),
+        );
       }).toList(),
     );
   }
+
 
   void showBottomSheetDetails(Map<String, dynamic> item) {
     showModalBottomSheet(
@@ -243,11 +275,14 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
-                  child: Text('Detailed View',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
+                  child: Text(
+                    'Detailed View',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 buildTable(item),
@@ -259,8 +294,7 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
     );
   }
 
-
-  Map<String, String> rangeOptions = {
+  final Map<String, String> rangeOptions = {
     'monthtodate': 'Current Month',
     'lastmonth': 'Previous Month',
     'yeartodate': 'Current Year',
@@ -269,11 +303,8 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-      widget.financeval == "1"
-          ?
-      AppBar(
-        // title: Image.asset('assets/logo.png'),
+      appBar: widget.financeval == "1"
+          ? AppBar(
         title: const Text(
           'Finance SKU',
           style: TextStyle(
@@ -284,8 +315,9 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
         ),
         centerTitle: true,
         backgroundColor: AppColors.primaryBlue,
-        iconTheme: IconThemeData(color: Colors.white),
-      ):null,
+        iconTheme: const IconThemeData(color: Colors.white),
+      )
+          : null,
       body: Column(
         children: [
           Padding(
@@ -294,52 +326,30 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  /*DropdownButton<String>(
+                  DropdownButton<String>(
                     dropdownColor: Colors.white,
                     value: selectedRange,
-                    items: [
-                      'monthtodate',
-                      'lastmonth',
-                      'yeartodate',
-                      //'custom'
-                    ]
-                        .map((e) => DropdownMenuItem(
-                      value: e,
-                      child: Container(
-                        color: selectedRange == e ? Colors.deepPurple[50] : null,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        child: Text(e),
+                    items: rangeOptions.entries
+                        .map(
+                          (entry) => DropdownMenuItem<String>(
+                        value: entry.key,
+                        child: Container(
+                          color: selectedRange == entry.key ? Colors.deepPurple[50] : null,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: Text(entry.value),
+                        ),
                       ),
-                    ))
+                    )
                         .toList(),
-                    onChanged: (val) => setState(() {
-                      selectedRange = val!;
+                    onChanged: (val) {
+                      if (val == null) return;
+                      setState(() {
+                        selectedRange = val;
+                      });
                       fetchPnlData();
-                    }),
-                  ),*/
-
-
-                DropdownButton<String>(
-                dropdownColor: Colors.white,
-                value: selectedRange,
-                items: rangeOptions.entries
-                    .map((entry) => DropdownMenuItem<String>(
-                  value: entry.key,
-                  child: Container(
-                    color: selectedRange == entry.key ? Colors.deepPurple[50] : null,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Text(entry.value),
+                    },
                   ),
-                ))
-                    .toList(),
-                onChanged: (val) => setState(() {
-                  selectedRange = val!;
-                  fetchPnlData();
-                }),
-              ),
-
-
-              const SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Row(
                     children: [
                       if (selectedCategory != null)
@@ -359,14 +369,16 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                             value: null,
                             child: Text('All Categories'),
                           ),
-                          ...categories.map((e) => DropdownMenuItem(
-                            value: e,
-                            child: Container(
-                              color: selectedCategory == e ? Colors.deepPurple[50] : null,
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              child: Text(e),
+                          ...categories.map(
+                                (e) => DropdownMenuItem(
+                              value: e,
+                              child: Container(
+                                color: selectedCategory == e ? Colors.deepPurple[50] : null,
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                child: Text(e),
+                              ),
                             ),
-                          ))
+                          )
                         ],
                         onChanged: (val) {
                           setState(() {
@@ -375,7 +387,6 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                           fetchPnlData();
                         },
                       ),
-
                     ],
                   ),
                   const SizedBox(width: 10),
@@ -389,7 +400,6 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                             fetchPnlData();
                           },
                         ),
-
                       DropdownButton<String>(
                         dropdownColor: Colors.white,
                         value: selectedSku,
@@ -399,14 +409,16 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                             value: null,
                             child: Text('All SKUs'),
                           ),
-                          ...skus.map((e) => DropdownMenuItem(
-                            value: e,
-                            child: Container(
-                              color: selectedSku == e ? Colors.deepPurple[50] : null,
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              child: Text(e),
+                          ...skus.map(
+                                (e) => DropdownMenuItem(
+                              value: e,
+                              child: Container(
+                                color: selectedSku == e ? Colors.deepPurple[50] : null,
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                child: Text(e),
+                              ),
                             ),
-                          ))
+                          )
                         ],
                         onChanged: (val) {
                           setState(() {
@@ -415,7 +427,6 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                           fetchPnlData();
                         },
                       ),
-
                     ],
                   ),
                 ],
@@ -437,7 +448,6 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
               itemBuilder: (context, index) {
                 final item = pnlData[index];
                 return Card(
-                 // color: const Color(0xFFF7EFD7),
                   color: AppColors.beige,
                   margin: const EdgeInsets.all(8),
                   elevation: 3,
@@ -448,20 +458,40 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'SKU: ${item['SKU']}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              // Text(
+                              //   'SKU: ${item['SKU']}',
+                              //   style: const TextStyle(
+                              //     fontWeight: FontWeight.bold,
+                              //     fontSize: 16,
+                              //   ),
+                              // ),
+
+                              Text(
+                               // 'Year-Month': item['Year-Month'],
+                                '${item['Year-Month']}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           buildTable({
+
+                            'SKU': item['SKU'],
                             'Product Name': item['Product Name'],
-                            'Deal Fee': item['Deal Fee'],
-                            'FBA Inventory Fee': item['FBA Inventory Fee'],
-                            'FBA Reimbursement': item['FBA Reimbursement'],
-                            'Liquidations': item['Liquidations'],
+                            'Product Category': item['Product Category'],
+                            'Total Sales with tax': item['Total Sales with tax'],
+                          //  'Total Sales with tax': 'Gross Revenue',
+
+                            'CM1': item['CM1'],
+                            'CM2': item['CM2'],
+                            'CM3': item['CM3'],
                             'Net Sales': item['Net Sales'],
                           }),
                         ],
@@ -471,8 +501,7 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                 );
               },
             ),
-          )
-
+          ),
         ],
       ),
     );

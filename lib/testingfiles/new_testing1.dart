@@ -375,7 +375,7 @@ class _testuiState extends State<testui> {
                   mainAxisSpacing: 3,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
-                    buildLabelValueExpend("Warehouse Inventory", product['afn-warehouse-quantity'] ?? "00"),
+                    buildLabelValueExpend("Amazon Inventory", product['afn-warehouse-quantity'] ?? "00"),
                     buildLabelValueExpend("Total Sellable", product['ASIN'] ?? "00"),
                     buildLabelValueExpend("Inventory Age", product['ASIN'] ?? "00"),
                     buildLabelValueExpend("DOS", product['ASIN'] ?? "00"),

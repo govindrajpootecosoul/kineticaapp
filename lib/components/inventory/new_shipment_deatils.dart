@@ -32,7 +32,7 @@ class _New_shipment_detailsState extends State<New_shipment_details> {
   ];
 
   final Map<String, String> fieldMapping = {
-    "Warehouse Inventory": "afn-warehouse-quantity",
+    "Amazon Inventory": "afn-warehouse-quantity",
     "Total Sellable": "afn-fulfillable-quantity",
     "Inventory Age": "afn-inventory-age-0-to-30-days",
     "DOS": "afn-inbound-receiving-quantity",
@@ -405,13 +405,13 @@ class _MultiSelectDialogState extends State<MultiSelectDialog> {
 //
 // class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //   List<String> _selectedItems = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Inventory Age"
 //   ];
 //
 //   final List<String> _options = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Inventory Age",
 //     "DOS",
@@ -423,7 +423,7 @@ class _MultiSelectDialogState extends State<MultiSelectDialog> {
 //   ];
 //
 //   final Map<String, String> fieldMapping = {
-//     "Warehouse Inventory": "afn-warehouse-quantity",
+//     "Amazon Inventory": "afn-warehouse-quantity",
 //     "Total Sellable": "afn-fulfillable-quantity",
 //     "Inventory Age": "afn-inventory-age-0-to-30-days",
 //     "DOS": "afn-inbound-receiving-quantity",
@@ -990,7 +990,7 @@ class _MultiSelectDialogState extends State<MultiSelectDialog> {
 // ];
 //
 // final Map<String, String> fieldMapping = {
-//   "Warehouse Inventory": "afn-warehouse-quantity",
+//   "Amazon Inventory": "afn-warehouse-quantity",
 //   "Total Sellable": "afn-fulfillable-quantity",
 //   "Inventory Age": "afn-inventory-age-0-to-30-days",
 //   "DOS": "afn-inbound-receiving-quantity",

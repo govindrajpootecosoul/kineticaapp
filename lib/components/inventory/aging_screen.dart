@@ -40,7 +40,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
   // ];
 
   final Map<String, String> fieldMapping = {
-    "Warehouse Inventory": "afn-warehouse-quantity",
+    "Amazon Inventory": "afn-warehouse-quantity",
     "Total Sellable": "afn-fulfillable-quantity",
 
     "0-30 Days": "inv_age_0_to_30_days",

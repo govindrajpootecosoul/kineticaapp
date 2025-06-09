@@ -759,7 +759,7 @@ class _New_HomePageState extends State<New_HomePage> {
                                   children: [
                                     Expanded(
                                         child: MetricCard(
-                                            title: "Warehouse Inventory", value: "00")),
+                                            title: "Amazon Inventory", value: "00")),
                                     const SizedBox(width: 8),
                                     Expanded(
                                         child: MetricCard(

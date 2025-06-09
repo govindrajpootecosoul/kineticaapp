@@ -79,6 +79,8 @@ class InventoryScreen extends StatefulWidget {
 class _InventoryScreenState extends State<InventoryScreen> {
   List<String> labels = [];
   List<double> values = [];
+  List<String> labelsunder = [];
+  List<double> valuesunder = [];
   bool isLoading = true;
 
   @override
@@ -91,19 +93,50 @@ class _InventoryScreenState extends State<InventoryScreen> {
     try {
       var dio = Dio();
       var response = await dio.get(
-        'https://api.thrivebrands.ai/api/inventory/productcategorysum',
-        //'http://192.168.50.92:3000/api/inventory/productcategorysum',
+       // 'https://api.thrivebrands.ai/api/inventory/productcategorysum',
+        'http://192.168.50.92:3000/api/inventory/productoversku',//api/inventory/productoversku
       );
 
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
+print("response  ${data}");
 
         labels.clear();
         values.clear();
 
         for (var item in data) {
-          labels.add(item['_id'].toString());
-          values.add((item['WH_Stock_Value'] ?? 0).toDouble());
+          labels.add(item['SKU'].toString());
+          values.add((item['days_of_supply'] ?? 0).toDouble());
+        }
+
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        print("Error: ${response.statusMessage}");
+      }
+    } catch (e) {
+      print("Exception: $e");
+    }
+  }
+  Future<void> fetchInventoryDataundersku() async {
+    try {
+      var dio = Dio();
+      var response = await dio.get(
+       // 'https://api.thrivebrands.ai/api/inventory/productcategorysum',
+        'http://192.168.50.92:3000/api/inventory/productunders',//api/inventory/productoversku
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+print("response  ${data}");
+
+        labelsunder.clear();
+        valuesunder.clear();
+
+        for (var item in data) {
+          labelsunder.add(item['SKU'].toString());
+          valuesunder.add((item['days_of_supply'] ?? 0).toDouble());
         }
 
         setState(() {
@@ -135,9 +168,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         // For example: DropdownButton widget for filtering
 
         // Graph widget
-        InventoryGraph(
-          values: values,
-          labels: labels,
+        InventoryGraph(values: values, labels: labels,idd:"oversku"
         ),
       ],
     );

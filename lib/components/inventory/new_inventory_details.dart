@@ -14,13 +14,13 @@
 //
 // class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //   List<String> _selectedItems = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Amazon Reserved"
 //   ];
 //
 //   final List<String> _options = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Amazon Reserved",
 //     "Inventory Age",
@@ -35,7 +35,7 @@
 //
 //
 //   final Map<String, String> fieldMapping = {
-//     "Warehouse Inventory": "afn-warehouse-quantity",
+//     "Amazon Inventory": "afn-warehouse-quantity",
 //     "Total Sellable": "afn-fulfillable-quantity",
 //     "Amazon Reserved": "Amazon Reserved",
 //     "Inventory Age": "inv-age-181-to-270-days"+"FC_Transfer",
@@ -452,7 +452,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   List<String> _selectedItems = [];
 
   final List<String> _options = [
-    "Warehouse Inventory",
+    "Amazon Inventory",
     "Total Sellable",
     "Amazon Reserved",
     "Inventory Age",
@@ -465,7 +465,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   ];
 
   final Map<String, String> fieldMapping = {
-    "Warehouse Inventory": "afn-warehouse-quantity",//
+    "Amazon Inventory": "afn-warehouse-quantity",//
     "Total Sellable": "afn_fulfillable_quantity",//
     "Amazon Reserved": "Amazon Reserved",
     "Inventory Age": "inv_age_181_to_270_days"+"FC_Transfer",//
@@ -498,7 +498,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   void initializeSelectedItems() {
   if (kIsWeb) {
     _selectedItems = [
-      "Warehouse Inventory",
+      "Amazon Inventory",
       "Total Sellable",
       "Amazon Reserved",
       "Inventory Age",
@@ -507,7 +507,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
     ]; // 6 items for Web
   } else {
     _selectedItems = [
-      "Warehouse Inventory",
+      "Amazon Inventory",
       "Total Sellable",
       "Amazon Reserved",
     ]; // 3 items for Mobile
@@ -929,13 +929,13 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //
 // class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //   List<String> _selectedItems = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Inventory Age"
 //   ];
 //
 //   final List<String> _options = [
-//     "Warehouse Inventory",
+//     "Amazon Inventory",
 //     "Total Sellable",
 //     "Inventory Age",
 //     "DOS",
@@ -947,7 +947,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
 //   ];
 //
 //   final Map<String, String> fieldMapping = {
-//     "Warehouse Inventory": "afn-warehouse-quantity",
+//     "Amazon Inventory": "afn-warehouse-quantity",
 //     "Total Sellable": "afn-fulfillable-quantity",
 //     "Inventory Age": "afn-inventory-age-0-to-30-days",
 //     "DOS": "afn-inbound-receiving-quantity",

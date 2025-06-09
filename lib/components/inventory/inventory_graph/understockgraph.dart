@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 String idd='';
-class InventoryGraph extends StatelessWidget {
+class UnderstockgraphScreen extends StatelessWidget {
   final List<double> values;
   final List<String> labels;
-  String idd='';
 
-   InventoryGraph({
+
+  UnderstockgraphScreen({
     required this.values,
     required this.labels,
-     required this.idd,
+
 
     Key? key,
   }) : super(key: key);
@@ -33,9 +33,7 @@ class InventoryGraph extends StatelessWidget {
       children: [
 
         if (topFive.isNotEmpty)
-          if(idd=="oversku")
-          _buildSection("Top 5 OverStock SKU's", topFive),
-        if(idd=="undersku")
+
           _buildSection("Top 5 UnderStock SKU's", topFive),
         // if (others.isNotEmpty)_buildExpandableSection("Other Categories", others),
       ],
@@ -157,7 +155,7 @@ class _HorizontalBarChart extends StatelessWidget {
                       ),
                       children: [
                         TextSpan(
-                          text: rod.toY.toStringAsFixed(1),
+                          text: "${rod.toY.toStringAsFixed(1)} Days",
                           style: const TextStyle(
                             color: Colors.yellowAccent,
                             fontWeight: FontWeight.w600,
@@ -191,9 +189,9 @@ class _HorizontalBarChart extends StatelessWidget {
                     BarChartRodData(
                       toY: categories[index].value,
                       width: 8,
-                    //  color: const Color(0xFF073349),
-                      color: idd == "undersku" ? Colors.red : const Color(0xFF073349),
-                      // color:Colors.red,
+                      //  color: const Color(0xFF073349),
+                     // color: idd == "undersku" ? Colors.red : const Color(0xFF073349),
+                       color:Colors.red,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ],

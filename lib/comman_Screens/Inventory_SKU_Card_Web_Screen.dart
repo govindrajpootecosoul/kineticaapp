@@ -145,7 +145,7 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
                   ),
                   Wrap(
                     children: [
-                      buildLabelValueExpend("Warehouse Inventory", product['afn_warehouse_quantity'] ?? "00"),
+                      buildLabelValueExpend("Amazon Inventory", product['afn_warehouse_quantity'] ?? "00"),
                       buildLabelValueExpend("Total Sellable", product['afn_fulfillable_quantity'] ?? "00"),
                       buildLabelValueExpend("Inventory Age", (product['inv_age_0_to_30_days'] ?? "00")+(product['inv_age_31_to_60_days'] ?? "00")+(product['inv_age_61_to_90_days'] ?? "00")+(product['inv_age_91_to_180_days'] ?? "00")+(product['inv_age_181_to_270_days'] ?? "00")+(product['inv_age_271_to_365_days'] ?? "00")+(product['inv_age_365_plus_days'] ?? "00")),
         
@@ -348,7 +348,7 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
 //                   mainAxisSpacing: 3,
 //                   physics: const NeverScrollableScrollPhysics(),
 //                   children: [
-//                     buildLabelValueExpend("Warehouse Inventory", product['afn-warehouse-quantity'] ?? "00"),
+//                     buildLabelValueExpend("Amazon Inventory", product['afn-warehouse-quantity'] ?? "00"),
 //                     buildLabelValueExpend("Total Sellable", product['ASIN'] ?? "00"),
 //                     buildLabelValueExpend("Inventory Age", product['ASIN'] ?? "00"),
 //                     buildLabelValueExpend("DOS", product['ASIN'] ?? "00"),

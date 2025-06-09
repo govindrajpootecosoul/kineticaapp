@@ -594,7 +594,7 @@
 //                   mainAxisSpacing: 3,
 //                   physics: const NeverScrollableScrollPhysics(),
 //                   children: [
-//                     buildLabelValueExpend("Warehouse Inventory",
+//                     buildLabelValueExpend("Amazon Inventory",
 //                         product['afn-warehouse-quantity'] ?? "00"),
 //                     buildLabelValueExpend("Total Sellable",
 //                         product['afn-fulfillable-quantity'] ?? "00"),

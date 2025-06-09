@@ -5,7 +5,8 @@ import 'package:flutter_application_1/utils/formatNumberStringWithComma.dart';
 import '../../utils/ApiConfig.dart';
 import '../../utils/colors.dart';
 import '../Dashboard.dart';
-import 'inventory_graph/product_category.dart'; // Your InventoryScreen is here?
+import 'inventory_graph/product_category.dart';
+import 'inventory_graph/undersku_api.dart'; // Your InventoryScreen is here?
 
 class InventoryExecutivePage extends StatefulWidget {
   const InventoryExecutivePage({Key? key}) : super(key: key);
@@ -23,6 +24,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
   String Storagecostsum = '00';
   String DaysInStock = '00';
   String DOSsum = '00';
+  String dosavg='';
 
   String WarehouseInventoryv = '00';
   String TotalSelleablev = '00';
@@ -37,6 +39,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
   String  Totaldayv= '00';
   String  Inventoryvaluev= '00';
   String  SellableStockvaluev= '00';
+  String  UnSellableQTYv= '00';
+  String  Sale_Lostv= '00';
 
   @override
   void initState() {
@@ -81,7 +85,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
   }
 
 
-  // buildLabelValueExpend("Warehouse Inventory", product['afn_warehouse_quantity'] ?? "00"),
+  // buildLabelValueExpend("Amazon Inventory", product['afn_warehouse_quantity'] ?? "00"),
   double Total_Warehouse_Inventory(List<dynamic> data) {
     double total = 0.0;
 
@@ -246,6 +250,35 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
     }
     return total.roundToDouble();
   }
+
+  double unSellable_qty(List<dynamic> data) {
+    double total = 0.0;
+
+    for (var item in data) {
+      item.forEach((key, value) {
+        if (key.startsWith("afn_unsellable_quantity")) {
+          final cost = double.tryParse(value.toString()) ?? 0.0;
+          total += cost;
+        }
+      });
+    }
+    return total.roundToDouble();
+  }
+
+  double Sale_Lostt(List<dynamic> data) {
+    double total = 0.0;
+
+    for (var item in data) {
+      item.forEach((key, value) {
+        if (key.startsWith("Sale_Lost")) {
+          final cost = double.tryParse(value.toString()) ?? 0.0;
+          total += cost;
+        }
+      });
+    }
+    return total.roundToDouble();
+  }
+
   // buildLabelValueExpend("Instock Rate", "${product['InStock_Rate_Percent']} %" ?? "00"),
   // double InStock_Rate_Percentt(List<dynamic> data) {
   //   double total = 0.0;
@@ -370,6 +403,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
           double Inventory_Agee270 = Inventory_Age91to270(inventoryList);
           double Inventoryvaluee = Inventoryvalue(inventoryList);
           double Sellable_Stock_Value = Sellable_Stock_Valuee(inventoryList);
+          double unSellable_qtyy = unSellable_qty(inventoryList);
+          double Sale_Los = Sale_Lostt(inventoryList);
 
           LTSFsum = formatNumberStringWithComma(totalAisCost.toString());
           DaysInStock = formatNumberStringWithComma(totalDaysInStock.toString());
@@ -388,6 +423,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
           InventoryAgev91_270= formatNumberStringWithComma(Inventory_Agee270.toString());
           Inventoryvaluev= formatNumberStringWithComma(Inventoryvaluee.toString());
           SellableStockvaluev= formatNumberStringWithComma(Sellable_Stock_Value.toString());
+          UnSellableQTYv= formatNumberStringWithComma(unSellable_qtyy.toString());
+          Sale_Lostv= formatNumberStringWithComma(Sale_Los.toString());
 
 
 
@@ -436,8 +473,11 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
     int roundedAverage = average.round();
     DOSsum = formatNumberStringWithComma(roundedAverage.toString());
 
+    dosavg=DOSsum;
+
     print('Total Days of Supply: $total');
     print('Rounded Average Days of Supply: $DOSsum');
+    print('Rounded Average: $dosavg');
 
     return total;
   }
@@ -458,6 +498,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
             children: [
               // InventoryScreen should handle its own height dynamically
               InventoryScreen(),
+              UnderskuApiscreen(),
 
               const SizedBox(height: 16),
 
@@ -529,7 +570,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                           Expanded(
                             child: MetriccardExecutive(
                               title: 'Storage Cost',
-                              value: "£ 00",
+                              value: "£ 1,260",
                               //value: '$zeroInStockRateSkuCount',
                               compared: "Previous Month",
 
@@ -544,8 +585,8 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                         children: [
                           Expanded(
                             child: MetriccardExecutive(
-                              title: 'LTSF Cost',
-                              value: "£ $LTSFsum",
+                              title: 'Sale Lost MTD',
+                              value: "£ $Sale_Lostv",
                               //value:"\$overstockCount",
                               compared: "",
                               // value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
@@ -556,9 +597,9 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                           Expanded(
                             child: MetriccardExecutive(
                               title: "DOS",
-                              value: "$DOSsum",
+                              value: "$dosavg",
                               //value: "\$understockCount",
-                              compared: "",
+                              compared: "Days",
                               // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
 
                             ),
@@ -608,7 +649,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                             child: MetriccardExecutive(
                               title: "Amazon Inventory",
                               value: "${WarehouseInventoryv} units",
-                              compared: "WH Stock Value: £${Inventoryvaluev}",
+                              compared: "Stock Value: £${Inventoryvaluev}",
                             ),
                           ),
 
@@ -631,24 +672,35 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                         children: [
                           Expanded(
                             child: MetriccardExecutive(
+                              title: "Unsellable",
+                              value: '${UnSellableQTYv} units',
+                              //value: '$zeroInStockRateSkuCount',
+                              compared: "",
+
+                              // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: MetriccardExecutive(
                               title: "FC Transfer",
                               value: "${FcTransferv} units",
                               compared: "",
                             ),
                           ),
 
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: MetriccardExecutive(
-                              title: "FC Processing",
-                              value: '${FcProcessingv} units',
-                              //value: '$zeroInStockRateSkuCount',
-                              compared: "",
+                          // Expanded(
+                          //   child: MetriccardExecutive(
+                          //     title: "Total Reserved",
+                          //     value: "${TotalSelleablev} units",
+                          //     //value: "\$understockCount",
+                          //     compared: "",
+                          //     // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                          //
+                          //   ),
+                          // ),
 
-                              // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
 
-                            ),
-                          ),
                         ],
                       ),
 
@@ -684,16 +736,23 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                           ),
 
                           const SizedBox(width: 8),
+
+
                           Expanded(
                             child: MetriccardExecutive(
-                              title: "Total Reserved",
-                              value: "${TotalSelleablev} units",
-                              //value: "\$understockCount",
+                              title: "FC Processing",
+                              value: '${FcProcessingv} units',
+                              //value: '$zeroInStockRateSkuCount',
                               compared: "",
-                              // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
 
+                              // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
                             ),
                           ),
+
+                          const SizedBox(width: 8),
+
+
+
                         ],
                       ),
                       SizedBox(height: 8,),
@@ -761,7 +820,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: MetriccardExecutive(
-                              title: "Active Stock OOS",
+                              title: "Active SKU's OOS",
                               value: zeroInStockRateSkuCount.toString(),
                               //value: "\$understockCount",
                               compared: "",
