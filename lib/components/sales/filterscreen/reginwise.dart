@@ -654,7 +654,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
 
   String formatShortYearMonth(String date) {
     DateTime parsedDate = DateTime.parse(date);
-    String shortYear = parsedDate.year.toString().substring(2); // "25"
+    String shortYear = parsedDate.year.toString().substring(0); // "25"
     String month = parsedDate.month.toString().padLeft(2, '0'); // "04"
     return '$shortYear-$month';
   }
@@ -1243,7 +1243,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                             Row(children: [
                               Expanded(
                                   child: MetricCard(
-                                    title: "Overall Sales",
+                                    title: "Revenue",
                                     value: '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
                                     compared: "${salesData?['comparison']['salesChangePercent']??"0"}",)
                               ),
@@ -1281,9 +1281,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                                   child: MetricCard(
                                     title: "AOV",
                                     //value: "",
-                                    value: "£ ${NumberFormat('#,###').format(
-                                        (((salesData?['totalSales'] ?? 0.0) as num) / (((adssales?['totalOrders'] == 0 ? 1 : adssales?['totalOrders']) ?? 1) as num)).toInt()
-                                    )}",
+                                    value: "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
                                     compared: "${salesData?['comparison']['aovChangePercent']}",
                                     //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalSales'] ?? 1) as num)).toStringAsFixed(0)}",
                                     //  totalOrders
@@ -1295,7 +1293,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
 
                                 Expanded(
                                   child: MetricCard(
-                                    title: "Organic Sales",
+                                    title: "Organic Revenue",
                                     value: "£ ${NumberFormat('#,###').format(
                                         ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
                                     )}",
@@ -1345,7 +1343,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: MetricCardcm(
-                                    title: "Ad Sales",
+                                    title: "Ad Revenue",
                                     value: "£ ${NumberFormat('#,###').format(
                                         (adssales?['totalAdSales'] ?? 0).toDouble().round()
                                     )}",
@@ -1401,7 +1399,7 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                               children: [
                                 Expanded(
                                   child: MetricCardcm(
-                                    title: "Organic Sales",
+                                    title: "Organic Revenue",
                                     value:
                                     "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)) / (salesData?['totalSales'] ?? 0.0) * 100).toStringAsFixed(2)} %",
                                   ),

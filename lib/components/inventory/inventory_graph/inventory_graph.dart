@@ -29,8 +29,7 @@ class InventoryGraph extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (topFive.isNotEmpty) _buildSection("Top 5 Product Categories By Stock", topFive),
-        if (others.isNotEmpty)
-          _buildExpandableSection("Other Categories", others),
+       // if (others.isNotEmpty)_buildExpandableSection("Other Categories", others),
       ],
     );
   }

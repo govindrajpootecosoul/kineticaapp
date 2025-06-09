@@ -24,7 +24,23 @@ class BarChartSample extends StatelessWidget {
           alignment:
           values.length <= 12 ? BarChartAlignment.start : BarChartAlignment.spaceAround,
           maxY: maxY + maxY * 0.1, // add 10% padding at top
-          barTouchData: BarTouchData(enabled: true),
+          barTouchData: BarTouchData(enabled: true,
+
+            touchTooltipData: BarTouchTooltipData(
+            tooltipBgColor: Colors.black87,
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              return BarTooltipItem(
+                '£${rod.toY.toStringAsFixed(0)}',
+                const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              );
+            },
+          ),
+          ),
+
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
@@ -103,110 +119,6 @@ class BarChartSample extends StatelessWidget {
   }
 }
 
-
-
-
-
-
-//
-//
-// import 'package:flutter/material.dart';
-// import 'package:fl_chart/fl_chart.dart';
-//
-// class BarChartSample extends StatelessWidget {
-//   final List<double> values;      // Active values only
-//   final List<String> labels;      // Total labels (for X-axis)
-//   final bool isWeb;
-//   final int activeCount;          // Number of active (blue) bars
-//
-//   const BarChartSample({
-//     required this.values,
-//     required this.labels,
-//     this.isWeb = false,
-//     required this.activeCount,   // New field: how many bars should be blue
-//     Key? key,
-//   }) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     int totalBars = labels.length;
-//
-//     // Fill values with zeros if needed
-//     List<double> allValues = List.from(values);
-//     while (allValues.length < totalBars) {
-//       allValues.add(0);
-//     }
-//
-//     double maxY = allValues.isNotEmpty
-//         ? allValues.reduce((a, b) => a > b ? a : b) +0
-//         : 10;
-//
-//     return Container(
-//       height: isWeb ? 450 : 270,
-//       child: BarChart(
-//         BarChartData(
-//           alignment: BarChartAlignment.start,
-//           maxY: maxY,
-//           barTouchData: BarTouchData(enabled: true),
-//           titlesData: FlTitlesData(
-//             leftTitles: AxisTitles(
-//               sideTitles: SideTitles(showTitles: true, reservedSize: 42),
-//             ),
-//             rightTitles: AxisTitles(
-//               sideTitles: SideTitles(showTitles: false),
-//             ),
-//             topTitles: AxisTitles(
-//               sideTitles: SideTitles(showTitles: false),
-//             ),
-//             bottomTitles: AxisTitles(
-//               sideTitles: SideTitles(
-//                 showTitles: true,
-//                 reservedSize: 32,
-//                 getTitlesWidget: (value, meta) => getBottomTitles(value, meta),
-//               ),
-//             ),
-//           ),
-//           borderData: FlBorderData(show: false),
-//           gridData: FlGridData(
-//             show: true,
-//             drawVerticalLine: false,
-//             drawHorizontalLine: true,
-//           ),
-//           barGroups: List.generate(totalBars, (index) {
-//             return makeGroupData(index, allValues[index], index < activeCount);
-//           }),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   BarChartGroupData makeGroupData(int x, double y, bool isActive) {
-//     return BarChartGroupData(
-//       x: x,
-//       barRods: [
-//         BarChartRodData(
-//           width: isWeb ? 20 : 10,
-//           toY: y,
-//           color: isActive ? const Color(0xFF073349) : Colors.grey[300],
-//           borderRadius: BorderRadius.circular(2),
-//         ),
-//       ],
-//     );
-//   }
-//
-//   Widget getBottomTitles(double value, TitleMeta meta) {
-//     int index = value.toInt();
-//     if (index < 0 || index >= labels.length) return const SizedBox.shrink();
-//     return SideTitleWidget(
-//       axisSide: meta.axisSide,
-//       space: 4,
-//       child: Text(
-//         labels[index],
-//         style: const TextStyle(fontSize: 10),
-//       ),
-//     );
-//   }
-// }
 
 
 

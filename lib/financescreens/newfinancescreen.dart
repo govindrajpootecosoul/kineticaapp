@@ -19,37 +19,61 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
   String? selectedCategory;
   String? selectedSku;
   bool isLoading = false;
+  //
+  // final List<String> orderedKeys = [
+  //   'SKU',
+  //   'Product Name',
+  //   'Product Category',
+  //   'Channel',
+  //   'Year-Month',
+  //   'Total Units',
+  //   'Net Sales',
+  //   'Net Sales with tax',
+  //   'Total Sales',
+  //   'Total Sales with tax',
+  //   'Total_Return_Amount',
+  //   'Total Return with tax',
+  //   'Deal Fee',
+  //   'FBA Inventory Fee',
+  //   'fba fees',
+  //   'FBA Reimbursement',
+  //   'selling fees',
+  //   'promotional rebates',
+  //   'Storage Fee',
+  //   'Spend',
+  //   'Other marketing Expenses',
+  //   'Product CoGS',
+  //   'Cogs',
+  //   'CM1',
+  //   'heads_CM2',
+  //   'CM2',
+  //   'heads_CM3',
+  //   'CM3',
+  // ];
+
 
   final List<String> orderedKeys = [
-    'SKU',
     'Product Name',
     'Product Category',
-    'Channel',
-    'Year-Month',
-    'Total Units',
-    'Net Sales',
-    'Net Sales with tax',
-    'Total Sales',
     'Total Sales with tax',
-    'Total_Return_Amount',
     'Total Return with tax',
-    'Deal Fee',
-    'FBA Inventory Fee',
-    'fba fees',
-    'FBA Reimbursement',
-    'selling fees',
-    'promotional rebates',
-    'Storage Fee',
-    'Spend',
-    'Other marketing Expenses',
-    'Product CoGS',
+    'Net Sales with tax',
     'Cogs',
     'CM1',
-    'heads_CM2',
+    'Deal Fee',
+    'FBA Inventory Fee',
+    'FBA Reimbursement',
+    'Liquidations',
+    'Storage Fee',
+    'fba fees',
     'CM2',
-    'heads_CM3',
+    'Other marketing Expenses',
+    'promotional rebates',
+    'selling fees',
+    'Spend',
     'CM3',
   ];
+
 
   final Map<String, Color> keyColors = {
     'SKU': Colors.green,
@@ -75,12 +99,38 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
     'Other marketing Expenses': Colors.green,
     'Product CoGS': Colors.green,
     'Cogs': Colors.green,
+    'Liquidations': Colors.green,
     'CM1': Colors.green,
     'heads_CM2': Colors.green,
     'CM2': Colors.green,
     'heads_CM3': Colors.green,
     'CM3': Colors.green,
   };
+
+
+  bool _isCurrencyField(String key) {
+    const currencyFields = {
+      'Total Sales with tax',
+      'Total Return with tax',
+      'Net Sales with tax',
+      'Cogs',
+      'CM1',
+      'Deal Fee',
+      'FBA Inventory Fee',
+      'FBA Reimbursement',
+      'Liquidations',
+      'Storage Fee',
+      'fba fees',
+      'CM2',
+      'Other marketing Expenses',
+      'promotional rebates',
+      'selling fees',
+      'Spend',
+      'CM3',
+    };
+    return currencyFields.contains(key);
+  }
+
 
   @override
   void initState() {
@@ -92,8 +142,8 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
   Future<void> fetchFilters() async {
     final dio = Dio();
     try {
-      final categoryRes = await dio.get('http://192.168.31.175:3000/api/category-list');
-      final skuRes = await dio.get('http://192.168.31.175:3000/api/sku-list');
+      final categoryRes = await dio.get('https://api.thrivebrands.ai/api/category-list');
+      final skuRes = await dio.get('https://api.thrivebrands.ai/api/sku-list');
       if (categoryRes.statusCode == 200 && skuRes.statusCode == 200) {
         setState(() {
           categories = List<String>.from(categoryRes.data.where((e) => e is String && e.trim().isNotEmpty));
@@ -109,7 +159,7 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
     setState(() => isLoading = true);
     final dio = Dio();
     try {
-      String url = 'http://192.168.31.175:3000/api/pnl-data?range=$selectedRange';
+      String url = 'https://api.thrivebrands.ai/api/pnl-data?range=$selectedRange';
       if (selectedCategory != null && selectedCategory!.isNotEmpty) {
         url += '&category=${Uri.encodeComponent(selectedCategory!)}';
       }
@@ -148,13 +198,23 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                     ),
                   ),
                 ),
-                Expanded(
+        /*        Expanded(
                   flex: 6,
                   child: Text(
                     data[key].toString(),
                     style:  TextStyle(color: color),
                   ),
+                ),*/
+
+                Expanded(
+                  flex: 6,
+                  child: Text(
+                    _isCurrencyField(key) ? '£ ${data[key]}' : data[key].toString(),
+                    style: TextStyle(color: color),
+                  ),
                 ),
+
+
               ],
             ),
           );
@@ -187,7 +247,7 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple)),
+                          color: Colors.black)),
                 ),
                 const SizedBox(height: 10),
                 buildTable(item),
@@ -198,6 +258,13 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
       ),
     );
   }
+
+
+  Map<String, String> rangeOptions = {
+    'monthtodate': 'Current Month',
+    'lastmonth': 'Previous Month',
+    'yeartodate': 'Current Year',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -227,10 +294,15 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  DropdownButton<String>(
+                  /*DropdownButton<String>(
                     dropdownColor: Colors.white,
                     value: selectedRange,
-                    items: ['monthtodate', 'lastmonth', 'yeartodate', 'custom']
+                    items: [
+                      'monthtodate',
+                      'lastmonth',
+                      'yeartodate',
+                      //'custom'
+                    ]
                         .map((e) => DropdownMenuItem(
                       value: e,
                       child: Container(
@@ -244,8 +316,30 @@ class _PnlDataScreenState extends State<NewFinanceSkuScreen> {
                       selectedRange = val!;
                       fetchPnlData();
                     }),
+                  ),*/
+
+
+                DropdownButton<String>(
+                dropdownColor: Colors.white,
+                value: selectedRange,
+                items: rangeOptions.entries
+                    .map((entry) => DropdownMenuItem<String>(
+                  value: entry.key,
+                  child: Container(
+                    color: selectedRange == entry.key ? Colors.deepPurple[50] : null,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Text(entry.value),
                   ),
-                  const SizedBox(width: 10),
+                ))
+                    .toList(),
+                onChanged: (val) => setState(() {
+                  selectedRange = val!;
+                  fetchPnlData();
+                }),
+              ),
+
+
+              const SizedBox(width: 10),
                   Row(
                     children: [
                       if (selectedCategory != null)
