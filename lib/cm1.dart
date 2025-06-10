@@ -133,9 +133,14 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                     "Entry: ${entry.key} - ${formatNumberStringWithComma(entry.value.toString())}");
                 return ListTile(
                   title: Text(entry.key),
+
                   subtitle: Text(
+                    "£${formatNumberStringWithComma(double.tryParse(entry.value.toString())?.round().toString() ?? '0')}",
+                  ),
+
+                  /* subtitle: Text(
                       "£${formatNumberStringWithComma(entry.value.toString())}" ??
-                          'N/A'),
+                          'N/A'),*/
                 );
               }).toList(),
             ),

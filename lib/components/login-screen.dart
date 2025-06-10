@@ -239,6 +239,134 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
+          // Responsive Login Form
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double width = constraints.maxWidth;
+
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: width > 600 ? 450 : double.infinity,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset('assets/vectorai.png',
+                              width: 330, height: 200),
+                          const SizedBox(height: 30),
+                          Text(
+                            "Welcome Back\nEnter your email to sign in",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: width > 600 ? 18 : 16,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          _buildTextField(emailController, "Email Address"),
+                          const SizedBox(height: 15),
+                          _buildTextField(passwordController, "Password",
+                              isPassword: true),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.gold,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed: loginUser,
+                              child: const Text(
+                                "Continue",
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("New Account?",
+                                  style: TextStyle(color: Colors.white70)),
+                              const SizedBox(width: 5),
+                              GestureDetector(
+                                onTap: () {
+                                  // Handle Sign Up
+                                },
+                                child: Text(
+                                  "Sign Up Now",
+                                  style: TextStyle(
+                                      color: AppColors.gold,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            "By clicking continue, you agree to our Terms of Service and Privacy Policy",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: Colors.white70, fontSize: 12),
+                          ),
+                          const SizedBox(height: 20),
+                          Image.asset('assets/newlogo.png', width: 125),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String labelText, {bool isPassword = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.2),
+        labelText: labelText,
+        labelStyle: const TextStyle(color: Colors.white),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+}
+
+
+
+
+
+/* @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.primaryBlue,
+      body: Stack(
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset(
+              "assets/login-bg.png",
+              fit: BoxFit.cover,
+            ),
+          ),
+
           // Login Form
           Center(
             child: SingleChildScrollView(
@@ -320,8 +448,9 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
-  }
+  }*/
 
+/*
   Widget _buildTextField(TextEditingController controller, String labelText, {bool isPassword = false}) {
     return TextField(
       controller: controller,
@@ -336,4 +465,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
+}*/

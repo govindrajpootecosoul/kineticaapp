@@ -767,88 +767,91 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
               itemBuilder: (context, index) {
                 var item = inventoryList[index];
 
-                return Card(
-                  color: AppColors.beige,
-                  elevation: 0,
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: 200,
-                                child: Text(
-                                  "${item['Product_Name'].toString()}",
-                                  style: const TextStyle(
+                return
+                  Card(
+                    color: AppColors.beige,
+                    elevation: 0,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // LEFT SIDE: Product Name + SKU
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 190),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item['Product_Name'].toString(),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
-                                      color: Colors.brown),
-                                 // overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
+                                      color: Colors.brown,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
                                   Row(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text("SKU ",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight:
-                                              FontWeight.bold,
-                                              color: AppColors.gold)),
-                                      SizedBox(
-                                       // width: 100,
+                                      Text(
+                                        "SKU ",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.gold,
+                                        ),
+                                      ),
+                                      Expanded(
                                         child: Text(
-                                          item['SKU'].toString(),
+                                          item['SKU']?.toString() ?? 'N/A',
                                           style: TextStyle(
                                             fontSize: 14,
-                                            fontWeight:
-                                            FontWeight.w800,
-                                            color: AppColors
-                                                .primaryBlue,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.primaryBlue,
                                           ),
                                           softWrap: true,
+                                          overflow: TextOverflow.visible,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                          Row(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: _selectedItems.map((label) {
-                              String value;
+                            ),
 
-                              if (label == "Inventory Age") {
-                                final invAge = item["inv_age_0_to_30_days"] ?? 0;
-                                final invAge60 = item["inv_age_31_to_60_days"] ?? 0;
-                                final invAge90 = item["inv_age_61_to_90_days"] ?? 0;
-                                final invAge180 = item["inv_age_91_to_180_days"] ?? 0;
-                                value = (invAge + invAge60 + invAge90 + invAge180).toString();
-                              } else {
-                                value = item[fieldMapping[label]]?.toString() ?? "0";
-                              }
+                            const SizedBox(width: 20),
 
-                              return buildInfoRow(label, value);
-                            }).toList(),
-                          ),
-                        ],
+                            // RIGHT SIDE: Dynamic Info Rows
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _selectedItems.map((label) {
+                                String value;
+
+                                if (label == "Inventory Age") {
+                                  final invAge = item["inv_age_0_to_30_days"] ?? 0;
+                                  final invAge60 = item["inv_age_31_to_60_days"] ?? 0;
+                                  final invAge90 = item["inv_age_61_to_90_days"] ?? 0;
+                                  final invAge180 = item["inv_age_91_to_180_days"] ?? 0;
+                                  value = (invAge + invAge60 + invAge90 + invAge180).toString();
+                                } else {
+                                  value = item[fieldMapping[label]]?.toString() ?? "0";
+                                }
+
+                                return buildInfoRow(label, value);
+                              }).toList(),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
+                  );
+
+
               },
             ),
           ),

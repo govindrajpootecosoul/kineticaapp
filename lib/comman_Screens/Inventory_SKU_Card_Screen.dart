@@ -270,10 +270,10 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     // buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Sellable Stock": product['Sellable_Stock_Value'] ?? "00"}),
 
 
-                    buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {"Stock Value": product['WH_Stock_Value'] ?? "00"}),
+                    buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {"Stock Value": "£ ${product['WH_Stock_Value']}" ?? "00"}),
                     // buildLabelValueExpend("Total Sellable",
                     //     product['afn_fulfillable_quantity'] ?? "00"),
-                    buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Stock Value": product['Sellable_Stock_Value'] ?? "00"}),
+                    buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Stock Value": "£ ${product['Sellable_Stock_Value']}" ?? "00"}),
 
 
                     buildLabelValueExpend(

@@ -1148,7 +1148,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen>{
                                 child: MetricCard(
                                   title: "Units Ordered",
                                   value: "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
-                                  compared: "${salesData?['comparison']['quantityChangePercent']}",
+                                  compared: "${salesData?['comparison']['quantityChangePercent']??"0"}",
                                   //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
                                 ),),
 
@@ -1177,7 +1177,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen>{
                                     title: "AOV",
                                     //value: "",
                                     value: "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
-                                    compared: "${salesData?['comparison']['aovChangePercentQty']}",
+                                    compared: "${salesData?['comparison']['aovChangePercentQty']??"0"}",
                                     //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalSales'] ?? 1) as num)).toStringAsFixed(0)}",
                                     //  totalOrders
                                   ),
@@ -1192,7 +1192,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen>{
                                     value: "£ ${NumberFormat('#,###').format(
                                         ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
                                     )}",
-                                    compared: "${salesData?['comparison']['organicSalesChangePercent']}",
+                                    compared: "${salesData?['comparison']['organicSalesChangePercent']??"0"}",
                                     //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
 
                                   ),
@@ -1252,7 +1252,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen>{
                                         double.parse(adssales?['current']?['totalAdSales'] ?? '0')
                                     )}",
 
-                                    compared: '${(adssales?['change']?['adSalesChangePercent'])}',
+                                    compared: '${(adssales?['change']?['adSalesChangePercent']??"0")}',
 
 
 
@@ -1271,7 +1271,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen>{
 
                                       // value: "£ ${NumberFormat('#,##0', 'en_GB').format(double.parse(adssales?['current']?['ACOS'] ?? '0'))}",
 
-                                      compared: '${(adssales?['change']?['acosChangePercent'])}',
+                                      compared: '${(adssales?['change']?['acosChangePercent']??"0")}',
 
 
 

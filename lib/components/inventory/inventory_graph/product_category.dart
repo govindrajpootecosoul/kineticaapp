@@ -94,7 +94,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
       var dio = Dio();
       var response = await dio.get(
        // 'https://api.thrivebrands.ai/api/inventory/productcategorysum',
-        'http://192.168.50.92:3000/api/inventory/productoversku',//api/inventory/productoversku
+        'https://api.thrivebrands.ai/api/inventory/productoversku',//api/inventory/productoversku
+          //https://api.thrivebrands.ai/api/inventory/productunders
       );
 
       if (response.statusCode == 200) {
@@ -119,37 +120,37 @@ print("response  ${data}");
       print("Exception: $e");
     }
   }
-  Future<void> fetchInventoryDataundersku() async {
-    try {
-      var dio = Dio();
-      var response = await dio.get(
-       // 'https://api.thrivebrands.ai/api/inventory/productcategorysum',
-        //'http://192.168.50.92:3000/api/inventory/productunders',//api/inventory/productoversku
-        'https://api.thrivebrands.ai/api/inventory/productunders',//api/inventory/productoversku
-      );
-
-      if (response.statusCode == 200) {
-        List<dynamic> data = response.data;
-print("response  ${data}");
-
-        labelsunder.clear();
-        valuesunder.clear();
-
-        for (var item in data) {
-          labelsunder.add(item['SKU'].toString());
-          valuesunder.add((item['days_of_supply'] ?? 0).toDouble());
-        }
-
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        print("Error: ${response.statusMessage}");
-      }
-    } catch (e) {
-      print("Exception: $e");
-    }
-  }
+//   Future<void> fetchInventoryDataundersku() async {
+//     try {
+//       var dio = Dio();
+//       var response = await dio.get(
+//        // 'https://api.thrivebrands.ai/api/inventory/productcategorysum',
+//         //'http://192.168.50.92:3000/api/inventory/productunders',//api/inventory/productoversku
+//         'https://api.thrivebrands.ai/api/inventory/productunders',//api/inventory/productoversku
+//       );
+//
+//       if (response.statusCode == 200) {
+//         List<dynamic> data = response.data;
+// print("response  ${data}");
+//
+//         labelsunder.clear();
+//         valuesunder.clear();
+//
+//         for (var item in data) {
+//           labelsunder.add(item['SKU'].toString());
+//           valuesunder.add((item['days_of_supply'] ?? 0).toDouble());
+//         }
+//
+//         setState(() {
+//           isLoading = false;
+//         });
+//       } else {
+//         print("Error: ${response.statusMessage}");
+//       }
+//     } catch (e) {
+//       print("Exception: $e");
+//     }
+//   }
 
   @override
   Widget build(BuildContext context) {

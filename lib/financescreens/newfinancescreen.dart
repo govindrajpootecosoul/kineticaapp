@@ -97,7 +97,7 @@ class _NewFinanceSkuScreenState extends State<NewFinanceSkuScreen> {
   };
 
   final Map<String, Color> keyColors = {
-    'SKU': Colors.green,
+    'SKU': Colors.black,
     'Product Name': Colors.black,
     'Product Category': Colors.black,
     'Channel': Colors.green,
