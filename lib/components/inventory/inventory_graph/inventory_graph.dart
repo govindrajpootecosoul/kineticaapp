@@ -33,10 +33,9 @@ class InventoryGraph extends StatelessWidget {
       children: [
 
         if (topFive.isNotEmpty)
-          if(idd=="oversku")
+
           _buildSection("Top 5 OverStock SKU's", topFive),
-        if(idd=="undersku")
-          _buildSection("Top 5 UnderStock SKU's", topFive),
+
         // if (others.isNotEmpty)_buildExpandableSection("Other Categories", others),
       ],
     );
@@ -157,7 +156,7 @@ class _HorizontalBarChart extends StatelessWidget {
                       ),
                       children: [
                         TextSpan(
-                          text: rod.toY.toStringAsFixed(1),
+                          text: "${rod.toY.toStringAsFixed(0)} Days",
                           style: const TextStyle(
                             color: Colors.yellowAccent,
                             fontWeight: FontWeight.w600,

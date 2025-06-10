@@ -666,12 +666,14 @@ class _DashboardState extends State<Dashboard>{
       final from = formatDateads_api(startDate!);
       final to = formatDateads_api(endDate!);
 
-      url = '${ApiConfig.baseUrl}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+     url = '${ApiConfig.baseUrl}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+     // url = '${ApiConfig.baseUrllocal}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
 
     print("print url custom ads data ${url}");
     } else {
       url =
       '${ApiConfig.baseUrl}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+     // '${ApiConfig.baseUrllocal}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     }
 
     var request = http.Request('GET', Uri.parse(url));
@@ -688,6 +690,8 @@ class _DashboardState extends State<Dashboard>{
           // totalAdSales = double.parse((jsonResponse['totalAdSales'] ?? 0.0).toString()).toStringAsFixed(2);
           // totalAdSpend = double.parse((jsonResponse['totalAdSpend'] ?? 0.0).toString()).toStringAsFixed(2);
           print("console:::   ${adssales}");
+          print("As Spend data :::::::::${adssales?['current']?['totalAdSpend']}");
+
           isLoading = false;
         });
       } else {
@@ -1228,6 +1232,7 @@ class _DashboardState extends State<Dashboard>{
                         style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
                       ),
                     ),
+
                     Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -1240,25 +1245,35 @@ class _DashboardState extends State<Dashboard>{
                             Row(
                               children: [
                                 Expanded(
-                                  child: MetricCardcm(
+                                  child: MetricCard(
                                     title: "Ad Spend",
                                    // title: Salesvaluepnl.toString(),
-                                    value: "£ ${NumberFormat('#,###').format(
-                                        (adssales?['totalAdSpend'] ?? 0).toDouble().round()
+                                   // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
+                                   // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
+
+                                    value: "£ ${NumberFormat('#,##0', 'en_GB').format(
+                                        double.parse(adssales?['current']?['totalAdSpend'] ?? '0')
                                     )}",
-                                    // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
 
+                                    compared: '${(adssales?['change']?['adSpendChangePercent'])}',
 
+                                    // value: "£ ${(adssales?['current']?['totalAdSpend'])}",
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
-                                  child: MetricCardcm(
+                                  child: MetricCard(
                                     title: "Ad Revenue",
-                                    value: "£ ${NumberFormat('#,###').format(
-                                        (adssales?['totalAdSales'] ?? 0).toDouble().round()
-                                    )}",
+                                    // value: "£ ${NumberFormat('#,###').format(
+                                    //     (adssales?['totalAdSales'] ?? 0).toDouble().round()
+                                    // )}",
                                     //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+                                    value: "£ ${NumberFormat('#,##0', 'en_GB').format(
+                                        double.parse(adssales?['current']?['totalAdSales'] ?? '0')
+                                    )}",
+
+                                    compared: '${(adssales?['change']?['adSalesChangePercent'])}',
 
 
 
@@ -1271,9 +1286,16 @@ class _DashboardState extends State<Dashboard>{
                               children: [
                                 if(selectedFilterType!= "last30days")
                                   Expanded(
-                                    child: MetricCardcm(
+                                    child: MetricCard(
                                       title: "ACOS",
-                                      value: "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                                      value: "${(adssales?["current"]?['ACOS'] ?? 0)} %",
+
+                                     // value: "£ ${NumberFormat('#,##0', 'en_GB').format(double.parse(adssales?['current']?['ACOS'] ?? '0'))}",
+
+                                      compared: '${(adssales?['change']?['acosChangePercent'])}',
+
+
+
                                     ),
                                   ),
                                 const SizedBox(width: 8),
@@ -1282,7 +1304,9 @@ class _DashboardState extends State<Dashboard>{
                                 Expanded(
                                   child: MetricCardcm(
                                     title: "TACOS",
-                                    value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+                                    value: "${((double.parse(adssales?["current"]?['totalAdSpend'] ?? '0') / Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+
+                                    // value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
                                   ),
                                 ):
                                 Expanded(

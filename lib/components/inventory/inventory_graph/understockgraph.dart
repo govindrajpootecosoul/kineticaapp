@@ -155,7 +155,7 @@ class _HorizontalBarChart extends StatelessWidget {
                       ),
                       children: [
                         TextSpan(
-                          text: "${rod.toY.toStringAsFixed(1)} Days",
+                          text: "${rod.toY.toStringAsFixed(0)} Days",
                           style: const TextStyle(
                             color: Colors.yellowAccent,
                             fontWeight: FontWeight.w600,

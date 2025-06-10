@@ -27,7 +27,8 @@ class _UnderskuApiscreenState extends State<UnderskuApiscreen> {
       var dio = Dio();
       var response = await dio.get(
         // 'https://api.thrivebrands.ai/api/inventory/productcategorysum',
-        'http://192.168.50.92:3000/api/inventory/productunders',//api/inventory/productoversku
+       // 'http://192.168.50.92:3000/api/inventory/productunders',//api/inventory/productoversku
+        'https://api.thrivebrands.ai/api/inventory/productunders',//api/inventory/productoversku
       );
 
       if (response.statusCode == 200) {
