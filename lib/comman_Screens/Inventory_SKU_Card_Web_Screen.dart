@@ -6,10 +6,12 @@ import '../../utils/colors.dart';
 class InventorySkuCardWebScreen extends StatefulWidget {
   final Map<String, dynamic> product;
 
-  const InventorySkuCardWebScreen({Key? key, required this.product}) : super(key: key);
+  const InventorySkuCardWebScreen({Key? key, required this.product})
+      : super(key: key);
 
   @override
-  State<InventorySkuCardWebScreen> createState() => _InventorySkuCardWebScreenState();
+  State<InventorySkuCardWebScreen> createState() =>
+      _InventorySkuCardWebScreenState();
 }
 
 class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
@@ -28,7 +30,8 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
           Text(value.toString(), style: const TextStyle(fontSize: 12)),
         ],
       ),
@@ -49,9 +52,121 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           const SizedBox(height: 8),
           Text(value.toString(), style: const TextStyle(fontSize: 13)),
+        ],
+      ),
+    );
+  }
+
+
+  
+  Widget buildLabeledDetailCard({
+    required String heading,
+    required Map<String, dynamic> details,
+  }) {
+    return Container(
+      width: 120,
+      // height: 170,
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white60,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            heading,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 10),
+          ...details.entries.map((entry) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    entry.key,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+                Text(
+                  entry.value.toString(),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget buildLabeledDetailCardWithHeaderValue({
+    required String heading,
+    required dynamic headingValue,
+    required Map<String, dynamic> details,
+  }) {
+    return Container(
+      width: 120,
+      // height: 170,
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white60,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  heading,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Text(
+                headingValue.toString(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...details.entries.map((entry) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    entry.key,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+                Text(
+                  entry.value.toString(),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+          )),
         ],
       ),
     );
@@ -80,7 +195,7 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
                 //   maxLines: 2,
                 //   overflow: TextOverflow.ellipsis,
                 // ),
-        
+
                 // Text(
                 //   product['Date']?.toString() ?? '',
                 //   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -92,7 +207,15 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    SizedBox (height: 120,width: 120, child: Center(child: Text("📦", style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),))),
+                    // SizedBox(
+                    //     height: 120,
+                    //     width: 120,
+                    //     child: Center(
+                    //         child: Text(
+                    //       "📦",
+                    //       style: TextStyle(
+                    //           fontSize: 50, fontWeight: FontWeight.bold),
+                    //     ))),
                     // Flexible(
                     //   flex: 3,
                     //   child: Image.network(
@@ -107,12 +230,12 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-        
                           buildLabelValue("SKU", product['SKU'] ?? "00"),
                           buildLabelValue("Available Inventory",
                               (product['afn_total_quantity'] ?? 0)),
-                             // (product['afn-fulfillable-quantity'] ?? 0) + (product['FC_Transfer'] ?? 0)),
-                          buildLabelValue("Storage Cost","£ ${(product['qestimated_ais_241_270-days'] ?? 0)+(product['estimated_ais_271_300_days'] ?? 0)+(product['estimated_ais_301_330_days'] ?? 0)}"),
+                          // (product['afn-fulfillable-quantity'] ?? 0) + (product['FC_Transfer'] ?? 0)),
+                          buildLabelValue("Storage Cost",
+                              "£ ${(product['qestimated_ais_241_270-days'] ?? 0) + (product['estimated_ais_271_300_days'] ?? 0) + (product['estimated_ais_301_330_days'] ?? 0)}"),
                         ],
                       ),
                     ),
@@ -122,9 +245,13 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildLabelValue("ASIN", product['ASIN'] ?? "N/A"),
-                          buildLabelValue("DOS", product['days_of_supply'] ?? '00'),
-                          buildLabelValue("LTSF Cost", "£ ${product['estimated_storage_cost_next_month'] ?? '00'}"),
+                          buildLabelValue(
+                              "Product Name", product['Product_Name'] ?? "N/A"),
+                          buildLabelValue("Product Category",
+                              product['Product_Category'] ?? '00'),
+                          //buildLabelValue("LTSF Cost", "£ ${product['estimated_storage_cost_next_month'] ?? '00'}"),
+                          buildLabelValue(
+                              "DOS", product['days_of_supply'] ?? "00"),
                         ],
                       ),
                     ),
@@ -145,16 +272,62 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
                   ),
                   Wrap(
                     children: [
-                      buildLabelValueExpend("Amazon Inventory", product['afn_warehouse_quantity'] ?? "00"),
-                      buildLabelValueExpend("Total Sellable", product['afn_fulfillable_quantity'] ?? "00"),
-                      buildLabelValueExpend("Inventory Age", (product['inv_age_0_to_30_days'] ?? "00")+(product['inv_age_31_to_60_days'] ?? "00")+(product['inv_age_61_to_90_days'] ?? "00")+(product['inv_age_91_to_180_days'] ?? "00")+(product['inv_age_181_to_270_days'] ?? "00")+(product['inv_age_271_to_365_days'] ?? "00")+(product['inv_age_365_plus_days'] ?? "00")),
-        
-                      buildLabelValueExpend("DOS", product['days_of_supply'] ?? "00"),
-                      buildLabelValueExpend("Customer Reserved", product['Customer_reserved'] ?? "00"),
-                      buildLabelValueExpend("FC Transfer", product['FC_Transfer'] ?? "00"),
-                      buildLabelValueExpend("FC Processing", product['FC_Processing'] ?? "00"),
-                      buildLabelValueExpend("Unfullfilled", product['afn_unsellable_quantity'] ?? "00"),
-                      buildLabelValueExpend("Inbound Recieving", product['afn_inbound_receiving_quantity'] ?? "00"),
+                     buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {"Stock Value": product['WH_Stock_Value'] ?? "00"}),
+                    // buildLabelValueExpend("Total Sellable",
+                    //     product['afn_fulfillable_quantity'] ?? "00"),
+                    buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Stock Value": product['Sellable_Stock_Value'] ?? "00"}),
+
+
+                    buildLabelValueExpend(
+                        "Unsellable Units              ", product['afn_unsellable_quantity'] ?? "00"),
+                    // buildLabeledDetailCard(heading: "Inventory Age", details: {"0-30" : (product['inv_age_0_to_30_days'] ?? "00"), "31-60" : (product['inv_age_31_to_60_days'] ?? "00"), "61-90" : (product['inv_age_61_to_90_days'] ?? "00")}),
+                    buildLabelValueExpend(
+                        "Inventory Age 0-30",
+                        (product['inv_age_0_to_30_days'] ?? "00")),
+                            // (product['inv_age_31_to_60_days'] ?? "00") +
+                            // (product['inv_age_61_to_90_days'] ?? "00") +
+                            // (product['inv_age_91_to_180_days'] ?? "00") +
+                            // (product['inv_age_181_to_270_days'] ?? "00") +
+                            // (product['inv_age_271_to_365_days'] ?? "00") +
+                            // (product['inv_age_365_plus_days'] ?? "00")),
+                    buildLabelValueExpend(
+                        "Inventory Age 31-60",
+                         (product['inv_age_31_to_60_days'] ?? "00")),
+                            // (product['inv_age_31_to_60_days'] ?? "00") +
+                            // (product['inv_age_61_to_90_days'] ?? "00") +
+                            // (product['inv_age_91_to_180_days'] ?? "00") +
+                            // (product['inv_age_181_to_270_days'] ?? "00") +
+                            // (product['inv_age_271_to_365_days'] ?? "00") +
+                            // (product['inv_age_365_plus_days'] ?? "00")),
+                    buildLabelValueExpend(
+                        "Inventory Age 61-90",
+                        (product['inv_age_61_to_90_days'] ?? "00")),
+                    // (product['inv_age_31_to_60_days'] ?? "00") +
+                    // (product['inv_age_61_to_90_days'] ?? "00") +
+                    // (product['inv_age_91_to_180_days'] ?? "00") +
+                    // (product['inv_age_181_to_270_days'] ?? "00") +
+                    // (product['inv_age_271_to_365_days'] ?? "00") +
+                    // (product['inv_age_365_plus_days'] ?? "00")),
+                    // // buildLabelValueExpend(
+                    //     "Unsellable", product['afn_unsellable_quantity'] ?? "00"),
+                    buildLabelValueExpend("Customer Reserved",
+                        product['Customer_reserved'] ?? "00"),
+                    buildLabelValueExpend(
+                        "FC Transfer", product['FC_Transfer'] ?? "00"),
+                    buildLabelValueExpend(
+                        "FC Processing", product['FC_Processing'] ?? "00"),
+                    // buildLabelValueExpend("Unfullfilled",
+                    //     product['afn_unsellable_quantity'] ?? "00"),
+                    buildLabelValueExpend("Inbound Recieving",
+                        product['afn_inbound_receiving_quantity'] ?? "00"),
+                    buildLabelValueExpend("Instock Rate",
+                        "${product['InStock_Rate_Percent']} %" ?? "00"),
+                    buildLabelValueExpend(
+                        "Days In Stock",
+                        "${product['Days_In_Stock']}/${product['Total_Days']}" ??
+                            "00"),
+
+
                     ],
                   ),
                   const Divider(height: 30),
@@ -191,18 +364,6 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 // // lib/screens/inventory/product_card.dart
 //

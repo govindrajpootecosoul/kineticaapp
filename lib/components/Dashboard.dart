@@ -28,13 +28,11 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-
-class _DashboardState extends State<Dashboard>{
+class _DashboardState extends State<Dashboard> {
   List<String> states = [];
   List<String> cities = [];
   List<String> skus = [];
   bool isWeb = false;
-
 
   List<dynamic> inventoryList = [];
   //bool isLoading = true;
@@ -51,9 +49,6 @@ class _DashboardState extends State<Dashboard>{
   //int zeroInStockRateSkuCount = 0;
 
   //final Map<String, int> stockCounts = countStockStatus();
-
-
-
 
   //late TabController _tabController;
 
@@ -90,29 +85,28 @@ class _DashboardState extends State<Dashboard>{
     // "custom",
   ];
 
-
   String formatFilterType(String filter) {
     switch (filter) {
-    // case 'today':
-    //   return 'Today';
-    //   case 'week':
-    //   return 'Week';
-    // case '6months':
-    //   return 'Last 6 Months';
-    // case 'last30days':
-    //   return 'Last 30 Days';
-    // case 'yeartodate':
-    //   return 'Year to Date';
+      // case 'today':
+      //   return 'Today';
+      //   case 'week':
+      //   return 'Week';
+      // case '6months':
+      //   return 'Last 6 Months';
+      // case 'last30days':
+      //   return 'Last 30 Days';
+      // case 'yeartodate':
+      //   return 'Year to Date';
       case 'lastmonth':
         return 'Previous Month';
       case 'monthtodate':
         return 'Current Month';
 
-    // case 'year':
-    //   return 'This Year';
-    //   case 'previousyear':
-    //     return 'Previous Year';
-    // case 'currentyear':
+      // case 'year':
+      //   return 'This Year';
+      //   case 'previousyear':
+      //     return 'Previous Year';
+      // case 'currentyear':
       case 'yeartodate':
         return 'Current Year';
       case 'custom':
@@ -121,7 +115,6 @@ class _DashboardState extends State<Dashboard>{
         return filter;
     }
   }
-
 
 /*  List<String> filterTypes = [
     // "today",
@@ -158,8 +151,8 @@ class _DashboardState extends State<Dashboard>{
   bool isLoading = false;
   String? errorMsg;
 
-  List<double> values=[10,20,30];
-  List<String> labels=[];
+  List<double> values = [10, 20, 30];
+  List<String> labels = [];
   Map<String, double> monthlyTotals = {};
 
   @override
@@ -177,7 +170,7 @@ class _DashboardState extends State<Dashboard>{
 
   @override
   void dispose() {
-   // _tabController.dispose();
+    // _tabController.dispose();
     super.dispose();
   }
   //inventory data
@@ -193,7 +186,6 @@ class _DashboardState extends State<Dashboard>{
   //   // Round to nearest whole number
   //   return totalCost.roundToDouble();
   // }
-
 
   Map<String, int> countStockStatus(List<dynamic> data) {
     Map<String, int> statusCounts = {
@@ -212,7 +204,6 @@ class _DashboardState extends State<Dashboard>{
     return statusCounts;
   }
 
-
   int calculateTotalDaysInStock(List<dynamic> data) {
     double totalCost = 0.0;
     int count = 0;
@@ -230,8 +221,6 @@ class _DashboardState extends State<Dashboard>{
     // Return rounded whole number
     return (totalCost / count).round();
   }
-
-
 
   // Future<void> fetchExecutiveData() async {
   //   try {
@@ -283,8 +272,6 @@ class _DashboardState extends State<Dashboard>{
   //   }
   // }
 
-
-
   Future<void> fetchExecutiveData() async {
     try {
       var dio = Dio();
@@ -295,7 +282,8 @@ class _DashboardState extends State<Dashboard>{
 
         // Calculate DaysInStock average
         int totaldayinstock = calculateTotalDaysInStock(data);
-        String daysInStockFormatted = formatNumberStringWithComma(totaldayinstock.toString());
+        String daysInStockFormatted =
+            formatNumberStringWithComma(totaldayinstock.toString());
 
         // Count stock statuses
         Map<String, int> statusCounts = {
@@ -304,7 +292,8 @@ class _DashboardState extends State<Dashboard>{
           'Balanced': 0,
         };
 
-        int zeroInStockRateCount = 0; // NEW variable to count SKUs with 0 InStock_Rate_Percent
+        int zeroInStockRateCount =
+            0; // NEW variable to count SKUs with 0 InStock_Rate_Percent
 
         for (var item in data) {
           final status = item['Stock_Status']?.toString();
@@ -328,7 +317,8 @@ class _DashboardState extends State<Dashboard>{
           overstockCount = statusCounts['Overstock'] ?? 0;
           balancedCount = statusCounts['Balanced'] ?? 0;
 
-          zeroInStockRateSkuCount = zeroInStockRateCount; // Update new variable here
+          zeroInStockRateSkuCount =
+              zeroInStockRateCount; // Update new variable here
 
           isLoading = false;
         });
@@ -345,8 +335,6 @@ class _DashboardState extends State<Dashboard>{
       });
     }
   }
-
-
 
   // Future<void> fetchExecutiveData() async {
   //   try {
@@ -378,9 +366,6 @@ class _DashboardState extends State<Dashboard>{
   //   }
   // }
 
-
-
-
   // String formatFilterType(String filter) {
   //   switch (filter) {
   //   // case 'today':
@@ -410,7 +395,7 @@ class _DashboardState extends State<Dashboard>{
   Future<void> fetchDropdownData() async {
     try {
       final stateRes =
-      await http.get(Uri.parse('${ApiConfig.baseUrl}/state?q='));
+          await http.get(Uri.parse('${ApiConfig.baseUrl}/state?q='));
       final cityRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/city?q='));
       final skuRes = await http.get(Uri.parse('${ApiConfig.baseUrl}/sku'));
 
@@ -431,7 +416,6 @@ class _DashboardState extends State<Dashboard>{
     return '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}';
   }
 
-
   String formatDate(DateTime date) =>
       "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
@@ -451,11 +435,11 @@ class _DashboardState extends State<Dashboard>{
       final to = formatDate(endDate!);
 
       url =
-      '${ApiConfig.baseUrl}/sales/resion?filterType=custom&fromDate=$from&toDate=$to}';
+          '${ApiConfig.baseUrl}/sales/resion?filterType=custom&fromDate=$from&toDate=$to}';
     } else {
       url =
-         // 'http://192.168.18.131:3000/api/sales/resion?filterType=lastmonth';
-      '${ApiConfig.baseUrl}/sales/resion?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+          // 'http://192.168.18.131:3000/api/sales/resion?filterType=lastmonth';
+          '${ApiConfig.baseUrl}/sales/resion?filterType=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     }
     //var request = http.Request('GET', url);
 
@@ -474,7 +458,6 @@ class _DashboardState extends State<Dashboard>{
 //         });
 //       }
 
-
       if (response.statusCode == 200) {
         final data = await response.stream.bytesToString();
         setState(() {
@@ -489,13 +472,14 @@ class _DashboardState extends State<Dashboard>{
 
           print("filte typee :: ${selectedFilterType}");
 
-
-
-          if(selectedFilterType== "last30days")
-          {
+          if (selectedFilterType == "last30days") {
             print("last30days");
-            values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
-            labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).toDouble())
+                .toList();
+            labels = breakdown
+                .map<String>((item) => item['date'].toString())
+                .toList();
 
             // values = breakdown
             //     .map<double>((item) => (item['totalSales'] as num).roundToDouble())
@@ -507,40 +491,33 @@ class _DashboardState extends State<Dashboard>{
             //   return '${date.month.toString().padLeft(1, '0')}-${date.day.toString().padLeft(1, '0')}';
             // })
             //     .toList();
-
           }
 
-
-
-          if(selectedFilterType== "monthtodate")
-          {
+          if (selectedFilterType == "monthtodate") {
             print("monthtodate");
             // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
             // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
 
             values = breakdown
-                .map<double>((item) => (item['totalSales'] as num).roundToDouble())
+                .map<double>(
+                    (item) => (item['totalSales'] as num).roundToDouble())
                 .toList();
 
 // Format dates to MM-DD
-            labels = breakdown
-                .map<String>((item) {
+            labels = breakdown.map<String>((item) {
               DateTime date = DateTime.parse(item['date']);
               return "${date.day.toString().padLeft(1, '0')}";
               //return "${date.month.toString().padLeft(0, '0')}-${date.day.toString().padLeft(1, '0')}";
-            })
-                .toList();
-
-
+            }).toList();
           }
-
-
 
           if (selectedFilterType == "lastmonth") {
             print("6666666 months");
             //   values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
             //   labels = breakdown.map<String>((item) => item['date'].toString()).toList();
-            values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).toDouble())
+                .toList();
 
             // Only show day (1, 2, 3...) as label
             labels = breakdown.map<String>((item) {
@@ -553,10 +530,7 @@ class _DashboardState extends State<Dashboard>{
             print("6666666 months");
           }
 
-
-
-          if(selectedFilterType== "yeartodate")
-          {
+          if (selectedFilterType == "yeartodate") {
             print("yeartodate");
             // values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
             // labels = breakdown.map<String>((item) => item['date'].toString()).toList();
@@ -566,11 +540,13 @@ class _DashboardState extends State<Dashboard>{
 // Summing totalSales by month
             for (var item in breakdown) {
               DateTime date = DateTime.parse(item['date']);
-              String monthLabel = DateFormat('MMM').format(date); // e.g., Jan, Feb
+              String monthLabel =
+                  DateFormat('MMM').format(date); // e.g., Jan, Feb
               double totalSales = (item['totalSales'] as num).toDouble();
 
               if (monthlyTotals.containsKey(monthLabel)) {
-                monthlyTotals[monthLabel] = monthlyTotals[monthLabel]! + totalSales;
+                monthlyTotals[monthLabel] =
+                    monthlyTotals[monthLabel]! + totalSales;
               } else {
                 monthlyTotals[monthLabel] = totalSales;
               }
@@ -578,15 +554,19 @@ class _DashboardState extends State<Dashboard>{
 
 // Convert the map to separate lists for chart use
             labels = monthlyTotals.keys.toList(); // ['Jan', 'Feb', ...]
-            values = monthlyTotals.values.map((val) => val.roundToDouble()).toList(); // Whole numbers
-
-
+            values = monthlyTotals.values
+                .map((val) => val.roundToDouble())
+                .toList(); // Whole numbers
           }
-          if(selectedFilterType == "custom") {
+          if (selectedFilterType == "custom") {
             print("custom");
 
-            values = breakdown.map<double>((item) => (item['totalSales'] as num).toDouble()).toList();
-            labels = breakdown.map<String>((item) => item['date'].toString()).toList();
+            values = breakdown
+                .map<double>((item) => (item['totalSales'] as num).toDouble())
+                .toList();
+            labels = breakdown
+                .map<String>((item) => item['date'].toString())
+                .toList();
 
             Map<String, double> monthWiseSum = {};
             String getMonthKey(String date) => date.substring(0, 7);
@@ -608,13 +588,13 @@ class _DashboardState extends State<Dashboard>{
               return "$year-$month";
             }
 
-            labels = monthWiseSum.keys.map((key) => formatMonthLabel(key)).toList();
+            labels =
+                monthWiseSum.keys.map((key) => formatMonthLabel(key)).toList();
             values = monthWiseSum.values.toList();
 
             print("📅 Month Labels: $labels");
             print("📊 Month Values: $values");
           }
-
 
           // print("📊 values: $values");
           // print("📅 labels: $labels");
@@ -622,9 +602,7 @@ class _DashboardState extends State<Dashboard>{
           fetchAdData();
           isLoading = false;
         });
-      }
-
-      else {
+      } else {
         setState(() {
           errorMessage = response.reasonPhrase ?? "Failed to fetch data.";
           isLoading = false;
@@ -647,9 +625,6 @@ class _DashboardState extends State<Dashboard>{
     return '$shortYear-$month';
   }
 
-
-
-
   Future<void> fetchAdData() async {
     if (selectedFilterType == null) return;
 
@@ -666,14 +641,15 @@ class _DashboardState extends State<Dashboard>{
       final from = formatDateads_api(startDate!);
       final to = formatDateads_api(endDate!);
 
-     url = '${ApiConfig.baseUrl}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
-     // url = '${ApiConfig.baseUrllocal}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      url =
+          '${ApiConfig.baseUrl}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      // url = '${ApiConfig.baseUrllocal}/data/filterData?range=custom&startDate=$from&endDate=$to&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
 
-    print("print url custom ads data ${url}");
+      print("print url custom ads data ${url}");
     } else {
       url =
-      '${ApiConfig.baseUrl}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
-     // '${ApiConfig.baseUrllocal}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+          '${ApiConfig.baseUrl}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
+      // '${ApiConfig.baseUrllocal}/data/filterData?range=$selectedFilterType&sku=${selectedSku ?? ''}&city=${selectedCity ?? ''}&state=${selectedState ?? ''}';
     }
 
     var request = http.Request('GET', Uri.parse(url));
@@ -690,7 +666,8 @@ class _DashboardState extends State<Dashboard>{
           // totalAdSales = double.parse((jsonResponse['totalAdSales'] ?? 0.0).toString()).toStringAsFixed(2);
           // totalAdSpend = double.parse((jsonResponse['totalAdSpend'] ?? 0.0).toString()).toStringAsFixed(2);
           print("console:::   ${adssales}");
-          print("As Spend data :::::::::${adssales?['current']?['totalAdSpend']}");
+          print(
+              "As Spend data :::::::::${adssales?['current']?['totalAdSpend']}");
 
           isLoading = false;
         });
@@ -749,8 +726,6 @@ class _DashboardState extends State<Dashboard>{
     }
   }
 
-
-
   Future<void> _showMonthYearRangePicker(BuildContext context) async {
     final now = DateTime.now();
     DateTime tempStartDate = startDate ?? DateTime(now.year, now.month);
@@ -789,7 +764,8 @@ class _DashboardState extends State<Dashboard>{
                           onChanged: (val) {
                             if (val != null) {
                               setState(() {
-                                tempStartDate = DateTime(tempStartDate.year, val);
+                                tempStartDate =
+                                    DateTime(tempStartDate.year, val);
                                 if (tempEndDate.isBefore(tempStartDate)) {
                                   tempEndDate = tempStartDate;
                                 }
@@ -882,7 +858,8 @@ class _DashboardState extends State<Dashboard>{
               ),
               actions: [
                 TextButton(
-                  child: Text('Cancel', style: TextStyle(color: AppColors.gold)),
+                  child:
+                      Text('Cancel', style: TextStyle(color: AppColors.gold)),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 TextButton(
@@ -902,7 +879,6 @@ class _DashboardState extends State<Dashboard>{
       },
     );
   }
-
 
 //old date picker days wise
   // void _showDateRangePicker(BuildContext context) async {
@@ -983,17 +959,15 @@ class _DashboardState extends State<Dashboard>{
     return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}";
   }
 
-
   @override
   Widget build(BuildContext context) {
-   // final stockCounts = countStockStatus(data);
+    // final stockCounts = countStockStatus(data);
     final config = getChartConfig('monthtodate');
     // print("custom datre value ${formatDate(startDate!)}");
     // print("custom datre value ${formatDate(endDate!)}");
 
     return Scaffold(
-
-      body:     Padding(
+      body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: ListView(
             // mainAxisAlignment: MainAxisAlignment.end,
@@ -1015,14 +989,15 @@ class _DashboardState extends State<Dashboard>{
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(50)),
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue, width: 1,),
-                            borderRadius: BorderRadius.circular(50)
-                        ),
-
+                            borderSide: BorderSide(
+                              color: Colors.blue,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(50)),
                       ),
                       items: filterTypes.map((type) {
                         return DropdownMenuItem(
-                          onTap: (){},
+                          onTap: () {},
                           value: type,
                           child: Padding(
                             padding: const EdgeInsets.only(right: 10),
@@ -1030,7 +1005,8 @@ class _DashboardState extends State<Dashboard>{
                               formatFilterType(type),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              style: TextStyle(fontSize: 12, color: Colors.black),
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.black),
                             ),
                           ),
                         );
@@ -1039,7 +1015,6 @@ class _DashboardState extends State<Dashboard>{
                       onChanged: (val) => onDropdownChanged(val, 'filter'),
                     ),
                   ),
-
                   if (selectedFilterType == 'custom')
                     ElevatedButton.icon(
                       onPressed: () => _showMonthYearRangePicker(context),
@@ -1061,20 +1036,11 @@ class _DashboardState extends State<Dashboard>{
                       //   overflow: TextOverflow.ellipsis,
                       // ),
                     ),
-
-
-
-
-
-
-
-
-
                 ],
               ),
               // 🔼 Your dropdown and filter widgets here...
 
-                const SizedBox(height: 40),
+              const SizedBox(height: 40),
 
               BarChartSample(values: values, labels: labels, isWeb: isWeb),
 
@@ -1084,353 +1050,355 @@ class _DashboardState extends State<Dashboard>{
               isLoading
                   ? Center(child: CircularProgressIndicator())
                   : errorMessage.isNotEmpty
-                  ? Center(child: Text(errorMessage))
-                  : SingleChildScrollView(
-                child:
-
-                Column(
-                  children: [
-                    // Align(
-                    //   alignment: Alignment.center,
-                    //   child: Text(
-                    //     "Sales",
-                    //     style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
-                    //   ),
-                    // ),
-
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Sales ',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          TextSpan(
-                            text: (salesData != null &&
-                                salesData!['comparison']?['previousPeriod']?['startDate'] != null &&
-                                salesData!['comparison']?['previousPeriod']?['endDate'] != null)
-                                ? 'Compared with ${formatShortYearMonth(salesData!['comparison']['previousPeriod']['startDate'])} To ${formatShortYearMonth(salesData!['comparison']['previousPeriod']['endDate'])}'
-                                : 'Comparison data unavailable',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          )
-
-
-
-                          // TextSpan(
-                          //   text: 'as of ${salesData?['comparison']['previousPeriod']['startDate']}/${salesData?['comparison']['previousPeriod']['endDate']}',
-                          //   style: TextStyle(
-                          //     fontSize: 14,
-                          //     fontWeight: FontWeight.w400,
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey), 
-                      ),
-                      child:Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(children: [
-                          Row(children: [
-                            Expanded(
-                                child: MetricCard(
-                                  title: "Revenue",
-                                  value: '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
-                                  compared: "${salesData?['comparison']['salesChangePercent']??"0"}",)
-                            ),
-                            // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: MetricCard(
-                                title: "Units Ordered",
-                                value: "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
-                                compared: "${salesData?['comparison']['quantityChangePercent']?? "0"}",
-                                //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
-                              ),),
-                        
-                          ],),
-                          SizedBox(height: 8,),
-                          Row(
+                      ? Center(child: Text(errorMessage))
+                      : SingleChildScrollView(
+                          child: Column(
                             children: [
-                        
-                              // Expanded(
-                              //   child: MetricCardcm(
-                              //     title: "AOV",
-                              //     //value: "",
-                              //     value: "£ ${NumberFormat('#,###').format(
-                              //         (((salesData?['totalSales'] ?? 0.0) as num) /
-                              //             ((adssales?['totalOrders'] ?? 1) as num)).toInt()
-                              //     )}",
-                              //     //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
-                              //     //  totalOrders
+                              // Align(
+                              //   alignment: Alignment.center,
+                              //   child: Text(
+                              //     "Sales",
+                              //     style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
                               //   ),
                               // ),
 
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Sales ',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: (salesData != null &&
+                                              salesData!['comparison']
+                                                          ?['previousPeriod']
+                                                      ?['startDate'] !=
+                                                  null &&
+                                              salesData!['comparison']
+                                                          ?['previousPeriod']
+                                                      ?['endDate'] !=
+                                                  null)
+                                          ? 'Compared with ${formatShortYearMonth(salesData!['comparison']['previousPeriod']['startDate'])} To ${formatShortYearMonth(salesData!['comparison']['previousPeriod']['endDate'])}'
+                                          : 'Comparison data unavailable',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    )
 
+                                    // TextSpan(
+                                    //   text: 'as of ${salesData?['comparison']['previousPeriod']['startDate']}/${salesData?['comparison']['previousPeriod']['endDate']}',
+                                    //   style: TextStyle(
+                                    //     fontSize: 14,
+                                    //     fontWeight: FontWeight.w400,
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
 
-                              Expanded(
-                                child: MetricCard(
-                                  title: "AOV",
-                                  //value: "",
-                                  value: "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
-                                 // value: "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
-                                 compared: "${salesData?['comparison']['aovChangePercentQty']??"0"}",
-                                 //compared: "${salesData?['comparison']['previousTotalSales']} ${salesData?['comparison']['previousTotalSales']}",
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.grey),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                                child: MetricCard(
+                                              title: "Revenue",
+                                              value:
+                                                  '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
+                                              compared:
+                                                  "${salesData?['comparison']['salesChangePercent'] ?? "0"}",
+                                            )),
+                                            // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
+                                            SizedBox(width: 8),
+                                            Expanded(
+                                              child: MetricCard(
+                                                title: "Units Ordered",
+                                                value:
+                                                    "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
+                                                compared:
+                                                    "${salesData?['comparison']['quantityChangePercent']}",
+                                                //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            // Expanded(
+                                            //   child: MetricCardcm(
+                                            //     title: "AOV",
+                                            //     //value: "",
+                                            //     value: "£ ${NumberFormat('#,###').format(
+                                            //         (((salesData?['totalSales'] ?? 0.0) as num) /
+                                            //             ((adssales?['totalOrders'] ?? 1) as num)).toInt()
+                                            //     )}",
+                                            //     //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+                                            //     //  totalOrders
+                                            //   ),
+                                            // ),
 
+                                            Expanded(
+                                              child: MetricCard(
+                                                title: "AOV",
+                                                //value: "",
+                                                value:
+                                                    "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
+                                                // value: "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
+                                                compared:
+                                                    "${salesData?['comparison']['aovChangePercentQty']}",
+                                                //compared: "${salesData?['comparison']['previousTotalSales']} ${salesData?['comparison']['previousTotalSales']}",
 
-                                    // previousTotalSales
-                                    // previousTotalQuantity
+                                                // previousTotalSales
+                                                // previousTotalQuantity
 
-                                    // totalSales
-                                    // totalQuantity
+                                                // totalSales
+                                                // totalQuantity
 
+                                                //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalSales'] ?? 1) as num)).toStringAsFixed(0)}",
+                                                //  totalOrders
+                                              ),
+                                            ),
 
+                                            const SizedBox(width: 8),
 
-                                  //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalSales'] ?? 1) as num)).toStringAsFixed(0)}",
-                                  //  totalOrders
+                                            Expanded(
+                                              child: MetricCard(
+                                                title: "Organic Revenue",
+                                                // value: "£ ${NumberFormat('#,###').format(
+                                                //     ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
+                                                // )}",
+
+                                                value:
+                                                    "£ ${NumberFormat('#,###').format(((double.tryParse(salesData?['totalSales'].toString() ?? '0') ?? 0) - (double.tryParse(adssales?["current"]?['totalAdSales'].toString() ?? '0') ?? 0)).round())}",
+
+                                                compared:
+                                                    "${salesData?['comparison']['organicSalesChangePercent']}",
+                                                //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Ads",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
                                 ),
                               ),
 
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.grey),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: MetricCardads(
+                                                title: "Ad Spend",
+                                                // title: Salesvaluepnl.toString(),
+                                                // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
+                                                // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
 
-                              const SizedBox(width: 8),
-                        
-                              Expanded(
-                                child: MetricCard(
-                                  title: "Organic Revenue",
-                                  value: "£ ${NumberFormat('#,###').format(
-                                      ((double.tryParse(salesData?['totalSales'].toString() ?? '0') ?? 0) -
-                                          (double.tryParse(adssales?["current"]?['totalAdSales'].toString() ?? '0') ?? 0)).round()
-                                  )}",
+                                                value:
+                                                    "£ ${NumberFormat('#,##0', 'en_GB').format(double.parse(adssales?['current']?['totalAdSpend'] ?? '0'))}",
 
-                                  compared: "${salesData?['comparison']['organicSalesChangePercent']??"0"}",
-                                  //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
-                        
-                                ),
+                                                compared:
+                                                    '${(adssales?['change']?['adSpendChangePercent'])}',
+
+                                                // value: "£ ${(adssales?['current']?['totalAdSpend'])}",
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: MetricCardads(
+                                                title: "Ad Revenue",
+                                                // value: "£ ${NumberFormat('#,###').format(
+                                                //     (adssales?['totalAdSales'] ?? 0).toDouble().round()
+                                                // )}",
+                                                //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+                                                value:
+                                                    "£ ${NumberFormat('#,##0', 'en_GB').format(double.parse(adssales?['current']?['totalAdSales'] ?? '0'))}",
+
+                                                compared:
+                                                    '${(adssales?['change']?['adSalesChangePercent'])}',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          children: [
+                                            if (selectedFilterType !=
+                                                "last30days")
+                                              Expanded(
+                                                child: MetricCardads(
+                                                  title: "ACOS",
+                                                  value:
+                                                      "${(adssales?["current"]?['ACOS'] ?? 0)} %",
+
+                                                  // value: "£ ${NumberFormat('#,##0', 'en_GB').format(double.parse(adssales?['current']?['ACOS'] ?? '0'))}",
+
+                                                  compared:
+                                                      '${(adssales?['change']?['acosChangePercent'])}',
+                                                ),
+                                              ),
+                                            const SizedBox(width: 8),
+                                            Salesvaluepnl != 0
+                                                ? Expanded(
+                                                    child: MetricCardcm(
+                                                      title: "TACOS",
+                                                      value:
+                                                          "${((double.parse(adssales?["current"]?['totalAdSpend'] ?? '0') / Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+
+                                                      // value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+                                                    ),
+                                                  )
+                                                : Expanded(
+                                                    child: MetricCardcm(
+                                                      title: "TACOS",
+                                                      value: "0 %",
+                                                    ),
+                                                  ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+
+                              SizedBox(
+                                height: 8,
                               ),
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Inventory ',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'as of today',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.grey),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        // Column(
+                                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                                        //   children: [
+                                        //     Text('Days in Stock: $DaysInStock'),
+                                        //     Text('Understock: $understockCount'),
+                                        //     Text('Overstock: $overstockCount'),
+                                        //     Text('Balanced: $balancedCount'),
+                                        //     Text('SKUs with InStock Rate 0: $zeroInStockRateSkuCount'),
+                                        //
+                                        //   ],
+                                        // ),
+
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: MetricCardinvetory(
+                                                title: "InStock Rate",
+                                                value: "${DaysInStock} %",
+                                                compared: "",
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: MetricCardinvetory(
+                                                title: "Active SKU OOS",
+                                                value:
+                                                    '$zeroInStockRateSkuCount',
+                                                compared: "SKU Counts",
+
+                                                // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: MetricCardinvetory(
+                                                title: "Over Stock",
+                                                value: "$overstockCount",
+                                                compared: "SKU Counts",
+                                                // value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: MetricCardinvetory(
+                                                title: "Under Stock",
+                                                value: "$understockCount",
+                                                compared: "SKU Counts",
+                                                // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )),
                             ],
                           ),
-                        
-                        ],),
-                      )
-                    ),
-
-                    SizedBox(height: 8,),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Ads",
-                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
-                      ),
-                    ),
-
-                    Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey),
                         ),
-                        child:Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: MetricCardads(
-                                    title: "Ad Spend",
-                                   // title: Salesvaluepnl.toString(),
-                                   // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
-                                   // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
-
-                                    value: "£ ${NumberFormat('#,##0', 'en_GB').format(
-                                        double.parse(adssales?['current']?['totalAdSpend'] ?? '0')
-                                    )}",
-
-                                    compared: '${(adssales?['change']?['adSpendChangePercent'])}',
-
-                                    // value: "£ ${(adssales?['current']?['totalAdSpend'])}",
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: MetricCardads(
-                                    title: "Ad Revenue",
-                                    // value: "£ ${NumberFormat('#,###').format(
-                                    //     (adssales?['totalAdSales'] ?? 0).toDouble().round()
-                                    // )}",
-                                    //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
-
-                                    value: "£ ${NumberFormat('#,##0', 'en_GB').format(
-                                        double.parse(adssales?['current']?['totalAdSales'] ?? '0')
-                                    )}",
-
-                                    compared: '${(adssales?['change']?['adSalesChangePercent']??"0")}',
-
-
-
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              children: [
-                                if(selectedFilterType!= "last30days")
-                                  Expanded(
-                                    child: MetricCardads(
-                                      title: "ACOS",
-                                      value: "${(adssales?["current"]?['ACOS'] ?? 0)} %",
-
-                                     // value: "£ ${NumberFormat('#,##0', 'en_GB').format(double.parse(adssales?['current']?['ACOS'] ?? '0'))}",
-
-                                      compared: '${(adssales?['change']?['acosChangePercent']??"0sss")}',
-
-
-
-                                    ),
-                                  ),
-                                const SizedBox(width: 8),
-                                Salesvaluepnl!=0
-                                    ?
-                                Expanded(
-                                  child: MetricCardcm(
-                                    title: "TACOS",
-                                    value: "${((double.parse(adssales?["current"]?['totalAdSpend'] ?? '0') / Salesvaluepnl) * 100).toStringAsFixed(2)} %",
-
-                                    // value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
-                                  ),
-                                ):
-                                Expanded(
-                                  child: MetricCardcm(
-                                    title: "TACOS",
-                                    value: "0 %",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],),
-                        )
-                    ),
-
-
-                    SizedBox(height: 8,),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Inventory ',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          TextSpan(
-                            text: 'as of today',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-
-                    Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey),
-                        ),
-                        child:Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(children: [
-
-                            // Column(
-                            //   crossAxisAlignment: CrossAxisAlignment.start,
-                            //   children: [
-                            //     Text('Days in Stock: $DaysInStock'),
-                            //     Text('Understock: $understockCount'),
-                            //     Text('Overstock: $overstockCount'),
-                            //     Text('Balanced: $balancedCount'),
-                            //     Text('SKUs with InStock Rate 0: $zeroInStockRateSkuCount'),
-                            //
-                            //   ],
-                            // ),
-
-
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: MetricCardinvetory(
-                                    title: "InStock Rate",
-                                    value: "${DaysInStock} %",
-                                    compared: "",
-                                  ),
-                                ),
-
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: MetricCardinvetory(
-                                    title: "Active SKU OOS",
-                                   value: '$zeroInStockRateSkuCount',
-                                   compared: "SKU Counts",
-
-                                   // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
-
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8,),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: MetricCardinvetory(
-                                    title: "Over Stock",
-                                   value:"$overstockCount",
-                                   compared: "SKU Counts",
-                                   // value: "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0))/(salesData?['totalSales'] ?? 0.0)*100).toStringAsFixed(2)} %",
-                                  ),
-                                ),
-
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: MetricCardinvetory(
-                                    title: "Under Stock",
-                                   value: "$understockCount",
-                                   compared: "SKU Counts",
-                                   // value: "${(((adssales?['totalAdSales'] ?? 0) / (adssales?['totalAdSpend'] ?? 1)) * 100).toStringAsFixed(2)} %",
-
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                          ],),
-                        )
-                    ),
-
-
-
-
-
-
-                  ],
-                ),
-              ),
-
 
               Text.rich(
                 TextSpan(
@@ -1449,54 +1417,47 @@ class _DashboardState extends State<Dashboard>{
                     //     fontWeight: FontWeight.w400,
                     //   ),
                     // ),
-
-
                   ],
                 ),
                 textAlign: TextAlign.center,
               ),
               if (selectedFilterType != 'custom')
-              Row(
-                children: [
-                  SizedBox(
-
+                Row(
+                  children: [
+                    SizedBox(
                       height: 250,
-                    width: MediaQuery.of(context).size.width * 0.95,
+                      width: MediaQuery.of(context).size.width * 0.95,
+
                       ///https://api.thrivebrands.ai/api/pnl-data-cmm?date=${widget.startDate}
 
-                      child:PnLSummaryScreen(startDate: "https://api.thrivebrands.ai/api/pnl-data-cmm?date=${selectedFilterType}",
+                      child: PnLSummaryScreen(
+                        startDate:
+                            "https://api.thrivebrands.ai/api/pnl-data-cmm?date=${selectedFilterType}",
 
-
-                      //'https://api.thrivebrands.ai/api/pnl-data-cmm?startDate=${widget.startDate}&endDate=${widget.endDate}',
-                      ),),
-                ],
-              ),
+                        //'https://api.thrivebrands.ai/api/pnl-data-cmm?startDate=${widget.startDate}&endDate=${widget.endDate}',
+                      ),
+                    ),
+                  ],
+                ),
 
               if (selectedFilterType == 'custom')
-
-
-        if (startDate != null && endDate != null)
-
-
-    Row(
-      children: [
-        SizedBox(
-          height: 250,
-          width: MediaQuery.of(context).size.width * 0.95,
-          child: PnLSummaryScreen(
-            startDate: "https://api.thrivebrands.ai/api/pnl-data-cmm?startDate=${formatDatepnl(startDate!)}&endDate=${formatDatepnl(endDate!)}",
-          ),
-        ),
-      ],
-    )
-    else
-    const SizedBox(), // or a loader / error message
-
-
+                if (startDate != null && endDate != null)
+                  Row(
+                    children: [
+                      SizedBox(
+                        height: 250,
+                        width: MediaQuery.of(context).size.width * 0.95,
+                        child: PnLSummaryScreen(
+                          startDate:
+                              "https://api.thrivebrands.ai/api/pnl-data-cmm?startDate=${formatDatepnl(startDate!)}&endDate=${formatDatepnl(endDate!)}",
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  const SizedBox(), // or a loader / error message
 
               Divider(color: AppColors.gold, thickness: 0.5),
-
-
             ],
           )),
     );
@@ -1511,16 +1472,14 @@ class MetricCard extends StatelessWidget {
 
   const MetricCard(
       {super.key,
-        required this.title,
-        required this.value,
-        required this.compared});
+      required this.title,
+      required this.value,
+      required this.compared});
 
   @override
   Widget build(BuildContext context) {
     print(compared);
-    return
-
-      Container(
+    return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: AppColors.beige,
@@ -1557,7 +1516,7 @@ class MetricCard extends StatelessWidget {
                       : Icons.arrow_downward,
                   size: 14,
                   color:
-                  compared.contains('Profit') ? Colors.green : Colors.red,
+                      compared.contains('Profit') ? Colors.green : Colors.red,
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -1566,7 +1525,7 @@ class MetricCard extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
                     color:
-                    compared.contains('Profit') ? Colors.green : Colors.red,
+                        compared.contains('Profit') ? Colors.green : Colors.red,
                   ),
                 ),
               ],
@@ -1585,74 +1544,69 @@ class MetricCardads extends StatelessWidget {
 
   const MetricCardads(
       {super.key,
-        required this.title,
-        required this.value,
-        required this.compared});
+      required this.title,
+      required this.value,
+      required this.compared});
 
   @override
   Widget build(BuildContext context) {
     print(compared);
-    return
-
-      Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: AppColors.beige,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title, style: const TextStyle(fontSize: 16),
-              // textAlign: TextAlign.left
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: AppColors.beige,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title, style: const TextStyle(fontSize: 16),
+            // textAlign: TextAlign.left
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                Icon(
+                  compared.trim().startsWith('-')
+                      ? Icons.arrow_downward
+                      : Icons.arrow_upward,
+                  size: 14,
+                  color: compared.trim().startsWith('-')
+                      ? Colors.red
+                      : Colors.green,
+                ),
+                const SizedBox(width: 4),
                 Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  compared.replaceAll('-', ''), // remove minus sign for UI
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                    color: compared.trim().startsWith('-')
+                        ? Colors.red
+                        : Colors.green,
                   ),
                 ),
               ],
             ),
+          )
 
-
-
-
-            Align(
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    compared.trim().startsWith('-')
-                        ? Icons.arrow_downward
-                        : Icons.arrow_upward,
-                    size: 14,
-                    color: compared.trim().startsWith('-') ? Colors.red : Colors.green,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    compared.replaceAll('-', ''), // remove minus sign for UI
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                      color: compared.trim().startsWith('-') ? Colors.red : Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-            )
-
-
-
-
-            /* Align(
+          /* Align(
               alignment: Alignment.centerRight,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1678,9 +1632,9 @@ class MetricCardads extends StatelessWidget {
                 ],
               ),
             ),*/
-          ],
-        ),
-      );
+        ],
+      ),
+    );
   }
 }
 
@@ -1727,13 +1681,13 @@ class MetricCardinvetory extends StatelessWidget {
 
   const MetricCardinvetory(
       {super.key,
-        required this.title,
-        required this.value,
-        required this.compared});
+      required this.title,
+      required this.value,
+      required this.compared});
 
   @override
   Widget build(BuildContext context) {
-  //  print(compared);
+    //  print(compared);
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -1779,7 +1733,7 @@ class MetricCardinvetory extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
-                  //  color: compared.contains('Profit') ? Colors.green : Colors.red,
+                    //  color: compared.contains('Profit') ? Colors.green : Colors.red,
                   ),
                 ),
               ],

@@ -36,7 +36,7 @@ class _UsersScreenState extends State<UsersScreen> {
     }
 
     final response = await http.get(
-      Uri.parse("https://hidden-cecile-rishabhgadhia-69e2a871.koyeb.app/auth/allUsers"),
+      Uri.parse("https://vectorauthbackend.onrender.com/auth/allUsers"),
       headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",

@@ -249,19 +249,19 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
                                       Column(
                                         children: [
                                           // Icon(Icons.icecream_outlined),
-                                          SizedBox(
-                                            width: 100,
-                                            child: Text(
-                                              '📦',
-                                              //Product: name
-                                              // "${item['SKU'].toString()}",
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 50,
-                                                  color: Colors.brown),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
+                                          // SizedBox(
+                                          //   width: 100,
+                                          //   child: Text(
+                                          //     '📦',
+                                          //     //Product: name
+                                          //     // "${item['SKU'].toString()}",
+                                          //     style: const TextStyle(
+                                          //         fontWeight: FontWeight.bold,
+                                          //         fontSize: 50,
+                                          //         color: Colors.brown),
+                                          //     overflow: TextOverflow.ellipsis,
+                                          //   ),
+                                          // ),
                                           const SizedBox(height: 10),
                                           Row(
                                             children: [
@@ -281,73 +281,140 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
                                               // ),
                                               // const SizedBox(width: 12),
         
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  // SizedBox(height: 8),
+                                              // Column(
+                                              //   crossAxisAlignment:
+                                              //       CrossAxisAlignment.start,
+                                              //   children: [
+                                              //     // SizedBox(height: 8),
         
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text("SKU",
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight.bold,
-                                                              color: AppColors
-                                                                  .gold)),
-                                                      SizedBox(
-                                                        width:
-                                                            100, // tweak this value to achieve a wrap around 15 characters
-                                                        child: Text(
-                                                          item['SKU'].toString(),
-                                                          style: TextStyle(
+                                              //     Column(
+                                              //       crossAxisAlignment:
+                                              //           CrossAxisAlignment.start,
+                                              //       children: [
+                                              //         Text("SKU",
+                                              //             style: TextStyle(
+                                              //                 fontSize: 14,
+                                              //                 fontWeight:
+                                              //                     FontWeight.bold,
+                                              //                 color: AppColors
+                                              //                     .gold)),
+                                              //         SizedBox(
+                                              //           width:
+                                              //               100, // tweak this value to achieve a wrap around 15 characters
+                                              //           child: Text(
+                                              //             item['SKU'].toString(),
+                                              //             style: TextStyle(
+                                              //               fontSize: 14,
+                                              //               fontWeight:
+                                              //                   FontWeight.w800,
+                                              //               color: AppColors
+                                              //                   .primaryBlue,
+                                              //             ),
+                                              //             softWrap: true,
+                                              //           ),
+                                              //         ),
+                                              //       ],
+                                              //     ),
+                                              //     //_buildInfoRow("SKU", "product['sellerSku'].toUpperCase()"),
+        
+                                              //     Column(
+                                              //       crossAxisAlignment:
+                                              //           CrossAxisAlignment.start,
+                                              //       children: [
+                                              //         Text("ASIN",
+                                              //             style: TextStyle(
+                                              //                 fontSize: 14,
+                                              //                 fontWeight:
+                                              //                     FontWeight.bold,
+                                              //                 color: AppColors
+                                              //                     .gold)),
+                                              //         SizedBox(
+                                              //           width:
+                                              //               100, // tweak this value to achieve a wrap around 15 characters
+                                              //           child: Text(
+                                              //             item['ASIN'].toString(),
+                                              //             style: TextStyle(
+                                              //               fontSize: 14,
+                                              //               fontWeight:
+                                              //                   FontWeight.w800,
+                                              //               color: AppColors
+                                              //                   .primaryBlue,
+                                              //             ),
+                                              //             softWrap: true,
+                                              //           ),
+                                              //         ),
+                                              //       ],
+                                              //     ),
+                                              //     // _buildInfoRow("ASIN", "product['asin'].toUpperCase()"),
+                                              //   ],
+                                              // ),
+                                               Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // SizedBox(height: 8),
+
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("SKU",
+                                                        style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w800,
+                                                                FontWeight.bold,
                                                             color: AppColors
-                                                                .primaryBlue,
-                                                          ),
-                                                          softWrap: true,
+                                                                .gold)),
+                                                    SizedBox(
+                                                      width:
+                                                          100, // tweak this value to achieve a wrap around 15 characters
+                                                      child: Text(
+                                                        item['SKU'].toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: AppColors
+                                                              .primaryBlue,
                                                         ),
+                                                        softWrap: true,
                                                       ),
-                                                    ],
-                                                  ),
-                                                  //_buildInfoRow("SKU", "product['sellerSku'].toUpperCase()"),
-        
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text("ASIN",
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight.bold,
-                                                              color: AppColors
-                                                                  .gold)),
-                                                      SizedBox(
-                                                        width:
-                                                            100, // tweak this value to achieve a wrap around 15 characters
-                                                        child: Text(
-                                                          item['ASIN'].toString(),
-                                                          style: TextStyle(
+                                                    ),
+                                                  ],
+                                                ),
+                                                //_buildInfoRow("SKU", "product['sellerSku'].toUpperCase()"),
+
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("Product Name",
+                                                        style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w800,
+                                                                FontWeight.bold,
                                                             color: AppColors
-                                                                .primaryBlue,
-                                                          ),
-                                                          softWrap: true,
+                                                                .gold)),
+                                                    SizedBox(
+                                                      width:
+                                                          100, // tweak this value to achieve a wrap around 15 characters
+                                                      child: Text(
+                                                        item['Product_Name'].toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: AppColors
+                                                              .primaryBlue,
                                                         ),
+                                                        softWrap: true,
                                                       ),
-                                                    ],
-                                                  ),
-                                                  // _buildInfoRow("ASIN", "product['asin'].toUpperCase()"),
-                                                ],
-                                              ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                // _buildInfoRow("ASIN", "product['asin'].toUpperCase()"),
+                                              ],
+                                            )
                                               //  SizedBox(width: 16),
                                             ],
                                           ),

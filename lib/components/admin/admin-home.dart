@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/login-screen.dart';
 import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/components/admin/users-list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminScreen extends StatefulWidget {
   @override
@@ -21,11 +23,25 @@ class _AdminScreenState extends State<AdminScreen> {
     });
   }
 
+  Future<void> logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all stored data
+
+    // Navigate to login screen and remove all previous routes
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (route) => false, // This removes all previous routes
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryBlue,
       appBar: AppBar(
+        
         title: Text(
           "Ecosoul Admin",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -34,10 +50,13 @@ class _AdminScreenState extends State<AdminScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
+          // IconButton(
+          //   icon: Icon(Icons.account_circle, color: Colors.white, size: 28),
+          //   onPressed: () {}, // Add profile navigation later
+          // ),
           IconButton(
-            icon: Icon(Icons.account_circle, color: Colors.white, size: 28),
-            onPressed: () {}, // Add profile navigation later
-          ),
+                        icon: Icon(Icons.logout, color: Colors.white),
+                        onPressed: () => logout(context)),
         ],
       ),
       body: _screens[_selectedIndex], // Load respective screen

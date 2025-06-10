@@ -20,8 +20,18 @@ class _AddUserDialogState extends State<AddUserDialog> {
   List<String> selectedRoles = [];
 
   Future<void> createUser() async {
+    // final response = await http.post(
+    //   Uri.parse("https://hidden-cecile-rishabhgadhia-69e2a871.koyeb.app/auth/signup"), // Update with actual API
+    //   headers: {"Content-Type": "application/json"},
+    //   body: json.encode({
+    //     "name": name,
+    //     "email": email,
+    //     "password": password,
+    //     "roles": selectedRoles,
+    //   }),
+    // );
     final response = await http.post(
-      Uri.parse("https://hidden-cecile-rishabhgadhia-69e2a871.koyeb.app/auth/signup"), // Update with actual API
+      Uri.parse("https://vectorauthbackend.onrender.com/auth/signup"), // Update with actual API
       headers: {"Content-Type": "application/json"},
       body: json.encode({
         "name": name,
