@@ -1210,8 +1210,10 @@ class _DashboardState extends State<Dashboard>{
                                 child: MetricCard(
                                   title: "Organic Revenue",
                                   value: "£ ${NumberFormat('#,###').format(
-                                      ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
+                                      ((double.tryParse(salesData?['totalSales'].toString() ?? '0') ?? 0) -
+                                          (double.tryParse(adssales?["current"]?['totalAdSales'].toString() ?? '0') ?? 0)).round()
                                   )}",
+
                                   compared: "${salesData?['comparison']['organicSalesChangePercent']??"0"}",
                                   //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
                         
