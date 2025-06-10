@@ -1329,25 +1329,35 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                             Row(
                               children: [
                                 Expanded(
-                                  child: MetricCardcm(
+                                  child: MetricCardads(
                                     title: "Ad Spend",
                                     // title: Salesvaluepnl.toString(),
-                                    value: "£ ${NumberFormat('#,###').format(
-                                        (adssales?['totalAdSpend'] ?? 0).toDouble().round()
+                                    // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
+                                    // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
+
+                                    value: "£ ${NumberFormat('#,##0', 'en_GB').format(
+                                        double.parse(adssales?['current']?['totalAdSpend'] ?? '0')
                                     )}",
-                                    // value: "£ ${((adssales?['totalAdSpend'] ?? 0).toDouble()).toStringAsFixed(0)}",
 
+                                    compared: '${(adssales?['change']?['adSpendChangePercent'])}',
 
+                                    // value: "£ ${(adssales?['current']?['totalAdSpend'])}",
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
-                                  child: MetricCardcm(
+                                  child: MetricCardads(
                                     title: "Ad Revenue",
-                                    value: "£ ${NumberFormat('#,###').format(
-                                        (adssales?['totalAdSales'] ?? 0).toDouble().round()
-                                    )}",
+                                    // value: "£ ${NumberFormat('#,###').format(
+                                    //     (adssales?['totalAdSales'] ?? 0).toDouble().round()
+                                    // )}",
                                     //value: "£ ${((adssales?['totalAdSales'] ?? 0).toDouble()).toStringAsFixed(0)}",
+
+                                    value: "£ ${NumberFormat('#,##0', 'en_GB').format(
+                                        double.parse(adssales?['current']?['totalAdSales'] ?? '0')
+                                    )}",
+
+                                    compared: '${(adssales?['change']?['adSalesChangePercent'])}',
 
 
 
@@ -1360,9 +1370,16 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                               children: [
                                 if(selectedFilterType!= "last30days")
                                   Expanded(
-                                    child: MetricCardcm(
+                                    child: MetricCardads(
                                       title: "ACOS",
-                                      value: "${(((adssales?['totalAdSpend'] ?? 0) / (adssales?['totalAdSales'] ?? 1)) * 100).toStringAsFixed(2)} %",
+                                      value: "${(adssales?["current"]?['ACOS'] ?? 0)} %",
+
+                                      // value: "£ ${NumberFormat('#,##0', 'en_GB').format(double.parse(adssales?['current']?['ACOS'] ?? '0'))}",
+
+                                      compared: '${(adssales?['change']?['acosChangePercent'])}',
+
+
+
                                     ),
                                   ),
                                 const SizedBox(width: 8),
@@ -1371,7 +1388,9 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                                 Expanded(
                                   child: MetricCardcm(
                                     title: "TACOS",
-                                    value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+                                    value: "${((double.parse(adssales?["current"]?['totalAdSpend'] ?? '0') / Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+
+                                    // value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
                                   ),
                                 ):
                                 Expanded(
@@ -1382,42 +1401,76 @@ class _Filter_SalesRereginwiseScreenState extends State<Filter_SalesRereginwiseS
                                 ),
                               ],
                             ),
-                          ],),
-                        )
-                    ),
-                    SizedBox(height: 8,),
-                    Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey),
-                        ),
-                        child:Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(children: [
+                            SizedBox(height: 10,),
                             Row(
                               children: [
                                 Expanded(
                                   child: MetricCardcm(
                                     title: "Organic Revenue",
-                                    value:
-                                    "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)) / (salesData?['totalSales'] ?? 0.0) * 100).toStringAsFixed(2)} %",
+                                    value: (() {
+                                      final totalSales = double.tryParse('${salesData?['totalSales']}') ?? 0;
+                                      final totalAdSales = double.tryParse('${adssales?["current"]?['totalAdSales']}') ?? 0;
+
+                                      if (totalSales == 0) return "0.00 %"; // avoid division by zero
+
+                                      final organicRevenue = ((totalSales - totalAdSales) / totalSales) * 100;
+                                      return "${organicRevenue.toStringAsFixed(2)} %";
+                                    })(),
                                   ),
                                 ),
+
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: MetricCardcm(
                                     title: "ROAS",
-                                    value:
-                                    "${(((salesData?['totalSales'] ?? 1)/(adssales?['totalAdSpend'] ?? 0) )).toStringAsFixed(2)} ",
+                                    value: (() {
+                                      final totalSales = double.tryParse("${salesData?['totalSales']}") ?? 0;
+                                      final totalAdSpend = double.tryParse("${adssales?["current"]?['totalAdSpend']}") ?? 1; // avoid division by 0
+
+                                      final roas = totalAdSpend == 0 ? 0 : (totalSales / totalAdSpend);
+                                      return roas.toStringAsFixed(2);
+                                    })(),
                                   ),
                                 ),
+
                               ],
                             ),
-
                           ],),
                         )
                     ),
+                    SizedBox(height: 8,),
+                    // Container(
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.white,
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       border: Border.all(color: Colors.grey),
+                    //     ),
+                    //     child:Padding(
+                    //       padding: const EdgeInsets.all(8.0),
+                    //       child: Column(children: [
+                    //         Row(
+                    //           children: [
+                    //             Expanded(
+                    //               child: MetricCardcm(
+                    //                 title: "Organic Revenue",
+                    //                 value:
+                    //                 "${(((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)) / (salesData?['totalSales'] ?? 0.0) * 100).toStringAsFixed(2)} %",
+                    //               ),
+                    //             ),
+                    //             const SizedBox(width: 8),
+                    //             Expanded(
+                    //               child: MetricCardcm(
+                    //                 title: "ROAS",
+                    //                 value:
+                    //                 "${(((salesData?['totalSales'] ?? 1)/(adssales?['totalAdSpend'] ?? 0) )).toStringAsFixed(2)} ",
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //
+                    //       ],),
+                    //     )
+                    // ),
 
                     // SizedBox(height: 8,),
                     // Text.rich(

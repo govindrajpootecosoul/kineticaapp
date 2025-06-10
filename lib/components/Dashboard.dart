@@ -1245,7 +1245,7 @@ class _DashboardState extends State<Dashboard>{
                             Row(
                               children: [
                                 Expanded(
-                                  child: MetricCard(
+                                  child: MetricCardads(
                                     title: "Ad Spend",
                                    // title: Salesvaluepnl.toString(),
                                    // value: "£ ${NumberFormat('#,###').format((adssales?['totalAdSpend'] ?? 0).toDouble().round())}",
@@ -1262,7 +1262,7 @@ class _DashboardState extends State<Dashboard>{
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
-                                  child: MetricCard(
+                                  child: MetricCardads(
                                     title: "Ad Revenue",
                                     // value: "£ ${NumberFormat('#,###').format(
                                     //     (adssales?['totalAdSales'] ?? 0).toDouble().round()
@@ -1286,7 +1286,7 @@ class _DashboardState extends State<Dashboard>{
                               children: [
                                 if(selectedFilterType!= "last30days")
                                   Expanded(
-                                    child: MetricCard(
+                                    child: MetricCardads(
                                       title: "ACOS",
                                       value: "${(adssales?["current"]?['ACOS'] ?? 0)} %",
 
@@ -1573,6 +1573,112 @@ class MetricCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class MetricCardads extends StatelessWidget {
+  final String title;
+  final String value;
+  final String compared;
+
+  const MetricCardads(
+      {super.key,
+        required this.title,
+        required this.value,
+        required this.compared});
+
+  @override
+  Widget build(BuildContext context) {
+    print(compared);
+    return
+
+      Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.beige,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title, style: const TextStyle(fontSize: 16),
+              // textAlign: TextAlign.left
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+
+
+
+
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    compared.trim().startsWith('-')
+                        ? Icons.arrow_downward
+                        : Icons.arrow_upward,
+                    size: 14,
+                    color: compared.trim().startsWith('-') ? Colors.red : Colors.green,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    compared.replaceAll('-', ''), // remove minus sign for UI
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                      color: compared.trim().startsWith('-') ? Colors.red : Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+            )
+
+
+
+
+            /* Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    compared.contains('Profit')
+                        ? Icons.arrow_upward
+                        : Icons.arrow_downward,
+                    size: 14,
+                    color:
+                    compared.contains('Profit') ? Colors.green : Colors.red,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    compared.split(' ').first, // e.g., "219.93%"
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                      color:
+                      compared.contains('Profit') ? Colors.green : Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),*/
+          ],
+        ),
+      );
   }
 }
 
