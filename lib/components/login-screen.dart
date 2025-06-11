@@ -193,6 +193,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
 
   // Future<void> loginUser() async {
   //   // final url = Uri.parse(
@@ -227,46 +229,49 @@ class _LoginScreenState extends State<LoginScreen> {
   //   }
   // }
 
-
-
   Future<void> loginUser() async {
-  final url = Uri.parse("https://vectorauthbackend.onrender.com/auth/login");
-  print("url =====> $url email =====> ${emailController.text} password =====> ${passwordController.text}");
+    setState(() {
+      _isLoading = true;
+    });
 
-  final response = await http.post(
-    url,
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode({
-      "email": emailController.text.trim(),
-      "password": passwordController.text.trim(),
-    }),
-  );
-
-  final responseData = jsonDecode(response.body);
-  print("responseData ====>  $responseData");
-
-  if (response.statusCode == 200) {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Save JWT token
-    await prefs.setString("jwt_token", responseData['token']);
-
-    // Save user details if needed
-    await prefs.setString("user_id", responseData['user']['_id']);
-    await prefs.setString("user_name", responseData['user']['name']);
-    await prefs.setString("user_email", responseData['user']['email']);
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoadingScreen()),
+    final url = Uri.parse("https://vectorauthbackend.onrender.com/auth/login");
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": emailController.text.trim(),
+        "password": passwordController.text.trim(),
+      }),
     );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(responseData['message'] ?? "Invalid credentials")),
-    );
+
+    final responseData = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("jwt_token", responseData['token']);
+      await prefs.setString("user_id", responseData['user']['_id']);
+      await prefs.setString("user_name", responseData['user']['name']);
+      await prefs.setString("user_email", responseData['user']['email']);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoadingScreen()),
+      );
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(responseData['message'] ?? "Invalid credentials")),
+      );
+    }
   }
-}
-
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -365,8 +370,6 @@ class _LoginScreenState extends State<LoginScreen> {
 //     );
 //   }
 
- 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -394,74 +397,139 @@ class _LoginScreenState extends State<LoginScreen> {
                       constraints: BoxConstraints(
                         maxWidth: width > 600 ? 450 : double.infinity,
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset('assets/vectorai.png',
-                              width: 330, height: 200),
-                          const SizedBox(height: 30),
-                          Text(
-                            "Welcome Back\nEnter your email to sign in",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.montserrat(
-                              fontSize: width > 600 ? 18 : 16,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          _buildTextField(emailController, "Email Address"),
-                          const SizedBox(height: 15),
-                          _buildTextField(passwordController, "Password",
-                              isPassword: true),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.gold,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: loginUser,
-                              child: const Text(
-                                "Continue",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset('assets/vectorai.png',
+                                width: 330, height: 200),
+                            const SizedBox(height: 30),
+                            Text(
+                              "Welcome Back\nEnter your email to sign in",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.montserrat(
+                                fontSize: width > 600 ? 18 : 16,
+                                color: Colors.white70,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text("New Account?",
-                                  style: TextStyle(color: Colors.white70)),
-                              const SizedBox(width: 5),
-                              GestureDetector(
-                                onTap: () {
-                                  // Handle Sign Up
-                                },
-                                child: Text(
-                                  "Sign Up Now",
-                                  style: TextStyle(
-                                      color: AppColors.gold,
-                                      fontWeight: FontWeight.bold),
+                            const SizedBox(height: 20),
+                            // _buildTextField(emailController, "Email Address"),
+                            // const SizedBox(height: 15),
+                            // _buildTextField(passwordController, "Password",
+                            //     isPassword: true),
+                            // ✅ Email field with validation
+                            _buildTextField(
+                              emailController,
+                              "Email Address",
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Email cannot be empty";
+                                } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                    .hasMatch(value)) {
+                                  return "Enter a valid email";
+                                }
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 15),
+
+                            // ✅ Password field with validation
+                            _buildTextField(
+                              passwordController,
+                              "Password",
+                              isPassword: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Password cannot be empty";
+                                } else if (value.length < 6) {
+                                  return "Password must be at least 6 characters";
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            // SizedBox(
+                            //   width: double.infinity,
+                            //   height: 50,
+                            //   child: ElevatedButton(
+                            //     style: ElevatedButton.styleFrom(
+                            //       backgroundColor: AppColors.gold,
+                            //       shape: RoundedRectangleBorder(
+                            //         borderRadius: BorderRadius.circular(10),
+                            //       ),
+                            //     ),
+                            //     onPressed: loginUser,
+                            //     child: const Text(
+                            //       "Continue",
+                            //       style: TextStyle(
+                            //           fontSize: 16, color: Colors.white),
+                            //     ),
+                            //   ),
+                            // ),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: _isLoading
+                                  ? Center(
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white))
+                                  : ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.gold,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      // onPressed: loginUser,
+                                      onPressed: () {
+                                        print("clicked  emailController ${emailController.value.text}     passwordController ${passwordController.value.text}");
+                                        if (_formKey.currentState!.validate()) {
+                                          loginUser();
+                                        }
+                                      },
+
+                                      child: const Text(
+                                        "Continue",
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white),
+                                      ),
+                                    ),
+                            ),
+
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text("New Account?",
+                                    style: TextStyle(color: Colors.white70)),
+                                const SizedBox(width: 5),
+                                GestureDetector(
+                                  onTap: () {
+                                    // Handle Sign Up
+                                  },
+                                  child: Text(
+                                    "Sign Up Now",
+                                    style: TextStyle(
+                                        color: AppColors.gold,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            "By clicking continue, you agree to our Terms of Service and Privacy Policy",
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                color: Colors.white70, fontSize: 12),
-                          ),
-                          const SizedBox(height: 20),
-                          Image.asset('assets/newlogo.png', width: 125),
-                        ],
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              "By clicking continue, you agree to our Terms of Service and Privacy Policy",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 12),
+                            ),
+                            const SizedBox(height: 20),
+                            Image.asset('assets/newlogo.png', width: 125),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -474,11 +542,32 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-   Widget _buildTextField(TextEditingController controller, String labelText, {bool isPassword = false}) {
-    return TextField(
+  //  Widget _buildTextField(TextEditingController controller, String labelText, {bool isPassword = false}) {
+  //   return TextField(
+  //     controller: controller,
+  //     obscureText: isPassword,
+  //     style: const TextStyle(color: Colors.white),
+  //     decoration: InputDecoration(
+  //       filled: true,
+  //       fillColor: Colors.white.withOpacity(0.2),
+  //       labelText: labelText,
+  //       labelStyle: const TextStyle(color: Colors.white),
+  //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String labelText, {
+    bool isPassword = false,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
       controller: controller,
       obscureText: isPassword,
       style: const TextStyle(color: Colors.white),
+      validator: validator,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white.withOpacity(0.2),
@@ -488,5 +577,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
 }

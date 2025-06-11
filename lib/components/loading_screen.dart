@@ -108,7 +108,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     await prefs.setStringList('roles', roles.map((e) => e.toString().toUpperCase()).toList());
     // roles = roles.map((e) => e.toString().toUpperCase()) as List;
     roles = roles.map((e) => e.toString().toUpperCase()).toList();
-  print("roles 2 =======> $roles");
+    print("roles 2 =======> $roles");
     navigateBasedOnRoles(context, roles);
   } catch (e) {
     print("Error fetching user data: $e");

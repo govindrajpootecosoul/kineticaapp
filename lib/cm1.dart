@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -87,7 +86,7 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
 
   void showPopup(String title, Map<String, dynamic> data) {
     if (kIsWeb) {
-      showDialog(
+       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: Text(title),
@@ -99,14 +98,15 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                 print(
                     "Entry: ${entry.key} - ${formatNumberStringWithComma(entry.value.toString())}");
                 return ListTile(
-                  title: Text(capitalizeFirstLetter(entry.key), ),
+                  title: Text(entry.key),
+
                   subtitle: Text(
-                    formatNumberStringWithComma(entry.value.toString()) ??
-                        'N/A',
-                    //          style: TextStyle(
-                    //   color: entry.value[0] == "-" ? Colors.red : Colors.black, // Example condition
-                    // ),
+                    "£${formatNumberStringWithComma(double.tryParse(entry.value.toString())?.round().toString() ?? '0')}",
                   ),
+
+                  /* subtitle: Text(
+                      "£${formatNumberStringWithComma(entry.value.toString())}" ??
+                          'N/A'),*/
                 );
               }).toList(),
             ),
@@ -398,5 +398,3 @@ class MetricCardcm1 extends StatelessWidget {
     );
   }
 }
-
-

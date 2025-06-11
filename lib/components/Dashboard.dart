@@ -966,6 +966,55 @@ class _DashboardState extends State<Dashboard> {
     // print("custom datre value ${formatDate(startDate!)}");
     // print("custom datre value ${formatDate(endDate!)}");
 
+    //Organic
+    var totalSales =
+        double.tryParse(salesData?['totalSales']?.toString() ?? '0') ?? 0;
+    var totalAdSalesCurrent = double.tryParse(
+            adssales?["current"]?['totalAdSales']?.toString() ?? '0') ??
+        0;
+    var totalAdSalesPrevious = double.tryParse(
+            adssales?["previous"]?['totalAdSales']?.toString() ?? '0') ??
+        0;
+    var previousTotalSales = double.tryParse(
+            salesData?["comparison"]?['previousTotalSales']?.toString() ??
+                '0') ??
+        0;
+
+    var organivc = totalSales - totalAdSalesCurrent;
+    var organivp = previousTotalSales - totalAdSalesPrevious;
+
+    var organicavg =
+        organivp != 0 ? ((organivc - organivp) / organivp) * 100 : 0;
+
+    print("Organic avg percentage: $organicavg");
+
+//AOV
+    var totalSalesss = salesData?['totalSales'];
+    var totalOrders = salesData?['totalOrders'];
+    var previousTotalSalesss = salesData?["comparison"]?['previousTotalSales'];
+    var previousTotalOrderss = salesData?["comparison"]?['previousTotalOrders'];
+
+    double? aov;
+    double? aovp;
+    double? per;
+
+    if (totalSalesss != null &&
+        totalOrders != null &&
+        previousTotalSalesss != null &&
+        previousTotalOrderss != null &&
+        totalOrders != 0 &&
+        previousTotalOrderss != 0) {
+      aov = totalSalesss / totalOrders;
+      aovp = previousTotalSalesss / previousTotalOrderss;
+      per = ((aov! - aovp!) / aovp) * 100;
+
+      print("AOV: $aov, AOVP: $aovp, Change %: $per");
+    } else {
+      print("Error: One or more values are null or division by zero.");
+    }
+
+    print("AOV percentage change: $per");
+
     return Scaffold(
       body: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -1102,6 +1151,107 @@ class _DashboardState extends State<Dashboard> {
                                 textAlign: TextAlign.center,
                               ),
 
+                              // Container(
+                              //     decoration: BoxDecoration(
+                              //       color: Colors.white,
+                              //       borderRadius: BorderRadius.circular(12),
+                              //       border: Border.all(color: Colors.grey),
+                              //     ),
+                              //     child: Padding(
+                              //       padding: const EdgeInsets.all(8.0),
+                              //       child: Column(
+                              //         children: [
+                              //           Row(
+                              //             children: [
+                              //               Expanded(
+                              //                   child: MetricCard(
+                              //                 title: "Revenue",
+                              //                 value:
+                              //                     '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
+                              //                 // compared:
+                              //                 //     "${salesData?['comparison']['salesChangePercent'] ?? "0"}",
+                              //                 compared: "",
+                              //               )),
+                              //               // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
+                              //               SizedBox(width: 8),
+                              //               Expanded(
+                              //                 child: MetricCard(
+                              //                   title: "Units Ordered",
+                              //                   value:
+                              //                       "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
+                              //                   // compared:
+                              //                   //     "${salesData?['comparison']['quantityChangePercent']}",
+                              //                    compared: "",
+                              //                   //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
+                              //                 ),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //           SizedBox(
+                              //             height: 8,
+                              //           ),
+                              //           Row(
+                              //             children: [
+                              //               // Expanded(
+                              //               //   child: MetricCardcm(
+                              //               //     title: "AOV",
+                              //               //     //value: "",
+                              //               //     value: "£ ${NumberFormat('#,###').format(
+                              //               //         (((salesData?['totalSales'] ?? 0.0) as num) /
+                              //               //             ((adssales?['totalOrders'] ?? 1) as num)).toInt()
+                              //               //     )}",
+                              //               //     //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalOrders'] ?? 1) as num)).toStringAsFixed(0)}",
+                              //               //     //  totalOrders
+                              //               //   ),
+                              //               // ),
+
+                              //               Expanded(
+                              //                 child: MetricCard(
+                              //                   title: "AOV",
+                              //                   //value: "",
+                              //                   value:
+                              //                       "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
+                              //                   // value: "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
+                              //                   // compared:
+                              //                   //     "${salesData?['comparison']['aovChangePercentQty']}",
+                              //                   compared: "",
+                              //                   //compared: "${salesData?['comparison']['previousTotalSales']} ${salesData?['comparison']['previousTotalSales']}",
+
+                              //                   // previousTotalSales
+                              //                   // previousTotalQuantity
+
+                              //                   // totalSales
+                              //                   // totalQuantity
+
+                              //                   //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalSales'] ?? 1) as num)).toStringAsFixed(0)}",
+                              //                   //  totalOrders
+                              //                 ),
+                              //               ),
+
+                              //               const SizedBox(width: 8),
+
+                              //               Expanded(
+                              //                 child: MetricCard(
+                              //                   title: "Organic Revenue",
+                              //                   // value: "£ ${NumberFormat('#,###').format(
+                              //                   //     ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
+                              //                   // )}",
+
+                              //                   value:
+                              //                       "£ ${NumberFormat('#,###').format(((double.tryParse(salesData?['totalSales'].toString() ?? '0') ?? 0) - (double.tryParse(adssales?["current"]?['totalAdSales'].toString() ?? '0') ?? 0)).round())}",
+
+                              //                   // compared:
+                              //                   //     "${salesData?['comparison']['organicSalesChangePercent']}",
+                              //                   compared: "",
+                              //                   //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
+                              //                 ),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     )),
+
                               Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
@@ -1119,9 +1269,16 @@ class _DashboardState extends State<Dashboard> {
                                               title: "Revenue",
                                               value:
                                                   '£ ${NumberFormat('#,###').format((salesData?['totalSales'] ?? 0).round())}',
+                                              //compared: "",
+                                              // ${salesData?['totalSales']??"0"}\n
+                                              // ((currentSales - previousSales) / previousSales) * 100;
+                                              //compared: "${((salesData?['totalSales']?? 0 - salesData?['comparison']!['previousTotalSales']??0) / salesData?['comparison']['previousTotalSales']??0) * 100}",
+                                              //compared: "${(((salesData?['totalSales'] ?? 0) as num) - ((salesData?['comparison']?['previousTotalSales'] ?? 0) as num)) / ((salesData?['comparison']?['previousTotalSales'] ?? 1) as num) * 100}",
                                               compared:
-                                                  "${salesData?['comparison']['salesChangePercent'] ?? "0"}",
-                                            )),
+                                                  "${(((((salesData?['totalSales'] ?? 0) as num) - ((salesData?['comparison']?['previousTotalSales'] ?? 0) as num)) / ((salesData?['comparison']?['previousTotalSales'] ?? 1) as num)) * 100).toStringAsFixed(2)}",
+                                            )
+                                                //  compared: "${salesData?['totalSales']??"0"}/${salesData?['comparison']['previousTotalSales']??"0"}",)
+                                                ),
                                             // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
                                             SizedBox(width: 8),
                                             Expanded(
@@ -1129,8 +1286,13 @@ class _DashboardState extends State<Dashboard> {
                                                 title: "Units Ordered",
                                                 value:
                                                     "${NumberFormat('#,###').format((salesData?['totalQuantity'] ?? 0).round())}",
+
+                                                // compared: "${salesData?['comparison']['quantityChangePercent']?? "0"}",
+                                                //compared: "${salesData?['comparison']['previousTotalOrders']?? "0"}",
+                                                // compared: "${(((salesData?['totalQuantity'] ?? 0) - (salesData?['comparison']?['previousTotalQuantity'] ?? 0)) / (salesData?['comparison']?['previousTotalQuantity'] ?? 1)) * 100}",
                                                 compared:
-                                                    "${salesData?['comparison']['quantityChangePercent']}",
+                                                    "${((((salesData?['totalQuantity'] ?? 0) - (salesData?['comparison']?['previousTotalQuantity'] ?? 0)) / (salesData?['comparison']?['previousTotalQuantity'] ?? 1)) * 100).toStringAsFixed(2)}",
+
                                                 //value:"${salesData?['totalQuantity']}", compared: "${salesData?['comparison']['quantityChangePercent']}",
                                               ),
                                             ),
@@ -1156,24 +1318,24 @@ class _DashboardState extends State<Dashboard> {
 
                                             Expanded(
                                               child: MetricCard(
-                                                title: "AOV",
-                                                //value: "",
-                                                value:
-                                                    "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
-                                                // value: "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
-                                                compared:
-                                                    "${salesData?['comparison']['aovChangePercentQty']}",
-                                                //compared: "${salesData?['comparison']['previousTotalSales']} ${salesData?['comparison']['previousTotalSales']}",
+                                                  title: "AOV",
+                                                  //value: "",
+                                                  //value: "£ ${((salesData?['totalSales'])/(salesData?['totalOrders']))}",
+                                                  value:
+                                                      "£ ${(salesData?['totalOrders'] == 0) ? 0 : ((salesData?['totalSales'] ?? 0) / (salesData?['totalOrders'] ?? 0)).toStringAsFixed(2)}",
 
-                                                // previousTotalSales
-                                                // previousTotalQuantity
+                                                  // value: "£ ${NumberFormat('#,###').format((((salesData?['totalSales'] ?? 0.0) as num) / (((salesData?['totalQuantity'] == 0 ? 1 : salesData?['totalQuantity']) ?? 1) as num)).toInt())}",
+                                                  //compared: "${salesData?['comparison']['aovChangePercentQty']??"0"}",
+                                                  //compared: "${((salesData?['totalSales'] - salesData?['comparison']['previousTotalQuantity']??"0") / salesData?['comparison']['previousTotalQuantity']??"0") * 100}",
 
-                                                // totalSales
-                                                // totalQuantity
+                                                  // compared: "${((((salesData?['totalSales']) / (salesData?['totalOrders']) - (salesData?["comparison"]?['previousTotalSales'])) / (salesData?['comparison']['previousTotalOrders'])))* 100 }",
+                                                  compared:
+                                                      per?.toStringAsFixed(2) ??
+                                                          "0.00"
 
-                                                //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalSales'] ?? 1) as num)).toStringAsFixed(0)}",
-                                                //  totalOrders
-                                              ),
+                                                  //value: "£ ${(((salesData?['totalSales'] ?? 0.0) as num) / ((adssales?['totalSales'] ?? 1) as num)).toStringAsFixed(0)}",
+                                                  //  totalOrders
+                                                  ),
                                             ),
 
                                             const SizedBox(width: 8),
@@ -1181,15 +1343,14 @@ class _DashboardState extends State<Dashboard> {
                                             Expanded(
                                               child: MetricCard(
                                                 title: "Organic Revenue",
-                                                // value: "£ ${NumberFormat('#,###').format(
-                                                //     ((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).round()
-                                                // )}",
-
                                                 value:
                                                     "£ ${NumberFormat('#,###').format(((double.tryParse(salesData?['totalSales'].toString() ?? '0') ?? 0) - (double.tryParse(adssales?["current"]?['totalAdSales'].toString() ?? '0') ?? 0)).round())}",
 
-                                                compared:
-                                                    "${salesData?['comparison']['organicSalesChangePercent']}",
+                                                //double.parse(adssales?['current']?['totalAdSales'] ?? '0'
+                                                // compared: "${salesData?['comparison']['organicSalesChangePercent']??"0"}",
+                                                compared: organicavg
+                                                    .toStringAsFixed(2),
+                                                //  compared: "(${salesData?['totalSales']??"0"})",
                                                 //value: "£ ${((salesData?['totalSales'] ?? 0.0) - (adssales?['totalAdSales'] ?? 0.0)).toStringAsFixed(0)}",
                                               ),
                                             ),
@@ -1422,22 +1583,18 @@ class _DashboardState extends State<Dashboard> {
                 textAlign: TextAlign.center,
               ),
               if (selectedFilterType != 'custom')
-                Row(
-                  children: [
-                    SizedBox(
-                      height: 250,
-                      width: MediaQuery.of(context).size.width * 0.95,
+                SizedBox(
+                  height: 250,
+                  width: MediaQuery.of(context).size.width * 0.95,
 
-                      ///https://api.thrivebrands.ai/api/pnl-data-cmm?date=${widget.startDate}
+                  ///https://api.thrivebrands.ai/api/pnl-data-cmm?date=${widget.startDate}
 
-                      child: PnLSummaryScreen(
-                        startDate:
-                            "https://api.thrivebrands.ai/api/pnl-data-cmm?date=${selectedFilterType}",
+                  child: PnLSummaryScreen(
+                    startDate:
+                        "https://api.thrivebrands.ai/api/pnl-data-cmm?date=${selectedFilterType}",
 
-                        //'https://api.thrivebrands.ai/api/pnl-data-cmm?startDate=${widget.startDate}&endDate=${widget.endDate}',
-                      ),
-                    ),
-                  ],
+                    //'https://api.thrivebrands.ai/api/pnl-data-cmm?startDate=${widget.startDate}&endDate=${widget.endDate}',
+                  ),
                 ),
 
               if (selectedFilterType == 'custom')
@@ -1505,27 +1662,81 @@ class MetricCard extends StatelessWidget {
               ),
             ],
           ),
+          // Align(
+          //   alignment: Alignment.centerRight,
+          //   child: Row(
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: [
+          //       // Icon(
+          //       //   compared.contains('Profit')
+          //       //       ? Icons.arrow_upward
+          //       //       : Icons.arrow_downward,
+          //       //   size: 14,
+          //       //   color:
+          //       //       compared.contains('Profit') ? Colors.green : Colors.red,
+          //       // ),
+          //       const SizedBox(width: 4),
+          //       Text(
+          //         compared.split(' ').first, // e.g., "219.93%"
+          //         style: TextStyle(
+          //           fontSize: 12,
+          //           fontWeight: FontWeight.normal,
+          //           color:
+          //               compared.contains('Profit') ? Colors.green : Colors.red,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
           Align(
             alignment: Alignment.centerRight,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Icon(
+                //   compared.contains('Profit')
+                //       ? Icons.arrow_upward
+                //       : Icons.arrow_downward,
+                //   size: 14,
+                //   color:
+                //   compared.contains('Profit') ? Colors.green : Colors.red,
+                // ),
+                const SizedBox(width: 4),
+                // Text(
+                //   compared.split(' ').first, // e.g., "219.93%"
+                //   style: TextStyle(
+                //     fontSize: 12,
+                //     fontWeight: FontWeight.normal,
+                //    // color: compared.contains('Profit') ? Colors.green : Colors.red,
+                //   ),
+                // ),
                 Icon(
-                  compared.contains('Profit')
-                      ? Icons.arrow_upward
-                      : Icons.arrow_downward,
+                  compared.toString().trim().startsWith('-')
+                      ? Icons.arrow_downward
+                      : Icons.arrow_upward,
                   size: 14,
-                  color:
-                      compared.contains('Profit') ? Colors.green : Colors.red,
+                  color: compared.trim().startsWith('-')
+                      ? Colors.red
+                      : Colors.green,
                 ),
                 const SizedBox(width: 4),
+                // Text(
+                //   compared.toString(),
+                //   style: TextStyle(
+                //     fontSize: 12,
+                //     fontWeight: FontWeight.normal,
+                //     color: compared.trim().startsWith('-') ? Colors.red : Colors.green,
+                //   ),
+                // ),
+
                 Text(
-                  compared.split(' ').first, // e.g., "219.93%"
+                  "${compared.toString().replaceFirst('-', '')} %", // Remove only the first '-' sign
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
-                    color:
-                        compared.contains('Profit') ? Colors.green : Colors.red,
+                    color: compared.trim().startsWith('-')
+                        ? Colors.red
+                        : Colors.green,
                   ),
                 ),
               ],
