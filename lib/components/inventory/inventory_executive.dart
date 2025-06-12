@@ -562,7 +562,7 @@ class _InventoryExecutivePageState extends State<InventoryExecutivePage> {
                             child: MetriccardExecutive(
                               title: 'Storage Cost',
                               value: "£ $Storagecostsum",
-                              compared: "Next Month",
+                              compared: "Est. Next Month",
                             ),
                           ),
 

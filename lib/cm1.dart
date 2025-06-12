@@ -372,7 +372,7 @@ class MetricCardcm1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: AppColors.beige,
         borderRadius: BorderRadius.circular(12),
@@ -381,7 +381,7 @@ class MetricCardcm1 extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title, style: const TextStyle(fontSize: 14),
+            title, style: const TextStyle(fontSize: 16),
             // textAlign: TextAlign.left
           ),
           const SizedBox(height: 8),
