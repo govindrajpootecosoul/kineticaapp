@@ -351,7 +351,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
                                       ? Colors.green
                                       : Colors.green),
                               dataRow1("Return Revenue:",
-                                  selectedMonthData!['Total Return with tax'],
+                                  selectedMonthData!['Total Return with tax']?.abs(),
                                   valueColor: selectedMonthData![
                                               'Total Return with tax']! <
                                           0

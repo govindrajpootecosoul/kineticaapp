@@ -631,7 +631,7 @@ class _Filter_SalesRereginwiseScreenState
     DateTime parsedDate = DateTime.parse(date);
     String shortYear = parsedDate.year.toString().substring(0); // "25"
     String month = parsedDate.month.toString().padLeft(2, '0'); // "04"
-    return '$shortYear-$month';
+    return '$month-$shortYear';
   }
 
   Future<void> fetchAdData() async {
