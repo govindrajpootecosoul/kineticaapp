@@ -58,6 +58,7 @@ class NewInventoryMain extends StatefulWidget {
 class _NewInventoryMainState extends State<NewInventoryMain> {
   String selectedSku = 'All';
   bool isWeb = false;
+  bool isWideScreen = false;
 
   @override
   void initState() {
@@ -71,6 +72,10 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
 
   @override
   Widget build(BuildContext context) {
+    isWideScreen = MediaQuery.of(context).size.width > 600;
+    int crossAxisCount = MediaQuery.of(context).size.width > 800 ? 2 : 1;
+
+    print('Is wide screen: $isWideScreen');
     return Scaffold(
       //  appBar: AppBar(title: const Text("Inventory Viewer")),
       body: Consumer<InventoryProvider>(
@@ -111,8 +116,9 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
                   alignment: Alignment.center,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxWidth:
-                          isWeb ? 400 : double.infinity, // Limit width on web
+                      maxWidth: isWideScreen && isWeb
+                          ? 400
+                          : double.infinity, // Limit width on web
                     ),
                     child: DropdownButtonFormField<String>(
                       value: selectedSku,
@@ -143,12 +149,12 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
               else if (provider.inventoryList.isEmpty)
                 const Text('No inventory data found.')
               else
-                isWeb
+                isWideScreen && isWeb
                     ? Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(10),
                           child: MasonryGridView.count(
-                            crossAxisCount: 2,
+                            crossAxisCount: crossAxisCount,
                             mainAxisSpacing: 10,
                             crossAxisSpacing: 10,
                             itemCount: provider.inventoryList.length,

@@ -477,6 +477,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   List<dynamic> inventoryList = [];
   bool isLoading = true;
   String error = '';
+  bool isWideScreen = false;
 
   // For selecting SKU
   String? selectedSku;
@@ -485,12 +486,12 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   @override
   void initState() {
     super.initState();
-    initializeSelectedItems();
+    // initializeSelectedItems();
     fetchSkuList();
   }
 
   void initializeSelectedItems() {
-    if (kIsWeb) {
+    if (isWideScreen && kIsWeb) {
       _selectedItems = [
         "Amazon Inventory",
         "Total Sellable",
@@ -569,6 +570,8 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
 
   @override
   Widget build(BuildContext context) {
+    isWideScreen = MediaQuery.of(context).size.width > 600;
+    initializeSelectedItems();
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
@@ -580,10 +583,11 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                  width: kIsWeb ? 200 : 0,
+                  width: isWideScreen && kIsWeb ? 200 : 0,
                 ),
                 ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 300),
+                  constraints: BoxConstraints(
+                      maxWidth: isWideScreen && kIsWeb ? 300 : 200),
                   child: DropdownButtonFormField<String>(
                     isExpanded: true,
                     value: selectedSku,
@@ -648,7 +652,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
           ),
         ),
       ),
-      body: kIsWeb
+      body: isWideScreen && kIsWeb
           ? Container(
               margin: const EdgeInsets.symmetric(horizontal: 180, vertical: 8),
               child: Column(
