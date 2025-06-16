@@ -404,6 +404,7 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
 
   DateTime? startDate;
   DateTime? endDate;
+  bool isWideScreen = false;
 
   @override
   void initState() {
@@ -615,6 +616,7 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    isWideScreen = MediaQuery.of(context).size.width > 600;
     return Scaffold(
       body: isLoading
           ? Center(child: CircularProgressIndicator())
@@ -701,7 +703,7 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
               ),
             )
 
-                : kIsWeb
+                : kIsWeb && isWideScreen
                 ? Padding(
               padding: const EdgeInsets.all(10),
               child: MasonryGridView.count(

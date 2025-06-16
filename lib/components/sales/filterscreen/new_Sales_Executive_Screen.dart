@@ -34,6 +34,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen>{
   List<String> cities = [];
   List<String> skus = [];
   bool isWeb = false;
+  bool isWideScreen = false;
 
 
   List<dynamic> inventoryList = [];
@@ -984,6 +985,7 @@ class _NewSalesExecutiveScreenState extends State<NewSalesExecutiveScreen>{
   Widget build(BuildContext context) {
     // final stockCounts = countStockStatus(data);
     final config = getChartConfig('monthtodate');
+    isWideScreen = MediaQuery.of(context).size.width > 600;
     // print("custom datre value ${formatDate(startDate!)}");
     // print("custom datre value ${formatDate(endDate!)}");
 

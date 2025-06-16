@@ -82,6 +82,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
   List<double> values = [10, 20, 30];
   List<String> labels = [];
   Map<String, double> monthlyTotals = {};
+  bool isWideScreen = false;
 
   @override
   void initState() {
@@ -710,6 +711,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
   @override
   Widget build(BuildContext context) {
     final config = getChartConfig('monthtodate');
+    isWideScreen = MediaQuery.of(context).size.width > 600;
     return Scaffold(
 
       appBar: AppBar(

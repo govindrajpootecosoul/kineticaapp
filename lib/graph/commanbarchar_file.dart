@@ -134,8 +134,9 @@ class BarChartSample extends StatelessWidget {
   final List<double> values;
   final List<String> labels;
   final bool isWeb;
+  bool isWideScreen = false; 
 
-  const BarChartSample({
+   BarChartSample({
     required this.values,
     required this.labels,
     Key? key,
@@ -144,10 +145,11 @@ class BarChartSample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    isWideScreen = MediaQuery.of(context).size.width > 600;
     double maxY = values.isNotEmpty ? values.reduce((a, b) => a > b ? a : b) : 0;
     print("");
     return Container(
-      height: isWeb ? 450 : 280,
+      height: isWeb && isWideScreen ? 450 : 280,
       child: BarChart(
         BarChartData(
           alignment:
@@ -231,7 +233,7 @@ class BarChartSample extends StatelessWidget {
       x: x,
       barRods: [
         BarChartRodData(
-          width: isWeb ? 10 : 10,
+          width: isWeb && isWideScreen ? 10 : 10,
           toY: y,
           color: const Color(0xFF073349),
           borderRadius: BorderRadius.circular(2),

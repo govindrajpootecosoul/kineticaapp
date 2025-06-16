@@ -33,6 +33,7 @@ class _DashboardState extends State<Dashboard> {
   List<String> cities = [];
   List<String> skus = [];
   bool isWeb = false;
+  bool isWideScreen = false;
 
   List<dynamic> inventoryList = [];
   //bool isLoading = true;
@@ -962,6 +963,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     // final stockCounts = countStockStatus(data);
+    isWideScreen = MediaQuery.of(context).size.width > 600;
     final config = getChartConfig('monthtodate');
     // print("custom datre value ${formatDate(startDate!)}");
     // print("custom datre value ${formatDate(endDate!)}");
@@ -1091,7 +1093,7 @@ class _DashboardState extends State<Dashboard> {
 
               const SizedBox(height: 40),
 
-              BarChartSample(values: values, labels: labels, isWeb: isWeb),
+              BarChartSample(values: values, labels: labels, isWeb: isWeb ),
 
               //BarChartSample(values: values, labels: labels, isWeb: isWeb, activeCount: config['activeCount'],),
 

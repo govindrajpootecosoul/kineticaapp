@@ -339,7 +339,8 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => kIsWeb ? FinanceExecutiveWebScreen() :
+                                      builder: (context) => 
+                                      // kIsWeb ? FinanceExecutiveScreen(productval: "1") :
                                       //CMReportScreen(),
                                       FinanceExecutiveScreen(productval:"1"),
                                     ),
