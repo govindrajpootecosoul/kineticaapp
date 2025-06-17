@@ -26,6 +26,7 @@ class PnLSummaryScreen extends StatefulWidget {
 
 class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
   Map<String, dynamic> pnlData = {};
+  Map<String, dynamic> cmPercent = {};
   bool isLoading = true;
   String? errorMessage;
 
@@ -61,6 +62,8 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
       if (response.statusCode == 200 && response.data['summary'] != null) {
         setState(() {
           pnlData = Map<String, dynamic>.from(response.data['summary']);
+          cmPercent = Map<String, dynamic>.from(response.data['cmPercentages']);
+
           Salesvaluepnl= (pnlData['Total Sales with tax'] ?? 0).toDouble();
           isLoading = false;
           print("Parsed pnlData: $pnlData");
@@ -157,8 +160,9 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
   }
 
   Widget buildContainer(
-      String title, double value, double totalSales, VoidCallback onTap) {
-    double percent = totalSales != 0 ? (value / totalSales) * 100 : 0;
+      String title, String value,String compare, VoidCallback onTap) {
+     // String title, double value, double totalSales, VoidCallback onTap) {
+  //  double percent = totalSales != 0 ? (value / totalSales) * 100 : 0;
     return GestureDetector(
       onTap: onTap,
       child:
@@ -182,12 +186,44 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                 children: [
                 //  Text("${percent.round()}%", style: const TextStyle(fontSize: 16)),
                   Text(
-                    "${percent.round()}%",
+                    "${value}%",
+                    //"${percent.round()}%",
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  //Text(compare),
+
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          compare.trim().startsWith('-')
+                              ? Icons.arrow_downward
+                              : Icons.arrow_upward,
+                          size: 14,
+                          color: compare.trim().startsWith('-')
+                              ? Colors.red
+                              : Colors.green,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          compare.replaceAll('-', ''), // remove minus sign for UI
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            color: compare.trim().startsWith('-')
+                                ? Colors.red
+                                : Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+
                 ],
               ),
 
@@ -313,12 +349,13 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                     child: Column(children: [
                       Row(children: [
                         Expanded(
-                            child: buildContainer("CM1", cm1, totalSales, () => showPopup("CM1 Details", cm1Details)),
+                            //child: buildContainer("CM1", cm1, totalSales, () => showPopup("CM1 Details", cm1Details)),
+                            child: buildContainer("CM1", cmPercent['CM1_Percent'],cmPercent['CM1_ChangePercent'], () => showPopup("CM1 Details", cm1Details)),
                         ),
                         // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
                         SizedBox(width: 8),
                         Expanded(
-                          child: buildContainer("CM2", cm2, totalSales, () => showPopup("CM2 Details", cm2Details)),
+                          child: buildContainer("CM2",cmPercent['CM2_Percent'],cmPercent['CM2_ChangePercent'], () => showPopup("CM2 Details", cm2Details)),
                         ),
 
                       ],),
@@ -327,7 +364,7 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                         children: [
 
                           Expanded(
-                            child: buildContainer("CM3", cm3, totalSales, () => showPopup("CM3 Details", cm3Details)),
+                            child: buildContainer("CM3", cmPercent['CM3_Percent'],cmPercent['CM3_ChangePercent'], () => showPopup("CM3 Details", cm3Details)),
                           ),
 
 
@@ -350,6 +387,7 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                                 child: MetricCardcm1(title: "View",value: "P&L",)
                             ),
                           ),
+
                         ],
                       ),
 

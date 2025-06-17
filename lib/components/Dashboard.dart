@@ -1426,8 +1426,7 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                         Row(
                                           children: [
-                                            if (selectedFilterType !=
-                                                "last30days")
+                                            if (selectedFilterType != "last30days")
                                               Expanded(
                                                 child: MetricCardads(
                                                   title: "ACOS",
@@ -1441,22 +1440,17 @@ class _DashboardState extends State<Dashboard> {
                                                 ),
                                               ),
                                             const SizedBox(width: 8),
-                                            Salesvaluepnl != 0
-                                                ? Expanded(
-                                                    child: MetricCardcm(
-                                                      title: "TACOS",
-                                                      value:
-                                                          "${((double.parse(adssales?["current"]?['totalAdSpend'] ?? '0') / Salesvaluepnl) * 100).toStringAsFixed(2)} %",
 
-                                                      // value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+                                                 Expanded(
+                                                    child: MetricCardads(
+                                                      title: "TACOS",
+                                                      value:"${(adssales?["current"]?['TACOS'] ?? 0)} %",
+                                                          //"${((double.parse(adssales?["current"]?['totalAdSpend'] ?? '0') / Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+                                                      compared:
+                                                      '${(adssales?['change']?['tacosChangePercent'])}',
                                                     ),
                                                   )
-                                                : Expanded(
-                                                    child: MetricCardcm(
-                                                      title: "TACOS",
-                                                      value: "0 %",
-                                                    ),
-                                                  ),
+
                                           ],
                                         ),
                                       ],

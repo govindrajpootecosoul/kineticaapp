@@ -1518,22 +1518,15 @@ class _Filter_SalesRereginwiseScreenState
                                                 ),
                                               ),
                                             const SizedBox(width: 8),
-                                            Salesvaluepnl != 0
-                                                ? Expanded(
-                                                    child: MetricCardcm(
-                                                      title: "TACOS",
-                                                      value:
-                                                          "${((double.parse(adssales?["current"]?['totalAdSpend'] ?? '0') / Salesvaluepnl) * 100).toStringAsFixed(2)} %",
-
-                                                      // value: "${((adssales?['totalAdSpend'] ?? 0) / (Salesvaluepnl) * 100).toStringAsFixed(2)} %",
-                                                    ),
-                                                  )
-                                                : Expanded(
-                                                    child: MetricCardcm(
-                                                      title: "TACOS",
-                                                      value: "0 %",
-                                                    ),
-                                                  ),
+                                            Expanded(
+                                              child: MetricCardads(
+                                                title: "TACOS",
+                                                value:"${(adssales?["current"]?['TACOS'] ?? 0)} %",
+                                                //"${((double.parse(adssales?["current"]?['totalAdSpend'] ?? '0') / Salesvaluepnl) * 100).toStringAsFixed(2)} %",
+                                                compared:
+                                                '${(adssales?['change']?['tacosChangePercent'])}',
+                                              ),
+                                            ),
                                           ],
                                         ),
                                         SizedBox(
@@ -1542,51 +1535,21 @@ class _Filter_SalesRereginwiseScreenState
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: MetricCardcm(
+                                              child: MetricCardads(
                                                 title: "Organic Revenue",
-                                                value: (() {
-                                                  final totalSales =
-                                                      double.tryParse(
-                                                              '${salesData?['totalSales']}') ??
-                                                          0;
-                                                  final totalAdSales =
-                                                      double.tryParse(
-                                                              '${adssales?["current"]?['totalAdSales']}') ??
-                                                          0;
-
-                                                  if (totalSales == 0)
-                                                    return "0.00 %"; // avoid division by zero
-
-                                                  final organicRevenue =
-                                                      ((totalSales -
-                                                                  totalAdSales) /
-                                                              totalSales) *
-                                                          100;
-                                                  return "${organicRevenue.toStringAsFixed(2)} %";
-                                                })(),
+                                                value:"${(adssales?["current"]?['organicrevenue'] ?? 0)} %",
+                                                compared:
+                                                '${(adssales?['change']?['organicrevenueChangePercent'])}',
                                               ),
                                             ),
                                             const SizedBox(width: 8),
                                             Expanded(
-                                              child: MetricCardcm(
-                                                title: "ROAS",
-                                                value: (() {
-                                                  final totalSales =
-                                                      double.tryParse(
-                                                              "${salesData?['totalSales']}") ??
-                                                          0;
-                                                  final totalAdSpend = double
-                                                          .tryParse(
-                                                              "${adssales?["current"]?['totalAdSpend']}") ??
-                                                      1; // avoid division by 0
-
-                                                  final roas = totalAdSpend == 0
-                                                      ? 0
-                                                      : (totalSales /
-                                                          totalAdSpend);
-                                                  return roas
-                                                      .toStringAsFixed(2);
-                                                })(),
+                                              child: MetricCardads(
+                                                title: "TROAS",
+                                                //ROAS
+                                                value:"${(adssales?["current"]?['ROAS'] ?? 0)}",
+                                                compared:
+                                                '${(adssales?['change']?['roasChangePercent'])}',
                                               ),
                                             ),
                                           ],
