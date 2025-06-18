@@ -39,6 +39,8 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
   Widget buildLabelValueExpend(String label, dynamic value) {
     return Container(
       padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 6),
+
       decoration: BoxDecoration(
         //color: const Color(0xECD5B0),
         color: Colors.white60,
@@ -66,13 +68,14 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
     required Map<String, dynamic> details,
   }) {
     return Container(
-      // width: 120,
-      // height: 170,
       padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      margin: const EdgeInsets.only(bottom: 6),
+
       decoration: BoxDecoration(
+
+        //color: const Color(0xECD5B0),
         color: Colors.white60,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +120,7 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
       // width: 120,
       // height: 170,
       padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+     margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: Colors.white60,
         borderRadius: BorderRadius.circular(12),
@@ -162,6 +165,16 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                   entry.value.toString(),
                   style: const TextStyle(fontSize: 13),
                 ),
+                // Text(
+                //   double.tryParse(entry.value.toString())?.toStringAsFixed(2) ?? '0.00',
+                //   style: const TextStyle(fontSize: 13),
+                // ),
+
+
+                // Text(
+                //   double.tryParse(entry.value.toString())?.round().toString() ?? '0',
+                //   style: const TextStyle(fontSize: 13),
+                // ),
               ],
             ),
           )),
@@ -271,15 +284,23 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     // buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Sellable Stock": product['Sellable_Stock_Value'] ?? "00"}),
 
 
-                    buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {"Stock Value": "£ ${product['WH_Stock_Value']}" ?? "00"}),
-                    // buildLabelValueExpend("Total Sellable",
-                    //     product['afn_fulfillable_quantity'] ?? "00"),
-                    buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Stock Value": "£ ${product['Sellable_Stock_Value']}" ?? "00"}),
+                   buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {"Stock Value": "£ ${product['WH_Stock_Value']}" ?? "00"}),
+                   // buildLabelValueExpend("Total Sellable", product['afn_fulfillable_quantity'] ?? "00"),
+                    //buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Stock Value": "£ ${product['Sellable_Stock_Value']}" ?? "00"}),
+                    buildLabeledDetailCardWithHeaderValue(
+                      heading: "Total Sellable",
+                      headingValue: product['afn_fulfillable_quantity']?.toString() ?? "00",
+                      details: {
+                        "Stock Value": "£ ${double.tryParse(product['Sellable_Stock_Value'].toString())?.toStringAsFixed(2) ?? "00.00"}"
+                      },
+                    ),
 
 
-                    buildLabelValueExpend(
-                        "Unsellable", product['afn_unsellable_quantity'] ?? "00"),
+
+                    buildLabelValueExpend("Unsellable", product['afn_unsellable_quantity'] ?? "00"),
                     buildLabeledDetailCard(heading: "Inventory Age", details: {"0-30" : (product['inv_age_0_to_30_days'] ?? "00"), "31-60" : (product['inv_age_31_to_60_days'] ?? "00"), "61-90" : (product['inv_age_61_to_90_days'] ?? "00")}),
+
+
                     // buildLabelValueExpend(
                     //     "Inventory Age 0-30",
                     //     (product['inv_age_0_to_30_days'] ?? "00")),
@@ -309,6 +330,11 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     // (product['inv_age_365_plus_days'] ?? "00")),
                     // buildLabelValueExpend(
                     //     "Unsellable", product['afn_unsellable_quantity'] ?? "00"),
+
+
+
+
+
                     buildLabelValueExpend("Customer Reserved",
                         product['Customer_reserved'] ?? "00"),
                     buildLabelValueExpend(
