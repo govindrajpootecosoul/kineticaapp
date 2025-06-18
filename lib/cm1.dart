@@ -350,12 +350,12 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                       Row(children: [
                         Expanded(
                             //child: buildContainer("CM1", cm1, totalSales, () => showPopup("CM1 Details", cm1Details)),
-                            child: buildContainer("CM1", cmPercent['CM1_Percent'],cmPercent['CM1_ChangePercent'], () => showPopup("CM1 Details", cm1Details)),
+                            child: buildContainer("CM1", cmPercent['CM1_Percent']?? "0",cmPercent['CM1_ChangePercent']?? "0", () => showPopup("CM1 Details", cm1Details)),
                         ),
                         // title: "Overall Sales", value: '£ ${salesData?['totalSales'].toStringAsFixed(2)}', compared: "${salesData?['comparison']['salesChangePercent']}",)),
                         SizedBox(width: 8),
                         Expanded(
-                          child: buildContainer("CM2",cmPercent['CM2_Percent'],cmPercent['CM2_ChangePercent'], () => showPopup("CM2 Details", cm2Details)),
+                          child: buildContainer("CM2",cmPercent['CM2_Percent']?? "0",cmPercent['CM2_ChangePercent']?? "0", () => showPopup("CM2 Details", cm2Details)),
                         ),
 
                       ],),
@@ -364,7 +364,7 @@ class _PnLSummaryScreenState extends State<PnLSummaryScreen> {
                         children: [
 
                           Expanded(
-                            child: buildContainer("CM3", cmPercent['CM3_Percent'],cmPercent['CM3_ChangePercent'], () => showPopup("CM3 Details", cm3Details)),
+                            child: buildContainer("CM3", cmPercent['CM3_Percent']?? "0",cmPercent['CM3_ChangePercent']?? "0", () => showPopup("CM3 Details", cm3Details)),
                           ),
 
 

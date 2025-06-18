@@ -727,9 +727,15 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  Future<void> _showMonthYearRangePicker(BuildContext context) async {
+  /*Future<void> _showMonthYearRangePicker(BuildContext context) async {
+    // final now = DateTime.now();
+    // DateTime tempStartDate = startDate ?? DateTime(now.year, now.month);
+    // DateTime tempEndDate = endDate ?? DateTime(now.year, now.month);
+
+
     final now = DateTime.now();
-    DateTime tempStartDate = startDate ?? DateTime(now.year, now.month);
+// Set startDate to February 2025 by default
+    DateTime tempStartDate = startDate ?? DateTime(2025, 2);
     DateTime tempEndDate = endDate ?? DateTime(now.year, now.month);
 
     await showDialog(
@@ -875,11 +881,176 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ],
             );
+
+          },
+        );
+      },
+    );
+  }*/
+//// Date range 2feb 2025
+  Future<void> _showMonthYearRangePicker(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime minDate = DateTime(2025, 2); // Minimum date: Feb 2025
+
+    DateTime tempStartDate = startDate ?? DateTime(2025, 2);
+    DateTime tempEndDate = endDate ?? DateTime(now.year, now.month);
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            // Build month dropdown items based on selected year
+            List<DropdownMenuItem<int>> buildMonthItems(int selectedYear) {
+              int startMonth = (selectedYear == minDate.year) ? minDate.month : 1;
+              int endMonth = (selectedYear == now.year) ? now.month : 12;
+
+              return List.generate(endMonth - startMonth + 1, (i) {
+                int month = startMonth + i;
+                return DropdownMenuItem(
+                  value: month,
+                  child: Text(month.toString().padLeft(2, '0')),
+                );
+              });
+            }
+
+            return AlertDialog(
+              backgroundColor: AppColors.beige,
+              title: Text('Select Month & Year Range'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Start"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempStartDate.month,
+                          items: buildMonthItems(tempStartDate.year),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                tempStartDate =
+                                    DateTime(tempStartDate.year, val);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempEndDate = tempStartDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempStartDate.year,
+                          items: List.generate(10, (i) {
+                            int year = minDate.year + i;
+                            if (year > now.year) return null;
+                            return DropdownMenuItem(
+                              value: year,
+                              child: Text(year.toString()),
+                            );
+                          }).whereType<DropdownMenuItem<int>>().toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              int newMonth = tempStartDate.month;
+                              if (val == now.year && newMonth > now.month) {
+                                newMonth = now.month;
+                              }
+                              if (val == minDate.year && newMonth < minDate.month) {
+                                newMonth = minDate.month;
+                              }
+                              setState(() {
+                                tempStartDate = DateTime(val, newMonth);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempEndDate = tempStartDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Text("End"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempEndDate.month,
+                          items: buildMonthItems(tempEndDate.year),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                tempEndDate = DateTime(tempEndDate.year, val);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempStartDate = tempEndDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempEndDate.year,
+                          items: List.generate(10, (i) {
+                            int year = minDate.year + i;
+                            if (year > now.year) return null;
+                            return DropdownMenuItem(
+                              value: year,
+                              child: Text(year.toString()),
+                            );
+                          }).whereType<DropdownMenuItem<int>>().toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              int newMonth = tempEndDate.month;
+                              if (val == now.year && newMonth > now.month) {
+                                newMonth = now.month;
+                              }
+                              if (val == minDate.year && newMonth < minDate.month) {
+                                newMonth = minDate.month;
+                              }
+                              setState(() {
+                                tempEndDate = DateTime(val, newMonth);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempStartDate = tempEndDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: Text('Cancel', style: TextStyle(color: AppColors.gold)),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                TextButton(
+                  child: Text('Apply', style: TextStyle(color: AppColors.gold)),
+                  onPressed: () {
+                    startDate = tempStartDate;
+                    endDate = tempEndDate;
+                    fetchFilteredData();
+                    fetchAdData();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
           },
         );
       },
     );
   }
+
 
 //old date picker days wise
   // void _showDateRangePicker(BuildContext context) async {
