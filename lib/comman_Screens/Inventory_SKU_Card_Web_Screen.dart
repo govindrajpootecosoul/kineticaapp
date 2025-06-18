@@ -272,11 +272,23 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
                   ),
                   Wrap(
                     children: [
-                     buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {"Stock Value": product['WH_Stock_Value'] ?? "00"}),
-                    // buildLabelValueExpend("Total Sellable",
-                    //     product['afn_fulfillable_quantity'] ?? "00"),
-                    buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Stock Value": product['Sellable_Stock_Value'] ?? "00"}),
+                     //buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {"Stock Value": product['WH_Stock_Value'] ?? "00"}),
 
+                      buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {
+                        // "Stock Value": "£ ${product['WH_Stock_Value']}" ?? "00"
+                        "Stock Value": "£ ${double.tryParse(product['WH_Stock_Value'].toString())?.toStringAsFixed(2) ?? "00.00"}"
+
+                      }),
+                      // buildLabelValueExpend("Total Sellable",
+                    //     product['afn_fulfillable_quantity'] ?? "00"),
+                   // buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Stock Value": product['Sellable_Stock_Value'] ?? "00"}),
+                      buildLabeledDetailCardWithHeaderValue(
+                        heading: "Total Sellable",
+                        headingValue: product['afn_fulfillable_quantity']?.toString() ?? "00",
+                        details: {
+                          "Stock Value": "£ ${double.tryParse(product['Sellable_Stock_Value'].toString())?.toStringAsFixed(2) ?? "00.00"}"
+                        },
+                      ),
 
                     buildLabelValueExpend(
                         "Unsellable Units              ", product['afn_unsellable_quantity'] ?? "00"),

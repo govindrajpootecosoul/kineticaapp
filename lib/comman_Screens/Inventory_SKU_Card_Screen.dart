@@ -284,7 +284,11 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     // buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Sellable Stock": product['Sellable_Stock_Value'] ?? "00"}),
 
 
-                   buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {"Stock Value": "£ ${product['WH_Stock_Value']}" ?? "00"}),
+                   buildLabeledDetailCardWithHeaderValue(heading: "Amazon Inventory", headingValue: product['afn_warehouse_quantity'] ?? "00", details: {
+                    // "Stock Value": "£ ${product['WH_Stock_Value']}" ?? "00"
+                   "Stock Value": "£ ${double.tryParse(product['WH_Stock_Value'].toString())?.toStringAsFixed(2) ?? "00.00"}"
+
+                   }),
                    // buildLabelValueExpend("Total Sellable", product['afn_fulfillable_quantity'] ?? "00"),
                     //buildLabeledDetailCardWithHeaderValue(heading: "Total Sellable", headingValue:  product['afn_fulfillable_quantity'] ?? "00", details: {"Stock Value": "£ ${product['Sellable_Stock_Value']}" ?? "00"}),
                     buildLabeledDetailCardWithHeaderValue(
@@ -344,7 +348,7 @@ class _InventorySkuCardScreenState extends State<InventorySkuCardScreen> {
                     // buildLabelValueExpend("Unfullfilled",
                     //     product['afn_unsellable_quantity'] ?? "00"),
                     buildLabelValueExpend("Inbound Recieving",
-                        product['afn_inbound_receiving_quantity'] ?? "00"),
+                        product['Inbound_receiving_quantity'] ?? "00"),
                     buildLabelValueExpend("Instock Rate",
                         "${product['InStock_Rate_Percent']} %" ?? "00"),
                     buildLabelValueExpend(
