@@ -486,12 +486,12 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   @override
   void initState() {
     super.initState();
-    // initializeSelectedItems();
+    initializeSelectedItems();
     fetchSkuList();
   }
 
   void initializeSelectedItems() {
-    if (isWideScreen && kIsWeb) {
+    if (kIsWeb) {
       _selectedItems = [
         "Amazon Inventory",
         "Total Sellable",
@@ -571,7 +571,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   @override
   Widget build(BuildContext context) {
     isWideScreen = MediaQuery.of(context).size.width > 600;
-    initializeSelectedItems();
+    // initializeSelectedItems();
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
@@ -626,6 +626,7 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
                       setState(() {
                         _selectedItems = selectedValues;
                       });
+                      print("Selected Items: $_selectedItems");
                     }
                   },
                   child: Container(
