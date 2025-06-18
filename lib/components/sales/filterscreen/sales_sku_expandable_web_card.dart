@@ -67,11 +67,11 @@ class _SalesSkuExpandableWebCardState extends State<SalesSkuExpandableWebCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("Product: ${record['productName']}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                          Text("Order ID: ${record['orderID']}"),
-                          Text("Purchase Date: ${record['purchaseDate'].split("T")[0]}"),
-                          Text("Status: ${record['orderStatus']}"),
+                          // Text("Order ID: ${record['orderID']}"),
+                          // Text("Purchase Date: ${record['purchaseDate'].split("T")[0]}"),
+                          // Text("Status: ${record['orderStatus']}"),
                           Text("Quantity: ${record['quantity']}"),
-                          Text("Sales: £${(record['totalSales'] as num).toStringAsFixed(2)}"),
+                          Text("Revenue: £${(record['totalSales'] as num).toStringAsFixed(2)}"),
                         ],
                       ),
                     );
