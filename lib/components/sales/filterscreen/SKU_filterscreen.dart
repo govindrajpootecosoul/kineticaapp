@@ -887,7 +887,11 @@ print("url::::: $url");
                       dropdownSearchDecoration: customInputDecoration(labelText: "SKU"),
                     ),
                     clearButtonProps: ClearButtonProps(isVisible: true),
-                    onChanged: (val) => onDropdownChanged(val, 'sku'),
+                    onChanged: (val) {
+
+                      onDropdownChanged(val, 'sku');
+                      fetchCategories();
+                      },
                   ),
                 ),
                 SizedBox(width: 8),
