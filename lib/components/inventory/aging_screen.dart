@@ -197,7 +197,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
       //     ),
       //   ),
       // ),
-      body: kIsWeb ? Container(
+      body: kIsWeb && isWideScreen ? Container(
         margin: const EdgeInsets.symmetric(horizontal: 180, vertical: 8),
         child: Column(
           children: [
