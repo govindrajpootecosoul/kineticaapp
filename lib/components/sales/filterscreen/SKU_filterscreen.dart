@@ -355,6 +355,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_application_1/components/sales/filterscreen/sales_sku_expandable_card.dart.dart';
 import 'package:flutter_application_1/components/sales/filterscreen/sales_sku_expandable_web_card.dart';
+import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/utils/custom_dropdown.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:http/http.dart' as http;
@@ -394,7 +395,7 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     // "lastmonth",
     //'6months',
     //"yeartodate",
-    // "custom",
+    "custom",
   ];
 
   String? selectedState;
@@ -405,13 +406,17 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
   DateTime? startDate;
   DateTime? endDate;
   bool isWideScreen = false;
+  String? selectedCategory = 'All Categories';
+  List<String> categories = ['All Categories'];
 
   @override
   void initState() {
     super.initState();
     selectedFilterType = 'monthtodate';
+    fetchCategories();
     fetchDropdownData();
     fetchSalesData();
+   
   }
 
 
@@ -452,12 +457,168 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     // case 'currentyear':
       case 'yeartodate':
         return 'Current Year';
-      // case 'custom':
-      //   return 'Custom Range';
+      case 'custom':
+        return 'Custom Range';
       default:
         return filter;
     }
   }
+
+   Future<void> _showMonthYearRangePicker(BuildContext context) async {
+    final now = DateTime.now();
+    DateTime tempStartDate = startDate ?? DateTime(now.year, now.month);
+    DateTime tempEndDate = endDate ?? DateTime(now.year, now.month);
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            // Helper to get months based on selected year (disable future months)
+            List<DropdownMenuItem<int>> buildMonthItems(int selectedYear) {
+              int maxMonth = (selectedYear == now.year) ? now.month : 12;
+              return List.generate(maxMonth, (i) {
+                int month = i + 1;
+                return DropdownMenuItem(
+                  value: month,
+                  child: Text(month.toString().padLeft(2, '0')),
+                );
+              });
+            }
+
+            return AlertDialog(
+              backgroundColor: AppColors.beige,
+              title: Text('Select Month & Year Range'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Start"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempStartDate.month,
+                          items: buildMonthItems(tempStartDate.year),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                tempStartDate =
+                                    DateTime(tempStartDate.year, val);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempEndDate = tempStartDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempStartDate.year,
+                          items: List.generate(10, (i) {
+                            int year = now.year - 9 + i;
+                            if (year > now.year) return null;
+                            return DropdownMenuItem(
+                              value: year,
+                              child: Text(year.toString()),
+                            );
+                          }).whereType<DropdownMenuItem<int>>().toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              int newMonth = tempStartDate.month;
+                              if (val == now.year && newMonth > now.month) {
+                                newMonth = now.month;
+                              }
+                              setState(() {
+                                tempStartDate = DateTime(val, newMonth);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempEndDate = tempStartDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Text("End"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempEndDate.month,
+                          items: buildMonthItems(tempEndDate.year),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                tempEndDate = DateTime(tempEndDate.year, val);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempStartDate = tempEndDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: DropdownButton<int>(
+                          value: tempEndDate.year,
+                          items: List.generate(10, (i) {
+                            int year = now.year - 9 + i;
+                            if (year > now.year) return null;
+                            return DropdownMenuItem(
+                              value: year,
+                              child: Text(year.toString()),
+                            );
+                          }).whereType<DropdownMenuItem<int>>().toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              int newMonth = tempEndDate.month;
+                              if (val == now.year && newMonth > now.month) {
+                                newMonth = now.month;
+                              }
+                              setState(() {
+                                tempEndDate = DateTime(val, newMonth);
+                                if (tempEndDate.isBefore(tempStartDate)) {
+                                  tempStartDate = tempEndDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child:
+                      Text('Cancel', style: TextStyle(color: AppColors.gold)),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                TextButton(
+                  child: Text('Apply', style: TextStyle(color: AppColors.gold)),
+                  onPressed: () {
+                    startDate = tempStartDate;
+                    endDate = tempEndDate;
+                    // fetchFilteredData();
+                    // fetchAdData();
+                    fetchSalesData();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
 
   String formatDate(DateTime date) =>
       "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
@@ -534,6 +695,9 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     final state = Uri.encodeComponent(selectedState ?? '');
 
     String url;
+    if(selectedCategory == null || selectedCategory == 'All Categories') {
+     selectedCategory = '';
+    }
 
     if (selectedFilterType == 'custom') {
       if (startDate == null || endDate == null) {
@@ -543,15 +707,18 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
         });
         return;
       }
-      final from = formatDate(startDate!);
-      final to = formatDate(endDate!);
+      // final from = formatDate(startDate!);
+      // final to = formatDate(endDate!);
+      final from = formatDateads_api(startDate!);
+      final to = formatDateads_api(endDate!);
       url =
-      '${ApiConfig.baseUrl}/sales?filterType=custom&fromDate=$from&toDate=$to&sku=$sku&city=$city&state=$state';
+      '${ApiConfig.baseUrl}/sales?filterType=custom&fromDate=$from&toDate=$to&sku=$sku&city=$city&state=$state&productCategory=${selectedCategory ?? ''}';
     } else {
       url =
-      '${ApiConfig.baseUrl}/sales?filterType=$selectedFilterType&sku=$sku&city=$city&state=$state';
+      '${ApiConfig.baseUrl}/sales?filterType=$selectedFilterType&sku=$sku&city=$city&state=$state&productCategory=${selectedCategory ?? ''}';
     }
 
+print("url::::: $url");
     try {
       var dio = Dio();
       var response = await dio.get(url);
@@ -579,6 +746,10 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
     }
   }
 
+  String formatDateads_api(DateTime date) {
+    return '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}';
+  }
+
   void onDropdownChanged(String? value, String type) {
     setState(() {
       if (type == 'filter') {
@@ -595,6 +766,42 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
         fetchSalesData();
       }
     });
+  }
+
+   Future<void> fetchCategories() async {
+    try {
+      final response = await http
+          .get(Uri.parse('https://api.thrivebrands.ai/api/category-list'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = await json.decode(response.body);
+        // setState(() {
+        //   // Start with "All Categories" and add the rest
+        //   categories = ['All Categories'] +
+        //       data.map<String>((category) => category.toString()).toList();
+        //   print('Available Categories: $categories');
+        // });
+
+        setState(() {
+  categories = ['All Categories'] +
+      data.map<String>((category) => category.toString()).toList();
+
+  // Ensure selectedCategory exists in the updated list
+  if (!categories.contains(selectedCategory)) {
+    selectedCategory = 'All Categories';
+  }
+
+  print('Available Categories: $categories');
+});
+      } else {
+        throw Exception('Failed to load categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading categories: $e')),
+      );
+    }
   }
 
   Future<void> selectDateRange(BuildContext context) async {
@@ -649,11 +856,12 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: ElevatedButton.icon(
-                      onPressed: () => selectDateRange(context),
+                      // onPressed: () => selectDateRange(context),
+                      onPressed: () => _showMonthYearRangePicker(context),
                       icon: Icon(Icons.date_range),
                       label: Text(
                         startDate != null && endDate != null
-                            ? "${formatDate(startDate!)} - ${formatDate(endDate!)}"
+                            ? "${startDate!.year}-${startDate!.month.toString().padLeft(2, '0')}/ ${endDate!.year}-${endDate!.month.toString().padLeft(2, '0')}"
                             : "Select Date Range",
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -682,6 +890,31 @@ class _SalesScreenState extends State<Filter_SalesSkuScreen> {
                     onChanged: (val) => onDropdownChanged(val, 'sku'),
                   ),
                 ),
+                SizedBox(width: 8),
+                SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedCategory,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: categories
+                                    .map((category) => DropdownMenuItem(
+                                          value: category,
+                                          child: Text(category),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) async{
+                                  setState(() {
+                                    selectedCategory = value ??
+                                        "All Categories"; // Default to "All Categories"
+                                    print("Selected Category: $selectedCategory");
+                                    print("categories: $categories");
+                                    fetchSalesData(); // Fetch data with new category
+                                    fetchCategories(); // Ensure categories are up-to-date
+                                    
+                                  });
+                                },
+                              ),),
               ],
             ),
           ),

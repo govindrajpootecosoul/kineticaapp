@@ -75,7 +75,7 @@ class _SalesSkuExpandableCardState extends State<SalesSkuExpandableCard> {
                           //   Text("Unit Selling Price: £${(record['totalSales'] as num).toStringAsFixed(2)}"),
 
                           Text("Product: ${record['productName']}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                          // Text("Order ID: ${record['orderID']}"),
+                           Text("Product Category: ${record['productCategory']}"),
                           // Text("Purchase Date: ${record['purchaseDate'].split("T")[0]}"),
                           // Text("Status: ${record['orderStatus']}"),
                           Text("Quantity: ${record['quantity']}"),
