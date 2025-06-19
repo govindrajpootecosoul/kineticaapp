@@ -234,8 +234,9 @@ class _InventorySkuCardWebScreenState extends State<InventorySkuCardWebScreen> {
                           buildLabelValue("Available Inventory",
                               (product['afn_total_quantity'] ?? 0)),
                           // (product['afn-fulfillable-quantity'] ?? 0) + (product['FC_Transfer'] ?? 0)),
-                          buildLabelValue("Storage Cost",
-                              "£ ${(product['qestimated_ais_241_270-days'] ?? 0) + (product['estimated_ais_271_300_days'] ?? 0) + (product['estimated_ais_301_330_days'] ?? 0)}"),
+                        //  buildLabelValue("Storage Cost", "£ ${(product['qestimated_ais_241_270-days'] ?? 0) + (product['estimated_ais_271_300_days'] ?? 0) + (product['estimated_ais_301_330_days'] ?? 0)}"),
+                          buildLabelValue("Storage Cost", "£ ${product['estimated_storage_cost_next_month']}"),
+
                         ],
                       ),
                     ),
