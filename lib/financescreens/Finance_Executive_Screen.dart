@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/utils/custom_dropdown.dart';
@@ -25,16 +26,76 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
   Map<String, double>? selectedMonthData;
   List<String> availableMonths = [];
   String? selectedMonth;
+  String? selectedCategory = 'All Categories';
+  List<String> categories = ['All Categories'];
+  bool isLoading = false;
+  bool isWideScreen = false;
 
   @override
   void initState() {
     super.initState();
     fetchData();
+    fetchCategories();
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      final response = await http
+          .get(Uri.parse('https://api.thrivebrands.ai/api/category-list'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = await json.decode(response.body);
+        setState(() {
+          // Start with "All Categories" and add the rest
+          categories = ['All Categories'] +
+              data.map<String>((category) => category.toString()).toList();
+          print('Available Categories: $categories');
+        });
+      } else {
+        throw Exception('Failed to load categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading categories: $e')),
+      );
+    }
   }
 
   Future<void> fetchData() async {
+    setState(() {
+      isLoading = true; // Show loading indicator
+    });
     try {
-      final response = await http.get(Uri.parse(ApiConfig.pnlData));
+      // final response = await http.get(Uri.parse(ApiConfig.pnlData));
+           Uri url = Uri.parse(ApiConfig.pnlData);
+      Map<String, String> queryParams = {
+        // 'range': 'lastmonth',
+      };
+
+      // Add category if selected
+      if (widget.productval == "0" && selectedCategory != "All Categories") {
+        queryParams['category'] = selectedCategory!;
+      } else {
+        // queryParams['category'] = '';
+      }
+
+      // Handle date range selection
+      // if (useCustomRange && startDate != null && endDate != null) {
+      //   queryParams['startMonth'] = DateFormat('yyyy-MM').format(startDate!);
+      //   queryParams['endMonth'] = DateFormat('yyyy-MM').format(endDate!);
+      // } else if (selectedMonth != null && !useCustomRange) {
+      //   final selectedYearMonth = DateFormat('yyyy-MM')
+      //       .format(DateFormat('MMMM yyyy').parse(selectedMonth!));
+      //   queryParams['startMonth'] = selectedYearMonth;
+      //   queryParams['endMonth'] = selectedYearMonth;
+      // }
+
+      url = url.replace(queryParameters: queryParams);
+      print("Fetching data from: $url");
+      final response = await http.get(url);
+      print("Response : ${response.body}");
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
@@ -61,11 +122,34 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
           selectedMonth =
               availableMonths.isNotEmpty ? availableMonths.first : null;
           updateSelectedMonthData();
+          isLoading = false; // Hide loading indicator
         });
+        //  final categoriesSet = data
+        //       .map((e) {
+        //         final category = e['Product Category'];
+        //         if (category == null) return null;
+        //         if (category is String) return category;
+        //         return category
+        //             .toString(); // Convert numbers/other types to string
+        //       })
+        //       .where((category) => category != null) // Remove nulls
+        //       .map((category) => category!) // Cast away nulls after filtering
+        //       .toSet()
+        //       .toList();
+        //   categoriesSet.sort();
+        //   categories = categoriesSet;
+        //   print('Available Categories: $categories');
       } else {
+        setState(() {
+          isLoading = false; // Hide loading indicator
+        });
+         print('Failed to load data: ${response.statusCode}');
         throw Exception('Failed to load data');
       }
     } catch (e) {
+      setState(() {
+        isLoading = false; // Hide loading indicator
+      });
       print('Error fetching data: $e');
     }
   }
@@ -273,6 +357,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
 
   @override
   Widget build(BuildContext context) {
+    isWideScreen = MediaQuery.of(context).size.width > 600;
     return SafeArea(
       child: Scaffold(
         appBar: widget.productval == "1"
@@ -298,13 +383,13 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
             : null,
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: allData.isEmpty
+          child: isLoading
               ? Center(child: CircularProgressIndicator())
-              : Column(
+              :  Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Month filter dropdown
-                    Row(
+                  kIsWeb && isWideScreen ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
@@ -314,30 +399,126 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
                               color: Colors.brown,
                               fontSize: 24),
                         ),
-                        SizedBox(
-                          width: 160,
-                          child: DropdownButtonFormField<String>(
-                            value: selectedMonth,
-                            decoration: customInputDecoration(),
-                            isExpanded: true,
-                            items: availableMonths
-                                .map((month) => DropdownMenuItem(
-                                      value: month,
-                                      child: Text(month),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedMonth = value;
-                                updateSelectedMonthData();
-                              });
-                            },
-                          ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedMonth,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: availableMonths
+                                    .map((month) => DropdownMenuItem(
+                                          value: month,
+                                          child: Text(month),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedMonth = value;
+                                    updateSelectedMonthData();
+                                  });
+                                },
+                              ),
+                            ),
+                            if(widget.productval == "0")
+                            SizedBox(
+                              width: 10,
+                            ),
+                            if(widget.productval == "0")
+                            SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedCategory,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: categories
+                                    .map((category) => DropdownMenuItem(
+                                          value: category,
+                                          child: Text(category),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) async{
+                                  setState(() {
+                                    selectedCategory = value ??
+                                        "All Categories"; // Default to "All Categories"
+                                    fetchData(); // Fetch data with new category
+                                    updateSelectedMonthData();
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ) : Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Profit & Loss",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.brown,
+                              fontSize: 24),
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedMonth,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: availableMonths
+                                    .map((month) => DropdownMenuItem(
+                                          value: month,
+                                          child: Text(month),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedMonth = value;
+                                    updateSelectedMonthData();
+                                  });
+                                },
+                              ),
+                            ),
+                            if(widget.productval == "0")
+                            SizedBox(
+                              width: 10,
+                            ),
+                            if(widget.productval == "0")
+                            SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedCategory,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: categories
+                                    .map((category) => DropdownMenuItem(
+                                          value: category,
+                                          child: Text(category),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) async{
+                                  setState(() {
+                                    selectedCategory = value ??
+                                        "All Categories"; // Default to "All Categories"
+                                    fetchData(); // Fetch data with new category
+                                    updateSelectedMonthData();
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     SizedBox(height: 20),
-                    if (selectedMonthData != null)
+                    if (selectedMonthData != null && allData.isNotEmpty)
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
@@ -350,8 +531,10 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
                                           0
                                       ? Colors.green
                                       : Colors.green),
-                              dataRow1("Return Revenue:",
-                                  selectedMonthData!['Total Return with tax']?.abs(),
+                              dataRow1(
+                                  "Return Revenue:",
+                                  selectedMonthData!['Total Return with tax']
+                                      ?.abs(),
                                   valueColor: selectedMonthData![
                                               'Total Return with tax']! <
                                           0
