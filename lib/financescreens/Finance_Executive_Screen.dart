@@ -68,7 +68,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
     });
     try {
       // final response = await http.get(Uri.parse(ApiConfig.pnlData));
-      Uri url = Uri.parse(ApiConfig.pnlData);
+           Uri url = Uri.parse(ApiConfig.pnlData);
       Map<String, String> queryParams = {
         // 'range': 'lastmonth',
       };
@@ -104,7 +104,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
 
         // Extract unique months in "yyyy-MM" format, then convert to readable "MMMM yyyy"
         final monthsSet =
-        allData.map<String>((e) => e['Year-Month'] as String).toSet();
+            allData.map<String>((e) => e['Year-Month'] as String).toSet();
 
         // Sort months in ascending order
         final monthsList = monthsSet.toList();
@@ -117,10 +117,10 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
         setState(() {
           availableMonths = monthsList
               .map((e) => DateFormat('MMMM yyyy')
-              .format(DateFormat('yyyy-MM').parse(e)))
+                  .format(DateFormat('yyyy-MM').parse(e)))
               .toList();
           selectedMonth =
-          availableMonths.isNotEmpty ? availableMonths.first : null;
+              availableMonths.isNotEmpty ? availableMonths.first : null;
           updateSelectedMonthData();
           isLoading = false; // Hide loading indicator
         });
@@ -143,7 +143,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
         setState(() {
           isLoading = false; // Hide loading indicator
         });
-        print('Failed to load data: ${response.statusCode}');
+         print('Failed to load data: ${response.statusCode}');
         throw Exception('Failed to load data');
       }
     } catch (e) {
@@ -163,7 +163,7 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
 
     // Filter data by selected month
     final selectedMonthList =
-    allData.where((e) => e['Year-Month'] == selectedYearMonth).toList();
+        allData.where((e) => e['Year-Month'] == selectedYearMonth).toList();
 
     // Sum up all required fields safely, defaulting to 0.0 if null
     double sumField(List<dynamic> list, String key) {
@@ -180,14 +180,14 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
     setState(() {
       selectedMonthData = {
         'Total Sales with tax':
-        sumField(selectedMonthList, 'Total Sales with tax'),
+            sumField(selectedMonthList, 'Total Sales with tax'),
         'Total Return with tax': sumField(selectedMonthList,
             'Total Return with tax'), // Assuming returns are 'Total Units', adjust if needed
         'Net Sales with tax': sumField(selectedMonthList,
             'Net Sales with tax'), // Your JSON doesn't have COGS? Set 0 or handle accordingly
         'Total Sales': sumField(selectedMonthList, 'Total Sales'),
         'Total_Return_Amount':
-        sumField(selectedMonthList, 'Total_Return_Amount'),
+            sumField(selectedMonthList, 'Total_Return_Amount'),
         'Net Sales': sumField(selectedMonthList, 'Net Sales'),
         'Cogs': sumField(selectedMonthList, 'Cogs'),
         'CM1': sumField(selectedMonthList, 'CM1'),
@@ -199,9 +199,9 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
         'fba fees': sumField(selectedMonthList, 'fba fees'),
         'CM2': sumField(selectedMonthList, 'CM2'),
         'Other marketing Expenses':
-        sumField(selectedMonthList, 'Other marketing Expenses'),
+            sumField(selectedMonthList, 'Other marketing Expenses'),
         'promotional rebates':
-        sumField(selectedMonthList, 'promotional rebates'),
+            sumField(selectedMonthList, 'promotional rebates'),
         'selling fees': sumField(selectedMonthList, 'selling fees'),
         'Spend': sumField(selectedMonthList, 'Spend'),
         'CM3': sumField(selectedMonthList, 'CM3'),
@@ -362,366 +362,366 @@ class _FinanceExecutiveScreenState extends State<FinanceExecutiveScreen> {
       child: Scaffold(
         appBar: widget.productval == "1"
             ? AppBar(
-          // centerTitle: true,
-          backgroundColor: AppColors.primaryBlue,
-          iconTheme: IconThemeData(
-              color: Colors.white), // 👈 sets back arrow color to white
-          // title: Expanded(
-          //   child: Text(
-          //     'Finance > Executive',
-          //     style: TextStyle(
-          //       color: Colors.white,
-          //       fontSize: 18,
-          //       fontWeight: FontWeight.w600,
-          //     ),
-          //   ),
-          // ),
-          flexibleSpace: Container(
-            child: Image.asset('assets/logo.png'),
-          ),
-        )
+                // centerTitle: true,
+                backgroundColor: AppColors.primaryBlue,
+                iconTheme: IconThemeData(
+                    color: Colors.white), // 👈 sets back arrow color to white
+                // title: Expanded(
+                //   child: Text(
+                //     'Finance > Executive',
+                //     style: TextStyle(
+                //       color: Colors.white,
+                //       fontSize: 18,
+                //       fontWeight: FontWeight.w600,
+                //     ),
+                //   ),
+                // ),
+                flexibleSpace: Container(
+                  child: Image.asset('assets/logo.png'),
+                ),
+              )
             : null,
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: isLoading
               ? Center(child: CircularProgressIndicator())
               :  Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Month filter dropdown
-              kIsWeb && isWideScreen ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Profit & Loss",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.brown,
-                        fontSize: 24),
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 160,
-                        child: DropdownButtonFormField<String>(
-                          value: selectedMonth,
-                          decoration: customInputDecoration(),
-                          isExpanded: true,
-                          items: availableMonths
-                              .map((month) => DropdownMenuItem(
-                            value: month,
-                            child: Text(month),
-                          ))
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedMonth = value;
-                              updateSelectedMonthData();
-                            });
-                          },
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Month filter dropdown
+                  kIsWeb && isWideScreen ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Profit & Loss",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.brown,
+                              fontSize: 24),
                         ),
-                      ),
-                      if(widget.productval == "0")
-                        SizedBox(
-                          width: 10,
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedMonth,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: availableMonths
+                                    .map((month) => DropdownMenuItem(
+                                          value: month,
+                                          child: Text(month),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedMonth = value;
+                                    updateSelectedMonthData();
+                                  });
+                                },
+                              ),
+                            ),
+                            if(widget.productval == "0")
+                            SizedBox(
+                              width: 10,
+                            ),
+                            if(widget.productval == "0")
+                            SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedCategory,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: categories
+                                    .map((category) => DropdownMenuItem(
+                                          value: category,
+                                          child: Text(category),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) async{
+                                  setState(() {
+                                    selectedCategory = value ??
+                                        "All Categories"; // Default to "All Categories"
+                                    fetchData(); // Fetch data with new category
+                                    updateSelectedMonthData();
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      if(widget.productval == "0")
-                        SizedBox(
-                          width: 160,
-                          child: DropdownButtonFormField<String>(
-                            value: selectedCategory,
-                            decoration: customInputDecoration(),
-                            isExpanded: true,
-                            items: categories
-                                .map((category) => DropdownMenuItem(
-                              value: category,
-                              child: Text(category),
-                            ))
-                                .toList(),
-                            onChanged: (value) async{
-                              setState(() {
-                                selectedCategory = value ??
-                                    "All Categories"; // Default to "All Categories"
-                                fetchData(); // Fetch data with new category
-                                updateSelectedMonthData();
-                              });
-                            },
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ) : Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Profit & Loss",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.brown,
-                        fontSize: 24),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: 160,
-                        child: DropdownButtonFormField<String>(
-                          value: selectedMonth,
-                          decoration: customInputDecoration(),
-                          isExpanded: true,
-                          items: availableMonths
-                              .map((month) => DropdownMenuItem(
-                            value: month,
-                            child: Text(month),
-                          ))
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedMonth = value;
-                              updateSelectedMonthData();
-                            });
-                          },
-                        ),
-                      ),
-                      if(widget.productval == "0")
-                        SizedBox(
-                          width: 10,
-                        ),
-                      if(widget.productval == "0")
-                        SizedBox(
-                          width: 160,
-                          child: DropdownButtonFormField<String>(
-                            value: selectedCategory,
-                            decoration: customInputDecoration(),
-                            isExpanded: true,
-                            items: categories
-                                .map((category) => DropdownMenuItem(
-                              value: category,
-                              child: Text(category),
-                            ))
-                                .toList(),
-                            onChanged: (value) async{
-                              setState(() {
-                                selectedCategory = value ??
-                                    "All Categories"; // Default to "All Categories"
-                                fetchData(); // Fetch data with new category
-                                updateSelectedMonthData();
-                              });
-                            },
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              if (selectedMonthData != null && allData.isNotEmpty)
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
+                      ],
+                    ) : Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        dataRow1("Gross Revenue:",
-                            selectedMonthData!['Total Sales with tax'],
-                            valueColor: selectedMonthData![
-                            'Total Sales with tax']! <
-                                0
-                                ? Colors.green
-                                : Colors.green),
-                        dataRow1(
-                            "Return Revenue:",
-                            selectedMonthData!['Total Return with tax']
-                                ?.abs(),
-                            valueColor: selectedMonthData![
-                            'Total Return with tax']! <
-                                0
-                                ? Colors.red
-                                : Colors.red),
-
-                        //dataRow("Net Revenue with tax:", selectedMonthData!['Net Sales with tax'],selectedMonthData!['Net Sales with tax'/'Total Sales with tax'], valueColor: selectedMonthData!['Net Sales with tax']! < 0 ? Colors.red : Colors.green),
-
-                        dataRow1(
-                          "Net Revenue:",
-                          selectedMonthData!['Net Sales with tax'],
-                          valueColor:
-                          (selectedMonthData!['Net Sales with tax'] ??
-                              0) <
-                              0
-                              ? Colors.green
-                              : Colors.green,
+                        Text(
+                          "Profit & Loss",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.brown,
+                              fontSize: 24),
                         ),
-
-                        // dataRow1("Orders Revenue:", selectedMonthData!['Total Sales'], valueColor: selectedMonthData!['Total Sales']! < 0 ? Colors.green : Colors.green),
-                        // dataRow("Returns Revenue:", selectedMonthData!['Total_Return_Amount'],(selectedMonthData!['Total_Return_Amount'] ?? 0) / (selectedMonthData!['Total Sales with tax'] ?? 1), valueColor: selectedMonthData!['Total_Return_Amount']! < 0 ? Colors.red : Colors.red),
-                        // dataRow("Net Revenue:", selectedMonthData!['Net Sales'],(selectedMonthData!['Net Sales'] ?? 0) / (selectedMonthData!['Total Sales with tax'] ?? 1), valueColor: selectedMonthData!['Net Sales']! < 0 ? Colors.green : Colors.green),
-                        dataRow(
-                            "Cogs:",
-                            selectedMonthData!['Cogs'],
-                            (selectedMonthData!['Cogs'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor: selectedMonthData!['Cogs']! < 0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "CM1",
-                            selectedMonthData!['CM1'],
-                            (selectedMonthData!['CM1'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor: selectedMonthData!['CM1']! < 0
-                                ? Colors.red
-                                : Colors.green),
-                        dataRow(
-                            "Deal Fee:",
-                            selectedMonthData!['Deal Fee'],
-                            (selectedMonthData!['Deal Fee'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor:
-                            selectedMonthData!['Deal Fee']! < 0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "FBA Inventory Fee:",
-                            selectedMonthData!['FBA Inventory Fee'],
-                            (selectedMonthData!['FBA Inventory Fee'] ??
-                                0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor:
-                            selectedMonthData!['FBA Inventory Fee']! <
-                                0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "FBA Reimbursement:",
-                            selectedMonthData!['FBA Reimbursement'],
-                            (selectedMonthData!['FBA Reimbursement'] ??
-                                0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor:
-                            selectedMonthData!['FBA Reimbursement']! <
-                                0
-                                ? Colors.green
-                                : Colors.green),
-                        dataRow(
-                            "Liquidations:",
-                            selectedMonthData!['Liquidations'],
-                            (selectedMonthData!['Liquidations'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor:
-                            selectedMonthData!['Liquidations']! < 0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "Storage Fee:",
-                            selectedMonthData!['Storage Fee'],
-                            (selectedMonthData!['Storage Fee'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor:
-                            selectedMonthData!['Storage Fee']! < 0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "FBA Fees:",
-                            selectedMonthData!['fba fees'],
-                            (selectedMonthData!['fba fees'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor:
-                            selectedMonthData!['fba fees']! < 0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "CM2",
-                            selectedMonthData!['CM2'],
-                            (selectedMonthData!['CM2'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor: selectedMonthData!['CM2']! < 0
-                                ? Colors.red
-                                : Colors.green),
-                        dataRow(
-                            "Other Marketing Expenses:",
-                            selectedMonthData![
-                            'Other marketing Expenses'],
-                            (selectedMonthData![
-                            'Other marketing Expenses'] ??
-                                0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor: selectedMonthData![
-                            'Other marketing Expenses']! <
-                                0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "Discounts:",
-                            selectedMonthData!['promotional rebates'],
-                            (selectedMonthData!['promotional rebates'] ??
-                                0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor: selectedMonthData![
-                            'promotional rebates']! <
-                                0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "Selling Fess:",
-                            selectedMonthData!['selling fees'],
-                            (selectedMonthData!['selling fees'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor:
-                            selectedMonthData!['selling fees']! < 0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "Ad Spend:",
-                            selectedMonthData!['Spend'],
-                            (selectedMonthData!['Spend'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor: selectedMonthData!['Spend']! < 0
-                                ? Colors.red
-                                : Colors.red),
-                        dataRow(
-                            "CM3",
-                            selectedMonthData!['CM3'],
-                            (selectedMonthData!['CM3'] ?? 0) /
-                                (selectedMonthData![
-                                'Total Sales with tax'] ??
-                                    1),
-                            valueColor: selectedMonthData!['CM3']! < 0
-                                ? Colors.red
-                                : Colors.green),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedMonth,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: availableMonths
+                                    .map((month) => DropdownMenuItem(
+                                          value: month,
+                                          child: Text(month),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedMonth = value;
+                                    updateSelectedMonthData();
+                                  });
+                                },
+                              ),
+                            ),
+                            if(widget.productval == "0")
+                            SizedBox(
+                              width: 10,
+                            ),
+                            if(widget.productval == "0")
+                            SizedBox(
+                              width: 160,
+                              child: DropdownButtonFormField<String>(
+                                value: selectedCategory,
+                                decoration: customInputDecoration(),
+                                isExpanded: true,
+                                items: categories
+                                    .map((category) => DropdownMenuItem(
+                                          value: category,
+                                          child: Text(category),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) async{
+                                  setState(() {
+                                    selectedCategory = value ??
+                                        "All Categories"; // Default to "All Categories"
+                                    fetchData(); // Fetch data with new category
+                                    updateSelectedMonthData();
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ),
+                    SizedBox(height: 20),
+                    if (selectedMonthData != null && allData.isNotEmpty)
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              dataRow1("Gross Revenue:",
+                                  selectedMonthData!['Total Sales with tax'],
+                                  valueColor: selectedMonthData![
+                                              'Total Sales with tax']! <
+                                          0
+                                      ? Colors.green
+                                      : Colors.green),
+                              dataRow1(
+                                  "Return Revenue:",
+                                  selectedMonthData!['Total Return with tax']
+                                      ?.abs(),
+                                  valueColor: selectedMonthData![
+                                              'Total Return with tax']! <
+                                          0
+                                      ? Colors.red
+                                      : Colors.red),
+
+                              //dataRow("Net Revenue with tax:", selectedMonthData!['Net Sales with tax'],selectedMonthData!['Net Sales with tax'/'Total Sales with tax'], valueColor: selectedMonthData!['Net Sales with tax']! < 0 ? Colors.red : Colors.green),
+
+                              dataRow1(
+                                "Net Revenue:",
+                                selectedMonthData!['Net Sales with tax'],
+                                valueColor:
+                                    (selectedMonthData!['Net Sales with tax'] ??
+                                                0) <
+                                            0
+                                        ? Colors.green
+                                        : Colors.green,
+                              ),
+
+                              // dataRow1("Orders Revenue:", selectedMonthData!['Total Sales'], valueColor: selectedMonthData!['Total Sales']! < 0 ? Colors.green : Colors.green),
+                              // dataRow("Returns Revenue:", selectedMonthData!['Total_Return_Amount'],(selectedMonthData!['Total_Return_Amount'] ?? 0) / (selectedMonthData!['Total Sales with tax'] ?? 1), valueColor: selectedMonthData!['Total_Return_Amount']! < 0 ? Colors.red : Colors.red),
+                              // dataRow("Net Revenue:", selectedMonthData!['Net Sales'],(selectedMonthData!['Net Sales'] ?? 0) / (selectedMonthData!['Total Sales with tax'] ?? 1), valueColor: selectedMonthData!['Net Sales']! < 0 ? Colors.green : Colors.green),
+                              dataRow(
+                                  "Cogs:",
+                                  selectedMonthData!['Cogs'],
+                                  (selectedMonthData!['Cogs'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor: selectedMonthData!['Cogs']! < 0
+                                      ? Colors.red
+                                      : Colors.red),
+                              dataRow(
+                                  "CM1",
+                                  selectedMonthData!['CM1'],
+                                  (selectedMonthData!['CM1'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor: selectedMonthData!['CM1']! < 0
+                                      ? Colors.red
+                                      : Colors.green),
+                              dataRow(
+                                  "Deal Fee:",
+                                  selectedMonthData!['Deal Fee'],
+                                  (selectedMonthData!['Deal Fee'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor:
+                                      selectedMonthData!['Deal Fee']! < 0
+                                          ? Colors.red
+                                          : Colors.red),
+                              dataRow(
+                                  "FBA Inventory Fee:",
+                                  selectedMonthData!['FBA Inventory Fee'],
+                                  (selectedMonthData!['FBA Inventory Fee'] ??
+                                          0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor:
+                                      selectedMonthData!['FBA Inventory Fee']! <
+                                              0
+                                          ? Colors.red
+                                          : Colors.red),
+                              dataRow(
+                                  "FBA Reimbursement:",
+                                  selectedMonthData!['FBA Reimbursement'],
+                                  (selectedMonthData!['FBA Reimbursement'] ??
+                                          0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor:
+                                      selectedMonthData!['FBA Reimbursement']! <
+                                              0
+                                          ? Colors.green
+                                          : Colors.green),
+                              dataRow(
+                                  "Liquidations:",
+                                  selectedMonthData!['Liquidations'],
+                                  (selectedMonthData!['Liquidations'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor:
+                                      selectedMonthData!['Liquidations']! < 0
+                                          ? Colors.red
+                                          : Colors.red),
+                              dataRow(
+                                  "Storage Fee:",
+                                  selectedMonthData!['Storage Fee'],
+                                  (selectedMonthData!['Storage Fee'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor:
+                                      selectedMonthData!['Storage Fee']! < 0
+                                          ? Colors.red
+                                          : Colors.red),
+                              dataRow(
+                                  "FBA Fees:",
+                                  selectedMonthData!['fba fees'],
+                                  (selectedMonthData!['fba fees'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor:
+                                      selectedMonthData!['fba fees']! < 0
+                                          ? Colors.red
+                                          : Colors.red),
+                              dataRow(
+                                  "CM2",
+                                  selectedMonthData!['CM2'],
+                                  (selectedMonthData!['CM2'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor: selectedMonthData!['CM2']! < 0
+                                      ? Colors.red
+                                      : Colors.green),
+                              dataRow(
+                                  "Other Marketing Expenses:",
+                                  selectedMonthData![
+                                      'Other marketing Expenses'],
+                                  (selectedMonthData![
+                                              'Other marketing Expenses'] ??
+                                          0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor: selectedMonthData![
+                                              'Other marketing Expenses']! <
+                                          0
+                                      ? Colors.red
+                                      : Colors.red),
+                              dataRow(
+                                  "Discounts:",
+                                  selectedMonthData!['promotional rebates'],
+                                  (selectedMonthData!['promotional rebates'] ??
+                                          0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor: selectedMonthData![
+                                              'promotional rebates']! <
+                                          0
+                                      ? Colors.red
+                                      : Colors.red),
+                              dataRow(
+                                  "Selling Fess:",
+                                  selectedMonthData!['selling fees'],
+                                  (selectedMonthData!['selling fees'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor:
+                                      selectedMonthData!['selling fees']! < 0
+                                          ? Colors.red
+                                          : Colors.red),
+                              dataRow(
+                                  "Ad Spend:",
+                                  selectedMonthData!['Spend'],
+                                  (selectedMonthData!['Spend'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor: selectedMonthData!['Spend']! < 0
+                                      ? Colors.red
+                                      : Colors.red),
+                              dataRow(
+                                  "CM3",
+                                  selectedMonthData!['CM3'],
+                                  (selectedMonthData!['CM3'] ?? 0) /
+                                      (selectedMonthData![
+                                              'Total Sales with tax'] ??
+                                          1),
+                                  valueColor: selectedMonthData!['CM3']! < 0
+                                      ? Colors.red
+                                      : Colors.green),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
-          ),
         ),
       ),
     );
