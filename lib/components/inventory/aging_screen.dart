@@ -76,6 +76,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
   // For selecting SKU
   String? selectedSku;
   List<String> skuList = []; // To hold available SKUs
+  bool isWideScreen = false;
 
   @override
   void initState() {
@@ -144,6 +145,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
 
   @override
   Widget build(BuildContext context) {
+    isWideScreen = MediaQuery.of(context).size.width > 600;
     return Scaffold(
       // appBar: PreferredSize(
       //   preferredSize: const Size.fromHeight(60),
@@ -591,7 +593,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
   }
 
   Widget showAgeingContent(var item) {
-    if (!kIsWeb) {
+    if (!kIsWeb ||(kIsWeb && !isWideScreen)) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
