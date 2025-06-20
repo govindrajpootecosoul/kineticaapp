@@ -46,12 +46,19 @@ class InventoryProvider with ChangeNotifier {
   String error = '';
   bool isLoading = false;
 
-  Future<void> fetchAllInventory() async {
+  Future<void> fetchAllInventory({required String productName, required String productCategory}) async {
     try {
       isLoading = true;
       notifyListeners();
-
-      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/inventory'));
+      if(productName == 'All') {
+        productName = '';
+      }
+      if(productCategory == 'All') {
+        productCategory = '';
+      }
+       final url = Uri.parse('${ApiConfig.baseUrl}/inventory?productName=$productName&productCategory=$productCategory');
+      print('Fetching inventory from URL: $url');
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         inventoryList = data.cast<Map<String, dynamic>>();
@@ -66,12 +73,20 @@ class InventoryProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchInventoryBySku(String sku) async {
+  Future<void> fetchInventoryBySku({required String sku, required String productName, required String productCategory}) async {
     try {
       isLoading = true;
       notifyListeners();
-
-      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/inventory?sku=$sku'));
+      if(productName == 'All') {
+        productName = '';
+      }
+      if(productCategory == 'All') {
+        productCategory = '';
+      }
+      final url = Uri.parse('${ApiConfig.baseUrl}/inventory?sku=$sku&productName=$productName&productCategory=$productCategory');
+      // final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/inventory?sku=$sku&productname=$productName&productcategory=$productCategory'));
+      print('Fetching inventory from URL: $url');
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         inventoryList = data.cast<Map<String, dynamic>>();

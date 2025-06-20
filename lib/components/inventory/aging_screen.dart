@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -5,6 +8,7 @@ import 'package:flutter_application_1/utils/custom_dropdown.dart';
 
 import '../../utils/ApiConfig.dart';
 import '../../utils/colors.dart';
+import 'package:http/http.dart' as http;
 
 class AgingScreen_details extends StatefulWidget {
   const AgingScreen_details({super.key});
@@ -77,11 +81,65 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
   String? selectedSku;
   List<String> skuList = []; // To hold available SKUs
   bool isWideScreen = false;
+  String? selectedCategory = 'All';
+  List<String> categories = ['All'];
+  String? productName = 'All'; // For searching by product
+  List<String> productNames = ['All'];
 
   @override
   void initState() {
     super.initState();
     fetchSkuList();
+    fetchCategories();
+    fetchProductNames();
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://api.thrivebrands.ai/api/inventory/productcategory'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = await json.decode(response.body);
+        setState(() {
+          // Start with "All Categories" and add the rest
+          categories = ['All'] +
+              data.map<String>((category) => category.toString()).toList();
+          print('Available Categories: $categories');
+        });
+      } else {
+        throw Exception('Failed to load categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading categories: $e')),
+      );
+    }
+  }
+
+  Future<void> fetchProductNames() async {
+    try {
+      final response = await http.get(
+          Uri.parse('https://api.thrivebrands.ai/api/inventory/productname'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = await json.decode(response.body);
+        setState(() {
+          // Start with "All" and add the rest
+          productNames = ['All'] +
+              data.map<String>((category) => category.toString()).toList();
+          print('Available Products: $productNames');
+        });
+      } else {
+        throw Exception('Failed to load categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching Products: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading Products: $e')),
+      );
+    }
   }
 
   // Function to fetch the list of SKUs
@@ -117,11 +175,17 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
     if (selectedSku == null) return;
 
     try {
+      if (selectedCategory == "All") {
+        selectedCategory = "";
+      }
+      if (productName == "All") {
+        productName = "";
+      }
       var dio = Dio();
       String url = selectedSku == "All"
-          ? '${ApiConfig.baseUrl}/inventory' // Fetch all data
-          : '${ApiConfig.baseUrl}/inventory?sku=$selectedSku'; // Fetch based on selected SKU
-
+          ? '${ApiConfig.baseUrl}/inventory?productName=$productName&productCategory=$selectedCategory' // Fetch all data
+          : '${ApiConfig.baseUrl}/inventory?sku=$selectedSku&productName=$productName&productCategory=$selectedCategory'; // Fetch based on selected SKU
+      print('Fetching inventory from URL: $url');
       var response = await dio.get(url);
 
       if (response.statusCode == 200) {
@@ -197,403 +261,611 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
       //     ),
       //   ),
       // ),
-      body: kIsWeb && isWideScreen ? Container(
-        margin: const EdgeInsets.symmetric(horizontal: 180, vertical: 8),
-        child: Column(
-          children: [
-            SizedBox(height: 15),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 300),
-              child: DropdownButtonFormField<String>(
-                isExpanded: true,
-                value: selectedSku,
-                decoration: customInputDecoration(
-                  hintText: "Select SKU",
-                  labelText: "SKU",
-                ),
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedSku = newValue;
-                    isLoading =
-                    true; // Set loading state before fetching new data
-                    fetchInventoryData(); // Fetch data with the new SKU
-                  });
-                },
-                items: skuList.map<DropdownMenuItem<String>>((String sku) {
-                  return DropdownMenuItem<String>(
-                    value: sku,
-                    child: Text(sku),
-                  );
-                }).toList(),
-              ),
-            ),
-            SizedBox(height: 15),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : error.isNotEmpty
-                  ? Center(child: Text(error))
-                  : ListView.builder(
-                itemCount: inventoryList.length,
-                itemBuilder: (context, index) {
-                  var item = inventoryList[index];
-
-                  return Card(
-                    color: AppColors.beige,
-                    elevation: 0,
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            Column(
-                              children: [
-                                // Icon(Icons.icecream_outlined),
-                                SizedBox(
-                                  width: 100,
-                                  child: Text(
-                                    '📦',
-                                    //Product: name
-                                    // "${item['SKU'].toString()}",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 50,
-                                        color: Colors.brown),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+      body: kIsWeb && isWideScreen
+          ? Container(
+              margin: const EdgeInsets.symmetric(horizontal: 180, vertical: 8),
+              child: Column(
+                children: [
+                  SizedBox(height: 15),
+                  SingleChildScrollView(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: 200),
+                          child: DropdownSearch<String>(
+                            items: skuList,
+                            selectedItem: selectedSku,
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                decoration: InputDecoration(
+                                  hintText: "Search SKU",
+                                  border: OutlineInputBorder(),
                                 ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    // ClipRRect(
-                                    //   borderRadius: BorderRadius.circular(8),
-                                    //   child: Image.network(
-                                    //     'https://www.kineticasports.com/cdn/shop/files/kinetica-sports-227kg-whey-choc-974567.png?v=1715782106&width=1200',
-                                    //     width: 100,
-                                    //     height: 120,
-                                    //     fit: BoxFit.cover,
-                                    //     errorBuilder: (context, error,
-                                    //         stackTrace) =>
-                                    //     const Icon(
-                                    //         Icons.image_not_supported,
-                                    //         size: 80),
-                                    //   ),
-                                    // ),
-                                    // const SizedBox(width: 12),
-
-                                    Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        // SizedBox(height: 8),
-
-                                        Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Text("SKU",
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                    FontWeight.bold,
-                                                    color: AppColors
-                                                        .gold)),
-                                            SizedBox(
-                                              width:
-                                              100, // tweak this value to achieve a wrap around 15 characters
-                                              child: Text(
-                                                item['SKU'].toString(),
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight:
-                                                  FontWeight.w800,
-                                                  color: AppColors
-                                                      .primaryBlue,
-                                                ),
-                                                softWrap: true,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        //_buildInfoRow("SKU", "product['sellerSku'].toUpperCase()"),
-
-                                        Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Text("Product Name",
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                    FontWeight.bold,
-                                                    color: AppColors
-                                                        .gold)),
-                                            SizedBox(
-                                              width:
-                                              100, // tweak this value to achieve a wrap around 15 characters
-                                              child: Text(
-                                                item['Product_Name'].toString(),
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight:
-                                                  FontWeight.w800,
-                                                  color: AppColors
-                                                      .primaryBlue,
-                                                ),
-                                                softWrap: true,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        // _buildInfoRow("ASIN", "product['asin'].toUpperCase()"),
-                                      ],
-                                    ),
-                                    //  SizedBox(width: 16),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            // Column(
-                            //   crossAxisAlignment:
-                            //       CrossAxisAlignment.start,
-                            //   children: [
-                            //     Row(
-                            //       crossAxisAlignment:
-                            //           CrossAxisAlignment.start,
-                            //       children: _selectedItems
-                            //           .map((label) => buildInfoRow(
-                            //               label,
-                            //               item[fieldMapping[label]]
-                            //                       ?.toString() ??
-                            //                   "0"))
-                            //           .toList(),
-                            //     ),
-                            //     SizedBox(
-                            //       height: 10,
-                            //     ),
-                            //     Row(
-                            //       crossAxisAlignment:
-                            //           CrossAxisAlignment.start,
-                            //       children: _selectedItemss
-                            //           .map((label) => buildInfoRow(
-                            //               label,
-                            //               item[fieldMapping[label]]
-                            //                       ?.toString() ??
-                            //                   "0"))
-                            //           .toList(),
-                            //     ),
-                            //   ],
-                            // ),
-                            showAgeingContent(item),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ) :
-      Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButton<String>(
-              value: selectedSku,
-              onChanged: (newValue) {
-                setState(() {
-                  selectedSku = newValue;
-                  isLoading =
-                  true; // Set loading state before fetching new data
-                  fetchInventoryData(); // Fetch data with the new SKU
-                });
-              },
-              items: skuList.map<DropdownMenuItem<String>>((String sku) {
-                return DropdownMenuItem<String>(
-                  value: sku,
-                  child: Text(sku),
-                );
-              }).toList(),
-            ),
-          ),
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : error.isNotEmpty
-                ? Center(child: Text(error))
-                : ListView.builder(
-              itemCount: inventoryList.length,
-              itemBuilder: (context, index) {
-                var item = inventoryList[index];
-
-                return Card(
-                  color: AppColors.beige,
-                  elevation: 0,
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              // Icon(Icons.icecream_outlined),
-                              // SizedBox(
-                              //   width: 100,
-                              //   child: Text(
-                              //     '📦',
-                              //     //Product: name
-                              //     // "${item['SKU'].toString()}",
-                              //     style: const TextStyle(
-                              //         fontWeight: FontWeight.bold,
-                              //         fontSize: 50,
-                              //         color: Colors.brown),
-                              //     overflow: TextOverflow.ellipsis,
-                              //   ),
-                              // ),
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  // ClipRRect(
-                                  //   borderRadius: BorderRadius.circular(8),
-                                  //   child: Image.network(
-                                  //     'https://www.kineticasports.com/cdn/shop/files/kinetica-sports-227kg-whey-choc-974567.png?v=1715782106&width=1200',
-                                  //     width: 100,
-                                  //     height: 120,
-                                  //     fit: BoxFit.cover,
-                                  //     errorBuilder: (context, error,
-                                  //         stackTrace) =>
-                                  //     const Icon(
-                                  //         Icons.image_not_supported,
-                                  //         size: 80),
-                                  //   ),
-                                  // ),
-                                  // const SizedBox(width: 12),
-
-                                  Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: [
-                                      // SizedBox(height: 8),
-
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text("SKU",
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight:
-                                                  FontWeight.bold,
-                                                  color: AppColors
-                                                      .gold)),
-                                          SizedBox(
-                                            width:
-                                            100, // tweak this value to achieve a wrap around 15 characters
-                                            child: Text(
-                                              item['SKU'].toString(),
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight:
-                                                FontWeight.w800,
-                                                color: AppColors
-                                                    .primaryBlue,
-                                              ),
-                                              softWrap: true,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      //_buildInfoRow("SKU", "product['sellerSku'].toUpperCase()"),
-
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Product Name",
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight:
-                                                  FontWeight.bold,
-                                                  color: AppColors
-                                                      .gold)),
-                                          SizedBox(
-                                            width:
-                                            100, // tweak this value to achieve a wrap around 15 characters
-                                            child: Text(
-                                              item['Product_Name'].toString(),
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight:
-                                                FontWeight.w800,
-                                                color: AppColors
-                                                    .primaryBlue,
-                                              ),
-                                              softWrap: true,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      // _buildInfoRow("ASIN", "product['asin'].toUpperCase()"),
-                                    ],
-                                  ),
-                                  //  SizedBox(width: 16),
-                                ],
                               ),
-                            ],
+                            ),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: customInputDecoration(
+                                hintText: "Select SKU",
+                                labelText: "SKU",
+                              ),
+                            ),
+                            clearButtonProps: ClearButtonProps(
+                              isVisible: true,
+                              onPressed: () {
+                                setState(() {
+                                  selectedSku = ""; // Clear selection
+                                  isLoading = true;
+                                  fetchInventoryData();
+                                });
+                              },
+                            ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedSku = newValue;
+                                isLoading = true;
+                                fetchInventoryData();
+                              });
+                            },
                           ),
-                          // Column(
-                          //   crossAxisAlignment:
-                          //       CrossAxisAlignment.start,
-                          //   children: [
-                          //     Row(
-                          //       crossAxisAlignment:
-                          //           CrossAxisAlignment.start,
-                          //       children: _selectedItems
-                          //           .map((label) => buildInfoRow(
-                          //               label,
-                          //               item[fieldMapping[label]]
-                          //                       ?.toString() ??
-                          //                   "0"))
-                          //           .toList(),
-                          //     ),
-                          //     SizedBox(
-                          //       height: 10,
-                          //     ),
-                          //     Row(
-                          //       crossAxisAlignment:
-                          //           CrossAxisAlignment.start,
-                          //       children: _selectedItemss
-                          //           .map((label) => buildInfoRow(
-                          //               label,
-                          //               item[fieldMapping[label]]
-                          //                       ?.toString() ??
-                          //                   "0"))
-                          //           .toList(),
-                          //     ),
-                          //   ],
-                          // ),
-                          showAgeingContent(item),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: 200,
+                          child: DropdownSearch<String>(
+                            items: categories,
+                            selectedItem: selectedCategory,
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                decoration: InputDecoration(
+                                  isDense: false, // Allow full height
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 14),
+                                  hintText: "Search Category",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: customInputDecoration(
+                                  labelText: 'Select Category'),
+                            ),
+                            clearButtonProps: ClearButtonProps(isVisible: true),
+                            onChanged: (value) async {
+                              setState(() {
+                                selectedCategory = value ?? "All";
+                                fetchInventoryData();
+                                fetchCategories();
+                                fetchProductNames();
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: 200,
+                          child: DropdownSearch<String>(
+                            items: productNames,
+                            selectedItem: productName,
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                decoration: InputDecoration(
+                                  isDense: false, // Allow full height
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 14),
+                                  hintText: "Search Product",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: customInputDecoration(
+                                  labelText: 'Select Product'),
+                            ),
+                            clearButtonProps: ClearButtonProps(isVisible: true),
+                            onChanged: (value) async {
+                              setState(() {
+                                productName = value ?? "All";
+                                fetchInventoryData();
+                                fetchCategories();
+                                fetchProductNames();
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
+                  SizedBox(height: 15),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : error.isNotEmpty
+                            ? Center(child: Text(error))
+                            : ListView.builder(
+                                itemCount: inventoryList.length,
+                                itemBuilder: (context, index) {
+                                  var item = inventoryList[index];
+
+                                  return Card(
+                                    color: AppColors.beige,
+                                    elevation: 0,
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Row(
+                                          children: [
+                                            Column(
+                                              children: [
+                                                // Icon(Icons.icecream_outlined),
+                                                SizedBox(
+                                                  width: 100,
+                                                  child: Text(
+                                                    '📦',
+                                                    //Product: name
+                                                    // "${item['SKU'].toString()}",
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 50,
+                                                        color: Colors.brown),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Row(
+                                                  children: [
+                                                    // ClipRRect(
+                                                    //   borderRadius: BorderRadius.circular(8),
+                                                    //   child: Image.network(
+                                                    //     'https://www.kineticasports.com/cdn/shop/files/kinetica-sports-227kg-whey-choc-974567.png?v=1715782106&width=1200',
+                                                    //     width: 100,
+                                                    //     height: 120,
+                                                    //     fit: BoxFit.cover,
+                                                    //     errorBuilder: (context, error,
+                                                    //         stackTrace) =>
+                                                    //     const Icon(
+                                                    //         Icons.image_not_supported,
+                                                    //         size: 80),
+                                                    //   ),
+                                                    // ),
+                                                    // const SizedBox(width: 12),
+
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        // SizedBox(height: 8),
+
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text("SKU",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: AppColors
+                                                                        .gold)),
+                                                            SizedBox(
+                                                              width:
+                                                                  100, // tweak this value to achieve a wrap around 15 characters
+                                                              child: Text(
+                                                                item['SKU']
+                                                                    .toString(),
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                  color: AppColors
+                                                                      .primaryBlue,
+                                                                ),
+                                                                softWrap: true,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        //_buildInfoRow("SKU", "product['sellerSku'].toUpperCase()"),
+
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text("Product Name",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: AppColors
+                                                                        .gold)),
+                                                            SizedBox(
+                                                              width:
+                                                                  100, // tweak this value to achieve a wrap around 15 characters
+                                                              child: Text(
+                                                                item['Product_Name']
+                                                                    .toString(),
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                  color: AppColors
+                                                                      .primaryBlue,
+                                                                ),
+                                                                softWrap: true,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        // _buildInfoRow("ASIN", "product['asin'].toUpperCase()"),
+                                                      ],
+                                                    ),
+                                                    //  SizedBox(width: 16),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            // Column(
+                                            //   crossAxisAlignment:
+                                            //       CrossAxisAlignment.start,
+                                            //   children: [
+                                            //     Row(
+                                            //       crossAxisAlignment:
+                                            //           CrossAxisAlignment.start,
+                                            //       children: _selectedItems
+                                            //           .map((label) => buildInfoRow(
+                                            //               label,
+                                            //               item[fieldMapping[label]]
+                                            //                       ?.toString() ??
+                                            //                   "0"))
+                                            //           .toList(),
+                                            //     ),
+                                            //     SizedBox(
+                                            //       height: 10,
+                                            //     ),
+                                            //     Row(
+                                            //       crossAxisAlignment:
+                                            //           CrossAxisAlignment.start,
+                                            //       children: _selectedItemss
+                                            //           .map((label) => buildInfoRow(
+                                            //               label,
+                                            //               item[fieldMapping[label]]
+                                            //                       ?.toString() ??
+                                            //                   "0"))
+                                            //           .toList(),
+                                            //     ),
+                                            //   ],
+                                            // ),
+                                            showAgeingContent(item),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: 200),
+                          child: DropdownSearch<String>(
+                            items: skuList,
+                            selectedItem: selectedSku,
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                decoration: InputDecoration(
+                                  hintText: "Search SKU",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: customInputDecoration(
+                                hintText: "Select SKU",
+                                labelText: "SKU",
+                              ),
+                            ),
+                            clearButtonProps: ClearButtonProps(
+                              isVisible: true,
+                              onPressed: () {
+                                setState(() {
+                                  selectedSku = ""; // Clear selection
+                                  isLoading = true;
+                                  fetchInventoryData();
+                                });
+                              },
+                            ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedSku = newValue;
+                                isLoading = true;
+                                fetchInventoryData();
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: 200,
+                          child: DropdownSearch<String>(
+                            items: categories,
+                            selectedItem: selectedCategory,
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                decoration: InputDecoration(
+                                  isDense: false, // Allow full height
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 14),
+                                  hintText: "Search Category",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: customInputDecoration(
+                                  labelText: 'Select Category'),
+                            ),
+                            clearButtonProps: ClearButtonProps(isVisible: true),
+                            onChanged: (value) async {
+                              setState(() {
+                                selectedCategory = value ?? "All";
+                                fetchInventoryData();
+                                fetchCategories();
+                                fetchProductNames();
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: 200,
+                          child: DropdownSearch<String>(
+                            items: productNames,
+                            selectedItem: productName,
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                decoration: InputDecoration(
+                                  isDense: false, // Allow full height
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 14),
+                                  hintText: "Search Product",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: customInputDecoration(
+                                  labelText: 'Select Product'),
+                            ),
+                            clearButtonProps: ClearButtonProps(isVisible: true),
+                            onChanged: (value) async {
+                              setState(() {
+                                productName = value ?? "All";
+                                fetchInventoryData();
+                                fetchCategories();
+                                fetchProductNames();
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : error.isNotEmpty
+                          ? Center(child: Text(error))
+                          : ListView.builder(
+                              itemCount: inventoryList.length,
+                              itemBuilder: (context, index) {
+                                var item = inventoryList[index];
+
+                                return Card(
+                                  color: AppColors.beige,
+                                  elevation: 0,
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Row(
+                                        children: [
+                                          Column(
+                                            children: [
+                                              // Icon(Icons.icecream_outlined),
+                                              // SizedBox(
+                                              //   width: 100,
+                                              //   child: Text(
+                                              //     '📦',
+                                              //     //Product: name
+                                              //     // "${item['SKU'].toString()}",
+                                              //     style: const TextStyle(
+                                              //         fontWeight: FontWeight.bold,
+                                              //         fontSize: 50,
+                                              //         color: Colors.brown),
+                                              //     overflow: TextOverflow.ellipsis,
+                                              //   ),
+                                              // ),
+                                              const SizedBox(height: 10),
+                                              Row(
+                                                children: [
+                                                  // ClipRRect(
+                                                  //   borderRadius: BorderRadius.circular(8),
+                                                  //   child: Image.network(
+                                                  //     'https://www.kineticasports.com/cdn/shop/files/kinetica-sports-227kg-whey-choc-974567.png?v=1715782106&width=1200',
+                                                  //     width: 100,
+                                                  //     height: 120,
+                                                  //     fit: BoxFit.cover,
+                                                  //     errorBuilder: (context, error,
+                                                  //         stackTrace) =>
+                                                  //     const Icon(
+                                                  //         Icons.image_not_supported,
+                                                  //         size: 80),
+                                                  //   ),
+                                                  // ),
+                                                  // const SizedBox(width: 12),
+
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      // SizedBox(height: 8),
+
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text("SKU",
+                                                              style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: AppColors
+                                                                      .gold)),
+                                                          SizedBox(
+                                                            width:
+                                                                100, // tweak this value to achieve a wrap around 15 characters
+                                                            child: Text(
+                                                              item['SKU']
+                                                                  .toString(),
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                color: AppColors
+                                                                    .primaryBlue,
+                                                              ),
+                                                              softWrap: true,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      //_buildInfoRow("SKU", "product['sellerSku'].toUpperCase()"),
+
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text("Product Name",
+                                                              style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: AppColors
+                                                                      .gold)),
+                                                          SizedBox(
+                                                            width:
+                                                                100, // tweak this value to achieve a wrap around 15 characters
+                                                            child: Text(
+                                                              item['Product_Name']
+                                                                  .toString(),
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                color: AppColors
+                                                                    .primaryBlue,
+                                                              ),
+                                                              softWrap: true,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      // _buildInfoRow("ASIN", "product['asin'].toUpperCase()"),
+                                                    ],
+                                                  ),
+                                                  //  SizedBox(width: 16),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          // Column(
+                                          //   crossAxisAlignment:
+                                          //       CrossAxisAlignment.start,
+                                          //   children: [
+                                          //     Row(
+                                          //       crossAxisAlignment:
+                                          //           CrossAxisAlignment.start,
+                                          //       children: _selectedItems
+                                          //           .map((label) => buildInfoRow(
+                                          //               label,
+                                          //               item[fieldMapping[label]]
+                                          //                       ?.toString() ??
+                                          //                   "0"))
+                                          //           .toList(),
+                                          //     ),
+                                          //     SizedBox(
+                                          //       height: 10,
+                                          //     ),
+                                          //     Row(
+                                          //       crossAxisAlignment:
+                                          //           CrossAxisAlignment.start,
+                                          //       children: _selectedItemss
+                                          //           .map((label) => buildInfoRow(
+                                          //               label,
+                                          //               item[fieldMapping[label]]
+                                          //                       ?.toString() ??
+                                          //                   "0"))
+                                          //           .toList(),
+                                          //     ),
+                                          //   ],
+                                          // ),
+                                          showAgeingContent(item),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
   Widget showAgeingContent(var item) {
-    if (!kIsWeb ||(kIsWeb && !isWideScreen)) {
+    if (!kIsWeb || (kIsWeb && !isWideScreen)) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -601,7 +873,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: _selectedItems
                 .map((label) => buildInfoRow(
-                label, item[fieldMapping[label]]?.toString() ?? "0"))
+                    label, item[fieldMapping[label]]?.toString() ?? "0"))
                 .toList(),
           ),
           SizedBox(
@@ -611,7 +883,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: _selectedItemss
                 .map((label) => buildInfoRow(
-                label, item[fieldMapping[label]]?.toString() ?? "0"))
+                    label, item[fieldMapping[label]]?.toString() ?? "0"))
                 .toList(),
           ),
         ],
@@ -624,7 +896,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: _selectedItems
                 .map((label) => buildInfoRow(
-                label, item[fieldMapping[label]]?.toString() ?? "0"))
+                    label, item[fieldMapping[label]]?.toString() ?? "0"))
                 .toList(),
           ),
           SizedBox(
@@ -634,7 +906,7 @@ class _AgingScreen_detailsState extends State<AgingScreen_details> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: _selectedItemss
                 .map((label) => buildInfoRow(
-                label, item[fieldMapping[label]]?.toString() ?? "0"))
+                    label, item[fieldMapping[label]]?.toString() ?? "0"))
                 .toList(),
           ),
         ],
@@ -752,9 +1024,6 @@ class _MultiSelectDialogState extends State<MultiSelectDialog> {
     );
   }
 }
-
-
-
 
 /*
 import 'package:flutter/foundation.dart';

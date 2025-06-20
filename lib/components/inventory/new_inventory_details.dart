@@ -429,6 +429,9 @@
 // }
 //
 
+import 'dart:convert';
+
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_application_1/utils/custom_dropdown.dart';
@@ -438,6 +441,7 @@ import '../../utils/ApiConfig.dart';
 import '../../utils/colors.dart';
 import 'aging_screen.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 class New_inventrory_details extends StatefulWidget {
   const New_inventrory_details({super.key});
@@ -479,6 +483,10 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
   bool isLoading = true;
   String error = '';
   bool isWideScreen = false;
+  String? selectedCategory = 'All';
+  List<String> categories = ['All'];
+  String? productName = 'All'; // For searching by product
+  List<String> productNames = ['All'];
 
   // For selecting SKU
   String? selectedSku;
@@ -489,6 +497,8 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
     super.initState();
     initializeSelectedItems();
     fetchSkuList();
+    fetchCategories();
+    fetchProductNames();
   }
 
   void initializeSelectedItems() {
@@ -507,6 +517,54 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
         "Total Sellable",
         "Amazon Reserved",
       ]; // 3 items for Mobile
+    }
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://api.thrivebrands.ai/api/inventory/productcategory'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = await json.decode(response.body);
+        setState(() {
+          // Start with "All Categories" and add the rest
+          categories = ['All'] +
+              data.map<String>((category) => category.toString()).toList();
+          print('Available Categories: $categories');
+        });
+      } else {
+        throw Exception('Failed to load categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading categories: $e')),
+      );
+    }
+  }
+
+  Future<void> fetchProductNames() async {
+    try {
+      final response = await http.get(
+          Uri.parse('https://api.thrivebrands.ai/api/inventory/productname'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = await json.decode(response.body);
+        setState(() {
+          // Start with "All" and add the rest
+          productNames = ['All'] +
+              data.map<String>((category) => category.toString()).toList();
+          print('Available Products: $productNames');
+        });
+      } else {
+        throw Exception('Failed to load categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching Products: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading Products: $e')),
+      );
     }
   }
 
@@ -544,10 +602,16 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
 
     try {
       var dio = Dio();
+      if (productName == 'All') {
+        productName = '';
+      }
+      if (selectedCategory == 'All') {
+        selectedCategory = '';
+      }
       String url = selectedSku == "All"
-          ? '${ApiConfig.baseUrl}/inventory' // Fetch all data
-          : '${ApiConfig.baseUrl}/inventory?sku=$selectedSku'; // Fetch based on selected SKU
-
+          ? '${ApiConfig.baseUrl}/inventory?productName=$productName&productCategory=$selectedCategory' // Fetch all data
+          : '${ApiConfig.baseUrl}/inventory?sku=$selectedSku&productName=$productName&productCategory=$selectedCategory'; // Fetch based on selected SKU
+      print('Fetching inventory from URL: $url');
       var response = await dio.get(url);
 
       if (response.statusCode == 200) {
@@ -580,75 +644,193 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
           toolbarHeight: 100,
           title: Container(
             margin: const EdgeInsets.only(top: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  width: isWideScreen && kIsWeb ? 200 : 0,
-                ),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxWidth: isWideScreen && kIsWeb ? 300 : 200),
-                  child: DropdownButtonFormField<String>(
-                    isExpanded: true,
-                    value: selectedSku,
-                    decoration: customInputDecoration(
-                      hintText: "Select SKU",
-                      labelText: "SKU",
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Padding(
+               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: isWideScreen && kIsWeb ? 300 : 0,
                     ),
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedSku = newValue;
-                        isLoading =
-                            true; // Set loading state before fetching new data
-                        fetchInventoryData(); // Fetch data with the new SKU
-                      });
-                    },
-                    items: skuList.map<DropdownMenuItem<String>>((String sku) {
-                      return DropdownMenuItem<String>(
-                        value: sku,
-                        child: Text(sku),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    final List<String>? selectedValues = await showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return MultiSelectDialog(
-                          options: _options,
-                          selectedValues: _selectedItems,
-                        );
-                      },
-                    );
-                    if (selectedValues != null) {
-                      setState(() {
-                        _selectedItems = selectedValues;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white24,
-                    ),
-                    child: const Row(
-                      children: [
-                        Text(
-                          "Filter",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                    // ConstrainedBox(
+                    //   constraints: BoxConstraints(
+                    //       maxWidth: isWideScreen && kIsWeb ? 300 : 200),
+                    //   child: DropdownButtonFormField<String>(
+                    //     isExpanded: true,
+                    //     value: selectedSku,
+                    //     decoration: customInputDecoration(
+                    //       hintText: "Select SKU",
+                    //       labelText: "SKU",
+                    //     ),
+                    //     onChanged: (newValue) {
+                    //       setState(() {
+                    //         selectedSku = newValue;
+                    //         isLoading =
+                    //             true; // Set loading state before fetching new data
+                    //         fetchInventoryData(); // Fetch data with the new SKU
+                    //       });
+                    //     },
+                    //     items: skuList.map<DropdownMenuItem<String>>((String sku) {
+                    //       return DropdownMenuItem<String>(
+                    //         value: sku,
+                    //         child: Text(sku),
+                    //       );
+                    //     }).toList(),
+                    //   ),
+                    // ),
+                
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: isWideScreen && kIsWeb ? 200 : 200,
+                      ),
+                      child: DropdownSearch<String>(
+                        items: skuList,
+                        selectedItem: selectedSku,
+                        popupProps: PopupProps.menu(
+                          showSearchBox: true,
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              hintText: "Search SKU",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
                         ),
-                        Icon(Icons.arrow_drop_down, color: Colors.black),
-                      ],
+                        dropdownDecoratorProps: DropDownDecoratorProps(
+                          dropdownSearchDecoration: customInputDecoration(
+                            hintText: "Select SKU",
+                            labelText: "SKU",
+                          ),
+                        ),
+                        clearButtonProps: ClearButtonProps(
+                            isVisible: true,
+                            onPressed: () {
+                              setState(() {
+                                selectedSku = ""; // Clear selection
+                                isLoading = true; // Show loading indicator
+                                fetchInventoryData(); // Fetch all inventory data
+                                fetchCategories(); // Fetch categories again
+                                fetchProductNames(); // Fetch product names again
+                              });
+                            }),
+                        onChanged: (newValue) {
+                          setState(() {
+                            selectedSku = newValue;
+                            isLoading = true; // Show loading indicator
+                            fetchInventoryData(); // Fetch inventory for new SKU
+                            fetchCategories(); // Fetch categories again
+                            fetchProductNames(); // Fetch product names again
+                          });
+                        },
+                      ),
                     ),
-                  ),
+                    SizedBox(width: 16),
+                    SizedBox(
+                      width: 200,
+                      child: DropdownSearch<String>(
+                        items: categories,
+                        selectedItem: selectedCategory,
+                        popupProps: PopupProps.menu(
+                          showSearchBox: true,
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              isDense: false, // Allow full height
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 14),
+                              hintText: "Search Category",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        dropdownDecoratorProps: DropDownDecoratorProps(
+                          dropdownSearchDecoration:
+                              customInputDecoration(labelText: 'Select Category'),
+                        ),
+                        clearButtonProps: ClearButtonProps(isVisible: true),
+                        onChanged: (value) async {
+                          setState(() {
+                            selectedCategory = value ?? "All";
+                            fetchInventoryData();
+                            fetchCategories(); // Fetch categories again
+                            fetchProductNames(); // Fetch product names again
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    SizedBox(
+                      width: 200,
+                      child: DropdownSearch<String>(
+                        items: productNames,
+                        selectedItem: productName,
+                        popupProps: PopupProps.menu(
+                          showSearchBox: true,
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              isDense: false, // Allow full height
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 14),
+                              hintText: "Search Product",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        dropdownDecoratorProps: DropDownDecoratorProps(
+                          dropdownSearchDecoration:
+                              customInputDecoration(labelText: 'Select Product'),
+                        ),
+                        clearButtonProps: ClearButtonProps(isVisible: true),
+                        onChanged: (value) async {
+                          setState(() {
+                            productName = value ?? "All";
+                            fetchInventoryData();
+                            fetchCategories();
+                            fetchProductNames();
+                          });
+                        },
+                      ),
+                    ),
+                     SizedBox(width: kIsWeb && isWideScreen ? 200 : 16),
+                    GestureDetector(
+                      onTap: () async {
+                        final List<String>? selectedValues = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return MultiSelectDialog(
+                              options: _options,
+                              selectedValues: _selectedItems,
+                            );
+                          },
+                        );
+                        if (selectedValues != null) {
+                          setState(() {
+                            _selectedItems = selectedValues;
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white24,
+                        ),
+                        child: const Row(
+                          children: [
+                            Text(
+                              "Filter",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Icon(Icons.arrow_drop_down, color: Colors.black),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -793,7 +975,8 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
                                                   _selectedItems.map((label) {
                                                 String value;
 
-                                                if (label == "Inventory Age (0-90)") {
+                                                if (label ==
+                                                    "Inventory Age (0-90)") {
                                                   final invAge = item[
                                                           "inv_age_0_to_30_days"] ??
                                                       0;
@@ -808,10 +991,10 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
                                                   //     0;
                                                   value = (invAge +
                                                           invAge60 +
-                                                           invAge90
+                                                          invAge90
                                                       //+
-                                                          // invAge180
-                                                  )
+                                                      // invAge180
+                                                      )
                                                       .toString();
                                                 } else {
                                                   value =
@@ -842,99 +1025,123 @@ class _New_inventrory_detailsState extends State<New_inventrory_details> {
                   child: isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : inventoryList.isEmpty
-                      ? const Center(child: Text('No products found.'))
-                      : ListView.builder(
-                    itemCount: inventoryList.length,
-                    itemBuilder: (context, index) {
-                      var item = inventoryList[index];
+                          ? const Center(child: Text('No products found.'))
+                          : ListView.builder(
+                              itemCount: inventoryList.length,
+                              itemBuilder: (context, index) {
+                                var item = inventoryList[index];
 
-                      return
-                        Card(
-                          color: AppColors.beige,
-                          elevation: 0,
-                          margin: const EdgeInsets.only(bottom: 10),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // LEFT SIDE: Product Name + SKU
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints(maxWidth: 190),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          item['Product_Name'].toString(),
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: Colors.brown,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "SKU ",
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.gold,
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                item['SKU']?.toString() ?? 'N/A',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w800,
-                                                  color: AppColors.primaryBlue,
+                                return Card(
+                                  color: AppColors.beige,
+                                  elevation: 0,
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // LEFT SIDE: Product Name + SKU
+                                          ConstrainedBox(
+                                            constraints:
+                                                BoxConstraints(maxWidth: 190),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item['Product_Name']
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                    color: Colors.brown,
+                                                  ),
                                                 ),
-                                                softWrap: true,
-                                                overflow: TextOverflow.visible,
-                                              ),
+                                                const SizedBox(height: 10),
+                                                Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "SKU ",
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: AppColors.gold,
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        item['SKU']
+                                                                ?.toString() ??
+                                                            'N/A',
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: AppColors
+                                                              .primaryBlue,
+                                                        ),
+                                                        softWrap: true,
+                                                        overflow: TextOverflow
+                                                            .visible,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ],
+                                          ),
+
+                                          const SizedBox(width: 20),
+
+                                          // RIGHT SIDE: Dynamic Info Rows
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children:
+                                                _selectedItems.map((label) {
+                                              String value;
+
+                                              if (label ==
+                                                  "Inventory Age (0-90)") {
+                                                final invAge = item[
+                                                        "inv_age_0_to_30_days"] ??
+                                                    0;
+                                                final invAge60 = item[
+                                                        "inv_age_31_to_60_days"] ??
+                                                    0;
+                                                final invAge90 = item[
+                                                        "inv_age_61_to_90_days"] ??
+                                                    0;
+                                                //final invAge180 = item["inv_age_91_to_180_days"] ?? 0;
+                                                value = (invAge +
+                                                        invAge60 +
+                                                        invAge90)
+                                                    .toString();
+                                              } else {
+                                                value =
+                                                    item[fieldMapping[label]]
+                                                            ?.toString() ??
+                                                        "0";
+                                              }
+
+                                              return buildInfoRow(label, value);
+                                            }).toList(),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-
-                                  const SizedBox(width: 20),
-
-                                  // RIGHT SIDE: Dynamic Info Rows
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: _selectedItems.map((label) {
-                                      String value;
-
-                                      if (label == "Inventory Age (0-90)") {
-                                        final invAge = item["inv_age_0_to_30_days"] ?? 0;
-                                        final invAge60 = item["inv_age_31_to_60_days"] ?? 0;
-                                        final invAge90 = item["inv_age_61_to_90_days"] ?? 0;
-                                        //final invAge180 = item["inv_age_91_to_180_days"] ?? 0;
-                                        value = (invAge + invAge60 + invAge90 ).toString();
-                                      } else {
-                                        value = item[fieldMapping[label]]?.toString() ?? "0";
-                                      }
-
-                                      return buildInfoRow(label, value);
-                                    }).toList(),
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                          ),
-                        );
-
-
-                    },
-                  ),
                 ),
               ],
             ),

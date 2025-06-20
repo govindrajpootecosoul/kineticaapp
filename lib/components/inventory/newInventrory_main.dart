@@ -38,6 +38,9 @@
 //   }
 // }
 
+import 'dart:convert';
+
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/comman_Screens/Inventory_SKU_Card_Web_Screen.dart';
 import 'package:flutter_application_1/utils/check_platform.dart';
@@ -47,6 +50,7 @@ import 'package:provider/provider.dart';
 import '../../Provider/sales_SKU_Provider.dart';
 import '../../comman_Screens/Inventory_SKU_Card_Screen.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:http/http.dart' as http;
 
 class NewInventoryMain extends StatefulWidget {
   const NewInventoryMain({super.key});
@@ -59,6 +63,10 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
   String selectedSku = 'All';
   bool isWeb = false;
   bool isWideScreen = false;
+  String? selectedCategory = 'All';
+  List<String> categories = ['All'];
+  String? productName = 'All'; // For searching by product
+  List<String> productNames = ['All'];
 
   @override
   void initState() {
@@ -66,8 +74,58 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
     isWeb = checkPlatform();
     final provider = Provider.of<InventoryProvider>(context, listen: false);
     provider.fetchSKUs().then((_) {
-      provider.fetchAllInventory();
+      provider.fetchAllInventory(productName: '', productCategory: '');
     });
+    fetchCategories();
+    fetchProductNames();
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://api.thrivebrands.ai/api/inventory/productcategory'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = await json.decode(response.body);
+        setState(() {
+          // Start with "All Categories" and add the rest
+          categories = ['All'] +
+              data.map<String>((category) => category.toString()).toList();
+          print('Available Categories: $categories');
+        });
+      } else {
+        throw Exception('Failed to load categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading categories: $e')),
+      );
+    }
+  }
+
+  Future<void> fetchProductNames() async {
+    try {
+      final response = await http.get(
+          Uri.parse('https://api.thrivebrands.ai/api/inventory/productname'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = await json.decode(response.body);
+        setState(() {
+          // Start with "All" and add the rest
+          productNames = ['All'] +
+              data.map<String>((category) => category.toString()).toList();
+          print('Available Products: $productNames');
+        });
+      } else {
+        throw Exception('Failed to load categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching Products: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading Products: $e')),
+      );
+    }
   }
 
   @override
@@ -110,36 +168,309 @@ class _NewInventoryMainState extends State<NewInventoryMain> {
               //     ),
               //   ),
               // ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: isWideScreen && isWeb
-                          ? 400
-                          : double.infinity, // Limit width on web
-                    ),
-                    child: DropdownButtonFormField<String>(
-                      value: selectedSku,
-                      items: dropdownItems.map((sku) {
-                        return DropdownMenuItem(value: sku, child: Text(sku));
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() => selectedSku = value!);
-                        if (value == 'All') {
-                          provider.fetchAllInventory();
-                        } else {
-                          provider.fetchInventoryBySku(value!);
-                        }
-                      },
-                      decoration: customInputDecoration(
-                        labelText: 'Select SKU',
-                      ),
-                    ),
-                  ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 16),
+              //   child: Align(
+              //     alignment: Alignment.center,
+              //     child: ConstrainedBox(
+              //       constraints: BoxConstraints(
+              //         maxWidth: isWideScreen && isWeb
+              //             ? 400
+              //             : double.infinity, // Limit width on web
+              //       ),
+              //       child: DropdownButtonFormField<String>(
+              //         value: selectedSku,
+              //         items: dropdownItems.map((sku) {
+              //           return DropdownMenuItem(value: sku, child: Text(sku));
+              //         }).toList(),
+              //         onChanged: (value) {
+              //           setState(() => selectedSku = value!);
+              //           if (value == 'All') {
+              //             provider.fetchAllInventory();
+              //           } else {
+              //             provider.fetchInventoryBySku(value!);
+              //           }
+              //         },
+              //         decoration: customInputDecoration(
+              //           labelText: 'Select SKU',
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+
+              // SingleChildScrollView(
+              //   scrollDirection: Axis.horizontal,
+              //   child: Row(
+              //     crossAxisAlignment: CrossAxisAlignment.center,
+              //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //     children: [
+              //       Padding(
+              //         padding: const EdgeInsets.symmetric(horizontal: 16),
+              //         child: Align(
+              //           alignment: Alignment.center,
+              //           child: ConstrainedBox(
+              //             constraints: BoxConstraints(
+              //               maxWidth:
+              //                   isWideScreen && isWeb ? 250 : double.infinity,
+              //             ),
+              //             child: DropdownSearch<String>(
+              //               items: dropdownItems, // your list of SKUs
+              //               selectedItem: selectedSku,
+              //               popupProps: PopupProps.menu(
+              //                 showSearchBox: true,
+              //                 searchFieldProps: TextFieldProps(
+              //                   decoration: InputDecoration(
+              //                     hintText: "Search SKU",
+              //                     border: OutlineInputBorder(),
+              //                   ),
+              //                 ),
+              //               ),
+              //               dropdownDecoratorProps: DropDownDecoratorProps(
+              //                 dropdownSearchDecoration:
+              //                     customInputDecoration(labelText: 'Select SKU'),
+              //               ),
+              //               clearButtonProps: ClearButtonProps(isVisible: true),
+              //               onChanged: (value) {
+              //                 setState(() => selectedSku = value ?? 'All');
+              //                 if (value == 'All' ||
+              //                     value == null ||
+              //                     value == '') {
+              //                   provider.fetchAllInventory(
+              //                       productName: productName ?? '',
+              //                       productCategory: selectedCategory ?? '');
+              //                 } else {
+              //                   provider.fetchInventoryBySku(
+              //                     sku: value,
+              //                     productName: productName ?? '',
+              //                     productCategory: selectedCategory ?? '',
+              //                   );
+              //                 }
+              //               },
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       SizedBox(
+              //         width: 200,
+              //         child: DropdownSearch<String>(
+              //           items: categories,
+              //           selectedItem: selectedCategory,
+              //           popupProps: PopupProps.menu(
+              //             showSearchBox: true,
+              //             searchFieldProps: TextFieldProps(
+              //               decoration: InputDecoration(
+              //                 hintText: "Search Category",
+              //                 border: OutlineInputBorder(),
+              //               ),
+              //             ),
+              //           ),
+              //           dropdownDecoratorProps: DropDownDecoratorProps(
+              //             dropdownSearchDecoration:
+              //                 customInputDecoration(labelText: 'Select Category'),
+              //           ),
+              //           clearButtonProps: ClearButtonProps(isVisible: true),
+              //           onChanged: (value) async {
+              //             setState(() {
+              //               selectedCategory = value ?? "All";
+              //               if (selectedSku == 'All' ||
+              //                   selectedSku == null ||
+              //                   selectedSku == '') {
+              //                 provider.fetchAllInventory(
+              //                   productName: productName ?? 'All',
+              //                   productCategory: selectedCategory ?? 'All',
+              //                 );
+              //               } else {
+              //                 provider.fetchInventoryBySku(
+              //                   sku: selectedSku ?? '',
+              //                   productName: productName ?? 'All',
+              //                   productCategory: selectedCategory ?? 'All',
+              //                 );
+              //               }
+              //               fetchCategories(); // If needed to re-fetch; otherwise remove it
+              //             });
+              //           },
+              //         ),
+              //       ),
+              //       SizedBox(
+              //         width: 200,
+              //         child: DropdownSearch<String>(
+              //           items: productNames,
+              //           selectedItem: productName,
+              //           popupProps: PopupProps.menu(
+              //             showSearchBox: true,
+              //             searchFieldProps: TextFieldProps(
+              //               decoration: InputDecoration(
+              //                 hintText: "Search Product",
+              //                 border: OutlineInputBorder(),
+              //               ),
+              //             ),
+              //           ),
+              //           dropdownDecoratorProps: DropDownDecoratorProps(
+              //             dropdownSearchDecoration:
+              //                 customInputDecoration(labelText: 'Select Product'),
+              //           ),
+              //           clearButtonProps: ClearButtonProps(isVisible: true),
+              //           onChanged: (value) async {
+              //             setState(() {
+              //               productName = value ?? "All";
+                
+              //               if (selectedSku == 'All' ||
+              //                   selectedSku == null ||
+              //                   selectedSku == '') {
+              //                 provider.fetchAllInventory(
+              //                   productName: productName ?? 'All',
+              //                   productCategory: selectedCategory ?? 'All',
+              //                 );
+              //               } else {
+              //                 provider.fetchInventoryBySku(
+              //                   sku: selectedSku ?? '',
+              //                   productName: productName ?? 'All',
+              //                   productCategory: selectedCategory ?? 'All',
+              //                 );
+              //               }
+              //               fetchCategories(); // Only include if needed, otherwise remove
+              //             });
+              //           },
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+ 
+              SingleChildScrollView(
+  scrollDirection: Axis.horizontal,
+  child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        SizedBox(
+          width: 250,
+          child: DropdownSearch<String>(
+            items: dropdownItems,
+            selectedItem: selectedSku,
+            popupProps: PopupProps.menu(
+              showSearchBox: true,
+              searchFieldProps: TextFieldProps(
+                decoration: InputDecoration(
+                   isDense: false, // Allow full height
+                   contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  hintText: "Search SKU",
+                  border: OutlineInputBorder(),
                 ),
               ),
+            ),
+            dropdownDecoratorProps: DropDownDecoratorProps(
+              dropdownSearchDecoration:
+                  customInputDecoration(labelText: 'Select SKU'),
+            ),
+            clearButtonProps: ClearButtonProps(isVisible: true),
+            onChanged: (value) {
+              setState(() => selectedSku = value ?? 'All');
+              if (value == 'All' || value == null || value == '') {
+                provider.fetchAllInventory(
+                  productName: productName ?? '',
+                  productCategory: selectedCategory ?? '',
+                );
+              } else {
+                provider.fetchInventoryBySku(
+                  sku: value,
+                  productName: productName ?? '',
+                  productCategory: selectedCategory ?? '',
+                );
+              }
+            },
+          ),
+        ),
+        const SizedBox(width: 16),
+        SizedBox(
+          width: 200,
+          child: DropdownSearch<String>(
+            items: categories,
+            selectedItem: selectedCategory,
+            popupProps: PopupProps.menu(
+              showSearchBox: true,
+              searchFieldProps: TextFieldProps(
+                decoration: InputDecoration(
+                   isDense: false, // Allow full height
+                   contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  hintText: "Search Category",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            dropdownDecoratorProps: DropDownDecoratorProps(
+              dropdownSearchDecoration:
+                  customInputDecoration(labelText: 'Select Category'),
+            ),
+            clearButtonProps: ClearButtonProps(isVisible: true),
+            onChanged: (value) async {
+              setState(() {
+                selectedCategory = value ?? "All";
+                if (selectedSku == 'All' || selectedSku == null || selectedSku == '') {
+                  provider.fetchAllInventory(
+                    productName: productName ?? 'All',
+                    productCategory: selectedCategory ?? 'All',
+                  );
+                } else {
+                  provider.fetchInventoryBySku(
+                    sku: selectedSku ?? '',
+                    productName: productName ?? 'All',
+                    productCategory: selectedCategory ?? 'All',
+                  );
+                }
+                fetchCategories();
+              });
+            },
+          ),
+        ),
+        const SizedBox(width: 16),
+        SizedBox(
+          width: 200,
+          child: DropdownSearch<String>(
+            items: productNames,
+            selectedItem: productName,
+            popupProps: PopupProps.menu(
+              showSearchBox: true,
+              searchFieldProps: TextFieldProps(
+                decoration: InputDecoration(
+                   isDense: false, // Allow full height
+                   contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  hintText: "Search Product",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            dropdownDecoratorProps: DropDownDecoratorProps(
+              dropdownSearchDecoration:
+                  customInputDecoration(labelText: 'Select Product'),
+            ),
+            clearButtonProps: ClearButtonProps(isVisible: true),
+            onChanged: (value) async {
+              setState(() {
+                productName = value ?? "All";
+                if (selectedSku == 'All' || selectedSku == null || selectedSku == '') {
+                  provider.fetchAllInventory(
+                    productName: productName ?? 'All',
+                    productCategory: selectedCategory ?? 'All',
+                  );
+                } else {
+                  provider.fetchInventoryBySku(
+                    sku: selectedSku ?? '',
+                    productName: productName ?? 'All',
+                    productCategory: selectedCategory ?? 'All',
+                  );
+                }
+                fetchCategories();
+              });
+            },
+          ),
+        ),
+      ],
+    ),
+  ),
+),
 
               const SizedBox(height: 20),
               if (provider.isLoading)
